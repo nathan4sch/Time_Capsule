@@ -12,7 +12,7 @@ Our project is a time capsule mobile application. An app that users can download
 - A full snapshot implemented through integration with Spotify to add personalized music.
 - An editing feature that allows users to modify their snapshots if they have a different vision of their month.
 - A personalized profile where users can connect with other friends to share and view other’s snapshots.
-- A link to other social media sites such as Instagram to get your favorite post-worthy pictures in monthly memory.
+- A link to other social media sites such as Instagram to get your favorite post-worthy pictures in your monthly memory.
 - A streamlined automatic design process to present the snapshot as a modern, stylized piece ready to be shared.
 - A process to select default photos and music in the case of limited personalization options.
 
