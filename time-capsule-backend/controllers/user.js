@@ -63,7 +63,7 @@ exports.getUser = async (req, res) => {
     }
 };
 
-//delete a user by unique id (id in mongo object)
+/*delete a user by unique id (id in mongo object)*/
 exports.deleteUser = async (req, res) => {
     const {id} = req.params
     UserSchema.findByIdAndDelete(id)
@@ -74,3 +74,47 @@ exports.deleteUser = async (req, res) => {
             res.status(500).json({ message: 'Server Error' })
         })
 }
+
+/*add the current user's username to the friend requests list of the specified user*/
+exports.addFriendRequest = async (req, res) => {
+    const { username } = req.params;
+    const { friendUsername } = req.body;
+
+    try {
+        // Validate if both usernames are provided
+        if (!username || !friendUsername) {
+            return res.status(400).json({ message: 'Current username and friend username required' });
+        }
+
+        // Find the user who is making the friend request
+        const user = await UserSchema.findOne({ username });
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if the friend username exists in the system
+        const friendUser = await UserSchema.findOne({ username: friendUsername });
+
+        if (!friendUser) {
+            return res.status(404).json({ message: 'Friend not found' });
+        }
+
+        // Check if the friend request already exists
+        if (friendUser.friendRequests.includes(username)) {
+            return res.status(400).json({ message: 'Friend request already sent' });
+        }
+
+        // Add the friend request to the user's friendRequests array
+        friendUser.friendRequests.push(username);
+
+        // Save the updated friendUser document
+        await friendUser.save();
+
+        res.status(200).json({ message: 'Friend request added successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

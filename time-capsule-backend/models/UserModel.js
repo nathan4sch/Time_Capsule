@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema({
     }],
     moments: [Moment.schema], //Import schema from 'MomentModel.js'
     capsules: [Capsule.schema], //Import schema from 'CapsuleModel.js'
-    friendsRequests: [{
+    friendRequests: [{
         type: String //List of usernames
     }],
     notifications: [Notification.schema], //Import schema from 'NotificationModel.js'
