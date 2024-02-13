@@ -1,5 +1,6 @@
 const UserSchema = require("../models/userModel")
 
+//USERS
 exports.addUser = async (req, res) => {
     const { username } = req.body
 
@@ -75,8 +76,9 @@ exports.deleteUser = async (req, res) => {
         })
 }
 
+//FRIEND REQUESTS
 /*add the current user's username to the friend requests list of the specified user*/
-exports.addFriendRequest = async (req, res) => {
+exports.sendFriendRequest = async (req, res) => {
     const { username } = req.params;
     const { friendUsername } = req.body;
 
@@ -113,6 +115,36 @@ exports.addFriendRequest = async (req, res) => {
         await friendUser.save();
 
         res.status(200).json({ message: 'Friend request added successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+/*remove the given 'requestUsername' from the user's friend requests */
+exports.removeFriendRequest = async (req, res) => {
+    const { username } = req.params;
+    const { requestUsername } = req.body;
+
+    try {
+        if (!username || !requestUsername) {
+            return res.status(400).json({ message: 'Current username and friend username required' });
+        }
+
+        // Find the user who is making the friend request
+        const user = await UserSchema.findOne({ username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        if (!user.friendRequests.includes(requestUsername)) {
+            return res.status(400).json({ message: 'Friend request not found' });
+        }
+
+        // Remove the friend request from the user's friendRequests array
+        indexToRemove = user.friendRequests.indexOf(requestUsername)
+        user.friendRequests.splice(indexToRemove, 1)
+        await user.save();
+        res.status(200).json({ message: 'Friend request removed successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
