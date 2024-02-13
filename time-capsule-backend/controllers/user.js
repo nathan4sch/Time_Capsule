@@ -150,3 +150,36 @@ exports.removeFriendRequest = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+/* add friendUsername objectid to the user's list of friends
+Mongoose will automatically replace the stored objectids with the actual documents from 
+the user collection because of the red: 'User' */
+exports.addFriend = async (req, res) => {
+    const { username } = req.params;
+    const { friendUsername } = req.body;
+
+    try {
+        if (!username || !friendUsername) {
+            return res.status(400).json({ message: 'Current username and friend username required' });
+        }
+
+        const user = await UserSchema.findOne({ username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const friendUser = await UserSchema.findOne({ username: friendUsername });
+        if (!friendUser) {
+            return res.status(404).json({ message: 'Friend not found' });
+        }
+
+        // Add the friend to the user's friends array
+        user.friends.push(friendUser._id);
+
+        await user.save();
+        res.status(200).json({ message: 'Friend added successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
