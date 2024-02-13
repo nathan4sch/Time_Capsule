@@ -13,6 +13,16 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [username, setUsername] = useState('');
+
+  const addUser = () => {
+    // Implement your addUser logic here
+    console.log(`Adding user: ${username}`);
+    
+    // Clear the text input after adding the user
+    setUsername('');
+  };
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
