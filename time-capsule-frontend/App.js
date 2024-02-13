@@ -1,36 +1,37 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { GlobalProvider, useGlobalContext } from './context/globalContext';
 
 export default function App() {
+  const { addUser } = useGlobalContext(); // Access addUser from the global context
   const [username, setUsername] = useState('');
 
-  const addUser = () => {
-    // Implement your addUser logic here
-    console.log(`Adding user: ${username}`);
-    
-    // Clear the text input after adding the user
-    setUsername('');
+  const handleAddUser = () => {
+    addUser({ username }); // Call addUser with the input value
+    setUsername(''); // Clear the text input after adding the user
   };
 
   return (
     <View style={styles.container}>
-      
-      {/* Text Input for Username */}
-      <TextInput
-        style={styles.input}
-        placeholder="Enter username"
-        value={username}
-        onChangeText={(text) => setUsername(text)}
-      />
+      <GlobalProvider>
 
-      {/* Button to Add User */}
-      <Button
-        title="Add User"
-        onPress={addUser}
-      />
+        {/* Text Input for Username */}
+        <TextInput
+          style={styles.input}
+          placeholder="Enter username"
+          value={username}
+          onChangeText={(text) => setUsername(text)}
+        />
 
-      <StatusBar style="auto" />
+        {/* Button to Add User */}
+        <Button
+          title="Add User"
+          onPress={handleAddUser}
+        />
+
+        <StatusBar style="auto" />
+      </GlobalProvider>
     </View>
   );
 }
