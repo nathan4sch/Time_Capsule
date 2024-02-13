@@ -1,4 +1,13 @@
-const { addUser, getUser, deleteUser, getAllUsers, sendFriendRequest, removeFriendRequest, addFriend } = require('../controllers/user')
+const { 
+    addUser, 
+    getUser, 
+    deleteUser, 
+    getAllUsers, 
+    sendFriendRequest,
+    removeFriendRequest, 
+    addFriend,
+    removeFriend 
+} = require('../controllers/user')
 
 const router = require('express').Router()
 
@@ -8,6 +17,7 @@ router.post('/add-user', addUser)
     .delete('/delete-user/:id', deleteUser)
     .post('/send-friend-request/:username', sendFriendRequest)
     .delete('/remove-friend-request/:username', removeFriendRequest)
-    .post('/add-friend/:username', addFriend);
+    .post('/add-friend/:username', addFriend)
+    .delete('/remove-friend/:username', removeFriend)
 
 module.exports = router

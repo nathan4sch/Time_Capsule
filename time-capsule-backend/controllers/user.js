@@ -183,3 +183,36 @@ exports.addFriend = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+/* remove the friendID from the user's friends list */
+exports.removeFriend = async (req, res) => {
+    const { username } = req.params;
+    const { friendId } = req.body;
+
+    try {
+        if (!username || !friendId) {
+            return res.status(400).json({ message: 'Current username and friend ID required' });
+        }
+
+        const user = await UserSchema.findOne({ username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const indexToRemove = user.friends.indexOf(friendId);
+        if (indexToRemove === -1) {
+            return res.status(400).json({ message: 'Friend not found in user\'s friends list' });
+        }
+
+        // Remove the friend from the user's friends array
+        user.friends.splice(indexToRemove, 1);
+
+        // Save the updated user document
+        await user.save();
+
+        res.status(200).json({ message: 'Friend removed successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
