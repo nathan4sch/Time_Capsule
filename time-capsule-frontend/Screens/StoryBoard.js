@@ -1,16 +1,18 @@
 import React from "react";
-import { StyleSheet, View, Text, Button, BackHandler, Pressable } from "react-native";
-import { Image } from "react-native";
-import GoogleLogo from './icons/google-.png';
+import { StyleSheet, View, Text, Button, BackHandler, Pressable, TouchableOpacity } from "react-native";
+import Background from "../Components/Background";
 
-export default () => {
+const StoryBoard = ({ navigation }) => {
     return (
-        <Pressable style={styles.container} onPress={() => console.log("hello")} title=''>
-            <Text style={styles.text}>Sign in with Google</Text>
-            <Image source={require('./icons/google-.png')} />
-        </Pressable>
+        <Background>
+            <TouchableOpacity style={styles.container} onPress={() => navigation.navigate('TempMain')} title=''>
+                <Text style={styles.text}>Back</Text>
+            </TouchableOpacity>
+        </Background>
     );  
 }
+
+export default StoryBoard;
 
 const styles = StyleSheet.create({  
     container: {
@@ -33,15 +35,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#000000',
     },
-    google: {
-        backgroundImage: `url(${GoogleLogo})`,
-      },
+
 });
-
-
-
-
-
-
-
-
