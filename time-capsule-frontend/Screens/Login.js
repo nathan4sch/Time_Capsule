@@ -1,15 +1,15 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import GoogleLogo from '../icons/google-.png';
-import Background from "../Components/Background";
+import GreenBackground from "../Components/GreenBackground";
 
 const Login = ({ navigation }) => {
     return (
-        <Background>
+        <GreenBackground>
             <TouchableOpacity style={styles.container} onPress={() => navigation.navigate('Registration')} title=''>
                 <Text style={styles.text}>Sign in with Google</Text>
             </TouchableOpacity>
-        </Background>
+        </GreenBackground>
     );  
 }
 

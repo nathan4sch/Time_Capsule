@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, View, Text, Button, BackHandler, Pressable, TouchableOpacity } from "react-native";
-import Background from "../Components/Background";
+import BlackBackground from "../Components/BlackBackground";
 
 const Main = ({ navigation }) => {
     return (
-        <Background>
+        <BlackBackground>
             <TouchableOpacity style={styles.container} onPress={() => navigation.navigate('TempMain')} title=''>
                 <Text style={styles.text}>Back</Text>
             </TouchableOpacity>
-        </Background>
+        </BlackBackground>
     );  
 }
 

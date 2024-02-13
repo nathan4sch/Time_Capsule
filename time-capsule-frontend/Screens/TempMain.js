@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, View, Text, Button, BackHandler, Pressable, TouchableOpacity } from "react-native";
-import Background from "../Components/Background";
+import GreenBackground from "../Components/GreenBackground";
 
 const Registration = ({ navigation }) => {
     return (
-        <Background>
+        <GreenBackground>
             <View style={styles.container}>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')} title=''>
                     <Text style={styles.text}>To Login Page</Text>
@@ -25,7 +25,7 @@ const Registration = ({ navigation }) => {
                     <Text style={styles.text}>To History Page</Text>
                 </TouchableOpacity>
             </View>
-        </Background>
+        </GreenBackground>
     );  
 }
 
