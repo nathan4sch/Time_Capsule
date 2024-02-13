@@ -8,22 +8,23 @@ const BASE_URL = "http://localhost:5000/api/v1/";
 const GlobalContext = React.createContext()
 
 export const GlobalProvider = ({ children }) => {
-
-
-    // State variables to hold incomes, expenses, and investments
     const [users, setUsers] = useState([])
     const [error, setError] = useState(null)
 
-
-    // Income Functions
-    //Function to add income data
+        // User Functions
+    //Function to add user data
     const addUser = async (user) => {
         const response = await axios.post(`${BASE_URL}add-user`, user)
             .catch((err) => {
                 setError(err.response.data.message)
             })
-        //getUsers()
+        getAllUsers()
+    }
 
+    //Retrieve all users and update users state
+    const getAllUsers = async () => {
+        const response = await axios.get(`${BASE_URL}get-all-users`)
+        setUsers(response.data)
     }
 
 
@@ -34,7 +35,8 @@ export const GlobalProvider = ({ children }) => {
             users,
             setUsers,
             error,
-            setError
+            setError,
+            getAllUsers
         }}>
             {children}
         </GlobalContext.Provider>
