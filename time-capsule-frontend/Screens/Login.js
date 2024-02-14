@@ -4,7 +4,6 @@ import GoogleLogo from '../icons/google-.png';
 import GreenBackground from "../Components/GreenBackground";
 import * as Google from "expo-auth-session/providers/google";
 import base64 from 'react-native-base64';
-import AsyncStorage from "@react-native-async-storage/async-storage";   
 
 
 const Login = ({ navigation }) => {
@@ -36,7 +35,8 @@ const Login = ({ navigation }) => {
           const payload = JSON.parse(decodedPayload.replace(/[\u0000-\u001F\u007F-\u009F]/g, ''));
 
           const userEmail = payload.email;
-          //Check if email is new or not
+          // TODO: link with database
+          // TODO: Check if email is new or not
           const newEmail = false;
           if (newEmail) {
             navigation.navigate('Registration');
