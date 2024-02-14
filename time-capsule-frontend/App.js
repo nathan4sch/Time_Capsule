@@ -1,54 +1,51 @@
-import React, { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import { GlobalProvider, useGlobalContext } from './context/globalContext';
+import { StyleSheet, Switch, Text, View } from 'react-native';
+import Login from "./Screens/Login"
+import {NavigationContainer} from '@react-navigation/native';
+import TempMain from './Screens/TempMain';
+import Registration from './Screens/Registration';
+import Friends from './Screens/Friends';
+import Profile from './Screens/Profile';
+import Main from './Screens/Main';
+import StoryBoard from './Screens/StoryBoard';
+import History from './Screens/History';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const { addUser } = useGlobalContext(); // Access addUser from the global context
   const [username, setUsername] = useState('');
 
-  const handleAddUser = () => {
-    addUser({ username }); // Call addUser with the input value
-    setUsername(''); // Clear the text input after adding the user
+  const addUser = () => {
+    // Implement your addUser logic here
+    console.log(`Adding user: ${username}`);
+    
+    // Clear the text input after adding the user
+    setUsername('');
   };
 
   return (
-    <View style={styles.container}>
-      <GlobalProvider>
-
-        {/* Text Input for Username */}
-        <TextInput
-          style={styles.input}
-          placeholder="Enter username"
-          value={username}
-          onChangeText={(text) => setUsername(text)}
-        />
-
-        {/* Button to Add User */}
-        <Button
-          title="Add User"
-          onPress={handleAddUser}
-        />
-
-        <StatusBar style="auto" />
-      </GlobalProvider>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="TempMain" component={TempMain} options={{ headerLeft: null }}/>
+        <Stack.Screen name="Login" component={Login} options={{ headerLeft: null, gestureEnabled: false }}/>
+        <Stack.Screen name="Registration" component={Registration} options={{ headerLeft: null, gestureEnabled: false }}/>
+        <Stack.Screen name="Friends" component={Friends} options={{ headerLeft: null, gestureEnabled: false }}/>
+        <Stack.Screen name="Profile" component={Profile} options={{ headerLeft: null, gestureEnabled: false }}/>
+        <Stack.Screen name="Main" component={Main} options={{ headerLeft: null, gestureEnabled: false }}/>
+        <Stack.Screen name="StoryBoard" component={StoryBoard} options={{ headerLeft: null, gestureEnabled: false }}/>
+        <Stack.Screen name="History" component={History} options={{ headerLeft: null, gestureEnabled: false }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
+
+
+const styles = StyleSheet.create({  
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    width: 200,
   },
 });
