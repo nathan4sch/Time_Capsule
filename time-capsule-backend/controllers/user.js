@@ -52,6 +52,7 @@ exports.getUser = async (req, res) => {
         const allUsers = await UserSchema.find()
         // Find the user with the specified username
         const user = allUsers.find(u => u.username === username);
+        //const user = await UserSchema.findOne({ username });
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -76,7 +77,7 @@ exports.deleteUser = async (req, res) => {
         })
 }
 
-//FRIEND REQUESTS
+//FRIENDs
 /*add the current user's username to the friend requests list of the specified user*/
 exports.sendFriendRequest = async (req, res) => {
     const { username } = req.params;
@@ -216,3 +217,4 @@ exports.removeFriend = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+

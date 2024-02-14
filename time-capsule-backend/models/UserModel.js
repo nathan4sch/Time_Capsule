@@ -15,7 +15,11 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User' //establish reference from user collection
     }],
-    moments: [Moment.schema], //Import schema from 'MomentModel.js'
+    //moments: [Moment.schema], //Import schema from 'MomentModel.js'
+    moments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Moment'
+    }],
     capsules: [Capsule.schema], //Import schema from 'CapsuleModel.js'
     friendRequests: [{
         type: String //List of usernames
