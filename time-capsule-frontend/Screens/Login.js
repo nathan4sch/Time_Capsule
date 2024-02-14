@@ -4,18 +4,7 @@ import GoogleLogo from '../icons/google-.png';
 import GreenBackground from "../Components/GreenBackground";
 import * as Google from "expo-auth-session/providers/google";
 import base64 from 'react-native-base64';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-//const [userInfo, setUserInfo] = useState(null);
-
-//client IDs from .env
-// const config = {
-//   androidClientId: Config.ANDROID_CLIENT_ID,
-//   iosClientId: Config.IOS_CLIENT_ID,
-//   webClientId: Config.WEB_CLIENT_ID,
-// };
-
-//const [request, response, promptAsync] = Google.useAuthRequest(config);
-
+import AsyncStorage from "@react-native-async-storage/async-storage";   
 
 
 const Login = ({ navigation }) => {
@@ -47,8 +36,14 @@ const Login = ({ navigation }) => {
           const payload = JSON.parse(decodedPayload.replace(/[\u0000-\u001F\u007F-\u009F]/g, ''));
 
           const userEmail = payload.email;
-          console.log('reponse', userEmail);
-          navigation.navigate('Registration');
+          //Check if email is new or not
+          const newEmail = false;
+          if (newEmail) {
+            navigation.navigate('Registration');
+          }
+          else {
+            navigation.navigate('Main')
+          }
 
         }
       }, [response]);
