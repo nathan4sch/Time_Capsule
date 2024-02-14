@@ -23,23 +23,32 @@ const Login = ({ navigation }) => {
     const IOS_CLIENT_ID='457222296603-d9o7m2le03mov1r3h3o4ettlodekdkp9.apps.googleusercontent.com'
     const WEB_CLIENT_ID='457222296603-r8cej7d4qa3420a2du8gv59p9qkavc54.apps.googleusercontent.com'
 
-    const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: ANDROID_CLIENT_ID,
         iosClientId: IOS_CLIENT_ID,
         webClientId: WEB_CLIENT_ID,
+        issuer: 'https://accounts.google.com',
+        redirectUri: 'com.anonymous.timecapsule:/oauth2callback',
         // NOTE: For iOS, specify the scopes required
         scopes: ['email'],
       });
-    
+
       React.useEffect(() => {
-        // Handle authentication response
         if (response?.type === 'success') {
-          const { id_token } = response.params;
-          // Store the ID token in AsyncStorage or wherever you want
-          AsyncStorage.setItem('google_id_token', id_token);    
+          const { authentication } = response;
         }
       }, [response]);
-      console.log(response)
+    
+      console.log('reponse', response)
+    //   React.useEffect(() => {
+    //     // Handle authentication response
+    //     if (response?.type === 'success') {
+    //       const { id_token } = response.params;
+    //       // Store the ID token in AsyncStorage or wherever you want
+    //       AsyncStorage.setItem('google_id_token', id_token);    
+    //     }
+    //   }, [response]);
+    //   console.log(response)
 	return (
         <GreenBackground>
             <TouchableOpacity style={styles.container1} onPress={() => navigation.navigate('Registration')} title=''>
