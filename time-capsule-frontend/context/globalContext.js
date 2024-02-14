@@ -2,7 +2,10 @@ import React, { useContext, useState } from "react"
 import axios from 'axios'
 
 // Defines the base URL for API calls
-const BASE_URL = "http://localhost:5000/api/v1/";
+
+//CHANGE TO YOUR OWN IP ADDRESS
+const BASE_URL = "http://100.67.14.58:5000/api/v1/";
+//
 
 // Create a context to share state and functions with components
 const GlobalContext = React.createContext()

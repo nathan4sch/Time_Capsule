@@ -2,10 +2,11 @@ const UserSchema = require("../models/userModel")
 
 //USERS
 exports.addUser = async (req, res) => {
-    const { username } = req.body
+    const { username, email } = req.body
 
     const user = UserSchema({
         username,
+        email,
         friends: [],  // Initialize with an empty array
         moments: [],  // Initialize with an empty array
         capsules: [], // Initialize with an empty array
