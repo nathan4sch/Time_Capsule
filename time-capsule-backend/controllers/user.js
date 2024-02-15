@@ -49,17 +49,49 @@ exports.getUser = async (req, res) => {
             return res.status(400).json({ message: 'Username is required' });
         }
 
-        // Get all users
-        const allUsers = await UserSchema.find()
-        // Find the user with the specified username
-        const user = allUsers.find(u => u.username === username);
-        //const user = await UserSchema.findOne({ username });
+        const user = await UserSchema.findOne({ username });
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.getUserbyID = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        if (!id) {
+            return res.status(400).json({ message: 'id is required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+
+        if (!user) {
+            return res.status(404).json({ message: 'id not found' });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.emailExist = async (req, res) => {
+    const { email } = req.params;
+    try {
+        const user = await UserSchema.findOne({ email });
+        if (!user) {
+            return res.status(200).json({ exists: false, user: ''  });
+        }
+
+        res.status(200).json({ exists: true, user: user });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
@@ -92,20 +124,16 @@ exports.sendFriendRequest = async (req, res) => {
 
         // Find the user who is making the friend request
         const user = await UserSchema.findOne({ username });
-
-        // Check if the user exists
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         // Check if the friend username exists in the system
         const friendUser = await UserSchema.findOne({ username: friendUsername });
-
         if (!friendUser) {
             return res.status(404).json({ message: 'Friend not found' });
         }
 
-        // Check if the friend request already exists
         if (friendUser.friendRequests.includes(username)) {
             return res.status(400).json({ message: 'Friend request already sent' });
         }

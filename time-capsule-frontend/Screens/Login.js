@@ -1,15 +1,17 @@
-import React, { useState } from "react";
-import { Platform, StyleSheet, TouchableOpacity, Text,Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Platform, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
 import GoogleLogo from '../icons/google-.png';
 import GreenBackground from "../Components/GreenBackground";
 import * as Google from "expo-auth-session/providers/google";
 import base64 from 'react-native-base64';
+import { useGlobalContext } from "../context/globalContext";
 
 const Login = ({ navigation }) => {
+    const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
 
-    const ANDROID_CLIENT_ID='457222296603-f24r4dn3je9vsctojduvh8a55f01dcf5.apps.googleusercontent.com'
-    const IOS_CLIENT_ID='457222296603-d9o7m2le03mov1r3h3o4ettlodekdkp9.apps.googleusercontent.com'
-    const WEB_CLIENT_ID='457222296603-r8cej7d4qa3420a2du8gv59p9qkavc54.apps.googleusercontent.com'
+    const ANDROID_CLIENT_ID = '457222296603-f24r4dn3je9vsctojduvh8a55f01dcf5.apps.googleusercontent.com'
+    const IOS_CLIENT_ID = '457222296603-d9o7m2le03mov1r3h3o4ettlodekdkp9.apps.googleusercontent.com'
+    const WEB_CLIENT_ID = '457222296603-r8cej7d4qa3420a2du8gv59p9qkavc54.apps.googleusercontent.com'
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: ANDROID_CLIENT_ID,
@@ -19,34 +21,41 @@ const Login = ({ navigation }) => {
         redirectUri: 'com.anonymous.timecapsule:/oauth2callback',
         // NOTE: For iOS, specify the scopes required
         scopes: ['email'],
-      });
+    });
 
-      React.useEffect(() => {
-        if (response?.type === 'success') {
-          const { authentication } = response;
-          const idToken = response.authentication.idToken;
+    React.useEffect(() => {
+        const handleResponse = async () => {
+            if (response?.type === 'success') {
+                const { authentication } = response;
+                const idToken = response.authentication.idToken;
 
-          const tokenParts = idToken.split('.');
-          const encodedPayload = tokenParts[1];
+                const tokenParts = idToken.split('.');
+                const encodedPayload = tokenParts[1];
 
-          const decodedPayload = base64.decode(encodedPayload);
+                const decodedPayload = base64.decode(encodedPayload);
 
-          const payload = JSON.parse(decodedPayload.replace(/[\u0000-\u001F\u007F-\u009F]/g, ''));
+                const payload = JSON.parse(decodedPayload.replace(/[\u0000-\u001F\u007F-\u009F]/g, ''));
+                const userEmail = payload.email; //contains email that is received, compare to mongo
 
-          const userEmail = payload.email; //contains email that is received, compare to mongo
-          //Check if email is new or not
-          const newEmail = false;
-          if (newEmail) {
-            navigation.navigate('Registration');
-          }
-          else {
-            navigation.navigate('Main')
-          }
+                // Check if email is new or not
+                const existResponse = await emailExist(userEmail);
+                const newEmail = !existResponse.exists;
 
-        }
-      }, [response]);
-    
-	return (
+                if (newEmail) {
+                    setUserEmail(userEmail)
+                    navigation.navigate('Registration');
+                } else {
+                    setCurUser(existResponse.user)
+                    //navigation.navigate('Main');
+                    navigation.navigate('TempMain');
+                }
+            }
+        };
+
+        handleResponse();
+    }, [response]);
+
+    return (
         <GreenBackground>
             <Image style={styles.capsule} source={require('../icons/capsule-.png')} />
             <TouchableOpacity style={styles.container} onPress={() => promptAsync()} title=''>
@@ -54,18 +63,18 @@ const Login = ({ navigation }) => {
                 <Image style={styles.google} source={require('../icons/google-.png')} />
             </TouchableOpacity>
         </GreenBackground>
-	);
+    );
 }
 
 export default Login;
 
-const styles = StyleSheet.create({  
+const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         width: 296,
         height: 50,
         left: 47,
-        top: 695, 
+        top: 695,
         backgroundColor: 'rgba(255, 255, 255, 0.48)',
         borderRadius: 10,
     },
@@ -74,7 +83,7 @@ const styles = StyleSheet.create({
         width: 296,
         height: 50,
         left: 47,
-        top: 495, 
+        top: 495,
         backgroundColor: 'rgba(255, 255, 255, 0.48)',
         borderRadius: 10,
     },
@@ -95,7 +104,7 @@ const styles = StyleSheet.create({
         height: 36,
         left: '3%',
         top: '13%',
-      },
+    },
     capsule: {
         position: 'absolute',
         width: 425,
@@ -104,14 +113,14 @@ const styles = StyleSheet.create({
         top: 56,
         ...Platform.select({
             ios: {
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.5,
-              shadowRadius: 4,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.5,
+                shadowRadius: 4,
             },
             android: {
-              elevation: 4,
+                elevation: 4,
             },
-          }),
+        }),
     }
 });
