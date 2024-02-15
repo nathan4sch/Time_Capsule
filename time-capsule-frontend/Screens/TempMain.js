@@ -6,7 +6,7 @@ const Registration = ({ navigation }) => {
     return (
         <GreenBackground>
             <View style={styles.container}>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Registration')} title=''>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')} title=''>
                     <Text style={styles.text}>To Login Page</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Profile')} title=''>
