@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image, View, Alert } from "react-native";
+import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image, Keyboard, Alert } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
 
@@ -33,20 +33,26 @@ const Registration = ({ navigation }) => {
     };
 
     return (
-        <GreenBackground>
-            <Image style={styles.image} source={require('../icons/profile-.png')} />
-            <TouchableOpacity style={styles.press} onPress={() => console.log('Set Profile')}>
-                <Text  style={styles.text2}>Set Profile Picture</Text>
-            </TouchableOpacity>
-            <Text style={styles.text1}>Create Username</Text>
-            <TouchableOpacity style={[styles.container1, error && styles.errorBorder]} title=''>
-                <TextInput style={ (error) ? styles.entry1 : styles.entry} placeholder="Enter username" onChangeText={setUsername} value={username} />
-            </TouchableOpacity>
-            <Text style={styles.text3}>{errorMsg}</Text>
-            <TouchableOpacity style={styles.container2} onPress={() => handleSubmission()} title=''>
-                <Text style={styles.text}>Continue to link Social Media</Text>
-            </TouchableOpacity>
-        </GreenBackground>
+        <TouchableOpacity
+            style={{ flex: 1 }} // Ensure the TouchableOpacity takes up the entire screen
+            activeOpacity={1} // Ensure the TouchableOpacity is touchable
+            onPress={() => Keyboard.dismiss()} // Dismiss the keyboard on press
+        >
+            <GreenBackground>
+                <Image style={styles.image} source={require('../icons/profile-.png')} />
+                <TouchableOpacity style={styles.press} onPress={() => console.log('Set Profile')}>
+                    <Text  style={styles.text2}>Set Profile Picture</Text>
+                </TouchableOpacity>
+                <Text style={styles.text1}>Create Username</Text>
+                <TouchableOpacity style={[styles.container1, error && styles.errorBorder]} title=''>
+                    <TextInput style={ (error) ? styles.entry1 : styles.entry} placeholder="Enter username" onChangeText={setUsername} value={username} />
+                </TouchableOpacity>
+                <Text style={styles.text3}>{errorMsg}</Text>
+                <TouchableOpacity style={styles.container2} onPress={() => handleSubmission()} title=''>
+                    <Text style={styles.text}>Continue to link Social Media</Text>
+                </TouchableOpacity>
+            </GreenBackground>
+        </TouchableOpacity>
     );
 };
 
