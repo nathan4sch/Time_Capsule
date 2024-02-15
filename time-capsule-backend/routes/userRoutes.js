@@ -6,7 +6,9 @@ const {
     sendFriendRequest,
     removeFriendRequest, 
     addFriend,
-    removeFriend 
+    removeFriend, 
+    emailExist,
+    getUserbyID
 } = require('../controllers/user')
 
 const {
@@ -20,6 +22,8 @@ router
     .post('/add-user', addUser)
     .get('/get-all-users', getAllUsers)
     .get('/get-user/:username', getUser)
+    .get('/get-user-byID/:id', getUserbyID)
+    .get('/email-exist/:email', emailExist)
     .delete('/delete-user/:id', deleteUser)
     .post('/send-friend-request/:username', sendFriendRequest)
     .delete('/remove-friend-request/:username', removeFriendRequest)

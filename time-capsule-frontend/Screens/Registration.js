@@ -1,34 +1,36 @@
 import React, { useState } from "react";
-import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image, View, Alert } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
+import { useGlobalContext } from "../context/globalContext";
 
 const Registration = ({ navigation }) => {
-    const [text, setText] = useState('');
+    const { userEmail, getUser, addUser, setCurUser } = useGlobalContext();
+    const [username, setUsername] = useState('');
     const [error, setError] = useState(false); 
     const [errorMsg, setErrorMsg] = useState('');
+  
+    const handleSubmission = async () => {
+        // Perform actions with the username, such as storing it
+        const curUsername = username
+        setUsername('');
 
-    const saveUsername = () => {
-        let valid = true;
-        if (text.length == 0) {
-            valid = false;
-            setErrorMsg('You must enter a username');
+        //check if username already exists, if so push error and try again
+        if (curUsername.length == 0) {
+            Alert.alert("Error", "You must type in a username");
+        } else {
+           const usernameExist = await getUser(curUsername)
+           if (usernameExist !== null) {
+               Alert.alert("Error", "Username already exists. Please choose another username.");
+          } else {
+              //create the user, for now go back to navigation screen
+              await addUser(curUsername, userEmail)
+              Alert.alert("Success", "Account Created");
+              const findUser = await getUser(curUsername)
+              setCurUser(findUser)
+              navigation.navigate('TempMain');
+          }
         }
-        else if (false) { //TODO check to see username exists and store in database
-            setErrorMsg('This username has been taken');
-            valid = false;
-        }
-
-        if (valid) {
-            //TODO store username
-            navigation.navigate('TempMain');
-            console.log('username', text);
-        }
-        else {
-            console.log(errorMsg)
-            setError(true)
-        }
-        
-    }
+    };
 
     return (
         <GreenBackground>
@@ -38,17 +40,15 @@ const Registration = ({ navigation }) => {
             </TouchableOpacity>
             <Text style={styles.text1}>Create Username</Text>
             <TouchableOpacity style={[styles.container1, error && styles.errorBorder]} title=''>
-                <TextInput style={ (error) ? styles.entry1 : styles.entry} placeholder="Enter username" onChangeText={setText} value={text} />
+                <TextInput style={ (error) ? styles.entry1 : styles.entry} placeholder="Enter username" onChangeText={setUsername} value={username} />
             </TouchableOpacity>
             <Text style={styles.text3}>{errorMsg}</Text>
-            <TouchableOpacity style={styles.container2} onPress={() => saveUsername()} title=''>
+            <TouchableOpacity style={styles.container2} onPress={() => handleSubmission()} title=''>
                 <Text style={styles.text}>Continue to link Social Media</Text>
             </TouchableOpacity>
         </GreenBackground>
-    );  
-}
-
-export default Registration;
+    );
+};
 
 const styles = StyleSheet.create({  
     container1: {
@@ -192,5 +192,4 @@ const styles = StyleSheet.create({
         textAlignVertical: 'center',
     },
 });
-
-
+export default Registration;

@@ -11,6 +11,9 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         maxLength: 20
     },
+    email: {
+        type: String,
+    },
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User' //establish reference from user collection
