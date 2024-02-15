@@ -37,7 +37,7 @@ const Login = ({ navigation }) => {
           const userEmail = payload.email;
           // TODO: link with database
           // TODO: Check if email is new or not
-          const newEmail = false;
+          const newEmail = true;
           if (newEmail) {
             navigation.navigate('Registration');
           }
