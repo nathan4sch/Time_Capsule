@@ -1,4 +1,87 @@
 import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import BlackBackground from "../Components/BlackBackground";
+import { useGlobalContext } from "../context/globalContext";
+import { commonStyles } from "../Components/CommonStyles";
+
+const Friends = ({ navigation }) => {
+    const { curUser, getUserbyID } = useGlobalContext();
+    const friendsID = curUser.friends;
+    const friendRequests = curUser.friendRequests;
+    const [friendObj, setFriendObj] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const promises = friendsID.map(async (id) => {
+                return await getUserbyID(id);
+            });
+
+            const friendData = await Promise.all(promises);
+            setFriendObj(friendData);
+        };
+
+        fetchData();
+    }, []);
+
+    const renderFriendRequestsItem = ({ item }) => (
+        <View style={commonStyles.listItemContainer}>
+            <Text style={commonStyles.usernameText}>{item}</Text>
+            <TouchableOpacity style={commonStyles.rejectButton} onPress={() => navigation.navigate('TempMain')}>
+            <Text style={commonStyles.buttonText}>Reject</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={commonStyles.acceptButton} onPress={() => navigation.navigate('TempMain')}>
+            <Text style={commonStyles.buttonText}>Accept</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
+    const renderUsernamesItem = ({ item }) => (
+        <View style={commonStyles.listItemContainer}>
+            <Text style={commonStyles.usernameText}>{item.username}</Text>
+            <TouchableOpacity style={commonStyles.removeButton} onPress={() => navigation.navigate('TempMain')}>
+            <Text style={commonStyles.buttonText}>Remove</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
+    return (
+        <BlackBackground>
+            <TouchableOpacity style={commonStyles.backButtonTop} onPress={() => navigation.navigate('TempMain')}>
+        {/*Fix Arrow */}
+                <View style={commonStyles.arrowContainer}>
+                <View style={commonStyles.arrowLine} />
+                <View style={[commonStyles.arrowLine, { transform: [{ rotate: '180deg' }] }]} />
+                </View>
+            </TouchableOpacity>
+
+            <View style={commonStyles.listContainer }>
+            <View style={commonStyles.line} />
+            <Text style={commonStyles.title}>Friend Requests</Text>
+            <FlatList
+                data={friendRequests}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderFriendRequestsItem}
+                ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+            />
+
+
+
+            <Text style={commonStyles.title}>Friends</Text>
+            <FlatList
+                data={friendObj}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderUsernamesItem}
+                ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+            />
+
+            </View>
+        </BlackBackground>
+    );
+};
+
+export default Friends;
+/*
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, FlatList } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
@@ -39,18 +122,19 @@ const Friends = ({ navigation }) => {
 
     return (
         <BlackBackground>
+            <View style={styles.line}></View>
             <View style={styles.container}>
-                {/* Friend Requests List */}
-                <Text style={styles.title}>Friend Requests</Text>
+*/                {/* Friend Requests List */}
+/*                <Text style={styles.title}>Friend Requests</Text>
                 <FlatList
                     data={friendRequests}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={renderFriendRequestsItem}
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
                 />
-
+*/
                 {/* Usernames from Objects List */}
-                <Text style={styles.title}>Usernames from Objects</Text>
+                /*<Text style={styles.title}>Usernames from Objects</Text>
                 <FlatList
                     data={friendObj}
                     keyExtractor={(item, index) => index.toString()}
@@ -58,15 +142,15 @@ const Friends = ({ navigation }) => {
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
                 />
             </View>
-
+*/
             {/* Back Button */}
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('TempMain')}>
+            /*<TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('TempMain')}>
                 <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
         </BlackBackground>
     );
-};
-
+};*/
+/*
 export default Friends;
 
 const styles = StyleSheet.create({
@@ -89,6 +173,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 8,
         marginBottom: 10,
+    },
+    line: {
+        position: 'fixed',
+        width: 360,
+        height: 0,
+        left: 0,
+        top: 200,
+        borderBottomWidth: 1,
+        borderBottomColor: '#FFFFFF',
     },
 
     usernameText: {
@@ -117,3 +210,4 @@ const styles = StyleSheet.create({
         color: 'white',
     },
 });
+*/

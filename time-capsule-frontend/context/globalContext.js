@@ -4,7 +4,7 @@ import axios from 'axios'
 // Defines the base URL for API calls
 
 //CHANGE TO YOUR OWN IP ADDRESS
-const BASE_URL = "http://100.70.0.251:3000/api/v1/";
+const BASE_URL = "http://100.69.9.87:3000/api/v1/";
 //10.186.124.112
 //100.67.14.58
 
