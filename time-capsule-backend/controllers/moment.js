@@ -1,5 +1,5 @@
 const MomentSchema = require("../models/MomentModel");
-const User = require("../models/userModel");
+const User = require("../models/UserModel");
 
 exports.createMoment = async (req, res) => {
     const { description } = req.body;
