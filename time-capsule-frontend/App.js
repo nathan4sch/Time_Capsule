@@ -8,6 +8,7 @@ import Profile from './Screens/Profile';
 import Main from './Screens/Main';
 import StoryBoard from './Screens/StoryBoard';
 import History from './Screens/History';
+import Spotify from './Screens/Spotify';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useState } from 'react'
 import { GlobalProvider, useGlobalContext } from './context/globalContext';
@@ -25,6 +26,7 @@ export default function App() {
           <Stack.Screen name="TempMain" component={TempMain} options={{ headerLeft: null }} />
           <Stack.Screen name="Login" component={Login} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Registration" component={Registration} options={{ headerLeft: null, gestureEnabled: false }} />
+          <Stack.Screen name="Spotify" component={Spotify} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Friends" component={Friends} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Profile" component={Profile} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Main" component={Main} options={{ headerLeft: null, gestureEnabled: false }} />
