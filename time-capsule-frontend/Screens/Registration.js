@@ -17,7 +17,10 @@ const Registration = ({ navigation }) => {
         //check if username already exists, if so push error and try again
         if (curUsername.length == 0) {
             Alert.alert("Error", "You must type in a username");
-        } else {
+        } else if (curUsername.length > 30) {
+            Alert.alert("Error", "Username can not be more than 30 character");
+        }
+             else {
            const usernameExist = await getUser(curUsername)
            if (usernameExist !== null) {
                Alert.alert("Error", "Username already exists. Please choose another username.");

@@ -6,8 +6,8 @@ const Registration = ({ navigation }) => {
     return (
         <GreenBackground>
             <View style={styles.container}>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Spotify')} title=''>
-                    <Text style={styles.text}>To Spotify Page</Text>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')} title=''>
+                    <Text style={styles.text}>To Login Page</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Profile')} title=''>
                     <Text style={styles.text}>To Profile Page</Text>

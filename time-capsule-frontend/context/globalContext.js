@@ -4,8 +4,9 @@ import axios from 'axios'
 // Defines the base URL for API calls
 
 //CHANGE TO YOUR OWN IP ADDRESS
-const BASE_URL = "http://100.67.14.58:5000/api/v1/";
-//
+const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+//10.186.124.112
+//100.67.14.58
 
 // Create a context to share state and functions with components
 const GlobalContext = React.createContext()

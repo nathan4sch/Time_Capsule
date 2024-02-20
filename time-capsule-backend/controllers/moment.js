@@ -1,9 +1,9 @@
 const MomentSchema = require("../models/MomentModel");
-const User = require("../models/userModel");
+const User = require("../models/UserModel");
 
-exports.createMoment = async (req, res) => {
+exports.addMoment = async (req, res) => {
     const { description } = req.body;
-    const { username } = req.params;
+    const { id } = req.params;
 
     try {
         if (!description) {
@@ -15,7 +15,7 @@ exports.createMoment = async (req, res) => {
         })
         
         await moment.save()
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ _id: id });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -30,3 +30,35 @@ exports.createMoment = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+exports.getMoment = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        if (!id) {
+            return res.status(400).json({ message: 'id is required' });
+        }
+
+        const moment = await MomentSchema.findOne({ _id: id });
+
+        if (!moment) {
+            return res.status(404).json({ message: 'id not found' });
+        }
+
+        res.status(200).json(moment);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.deleteMoment = async (req, res) => {
+    const {id} = req.params
+    MomentSchema.findByIdAndDelete(id)
+        .then((moment) => {
+            res.status(200).json({ message: 'Moment deleted' })
+        })
+        .catch((err)=> {
+            res.status(500).json({ message: 'Server Error' })
+        })
+}
