@@ -25,12 +25,11 @@ const Registration = ({ navigation }) => {
            if (usernameExist !== null) {
                Alert.alert("Error", "Username already exists. Please choose another username.");
           } else {
-              //create the user, for now go back to navigation screen
               await addUser(curUsername, userEmail)
               Alert.alert("Success", "Account Created");
               const findUser = await getUser(curUsername)
               setCurUser(findUser)
-              navigation.navigate('TempMain');
+              navigation.navigate('Spotify');
           }
         }
     };
