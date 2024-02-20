@@ -105,9 +105,9 @@ export const GlobalProvider = ({ children }) => {
 
     
 
-    const setSpotify = async (spotifyKey) => {
-        const response = await axios.post(`${BASE_URL}set-spotify-account/${curUser.id}`, {
-            spotify: spotifyKey
+    const setSpotify = async (spotify) => {
+        const response = await axios.post(`${BASE_URL}set-spotify-account/${curUser._id}`, {
+            spotify: spotify,
         })
             .catch((err) => {
                 setError(err.response.data.message)
@@ -115,7 +115,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const setInstragram = async (instagramKey) => {
-        const response = await axios.post(`${BASE_URL}set-instagram-account/${curUser.id}`, {
+        const response = await axios.post(`${BASE_URL}set-instagram-account/${curUser._id}`, {
             spotify: instagramKey
         })
             .catch((err) => {
@@ -124,7 +124,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const removeFriendRequest = async (requestUsername) => {
-        const response = await axios.delete(`${BASE_URL}remove-friend-request/${curUser.id}`, {
+        const response = await axios.delete(`${BASE_URL}remove-friend-request/${curUser._id}`, {
             requestUsername
         })
             .catch((err) => {
@@ -133,7 +133,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const sendFriendRequest = async (friendUsername) => {
-        const response = await axios.post(`${BASE_URL}send-friend-request/${curUser.id}`, {
+        const response = await axios.post(`${BASE_URL}send-friend-request/${curUser._id}`, {
             friendUsername
         })
             .catch((err) => {
@@ -142,7 +142,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const addFriend = async (friendUsername) => {
-        const response = await axios.post(`${BASE_URL}add-friend/${curUser.id}`, {
+        const response = await axios.post(`${BASE_URL}add-friend/${curUser._id}`, {
             friendUsername
         })
             .catch((err) => {
@@ -151,7 +151,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const removeFriend = async (friendId) => {
-        const response = await axios.post(`${BASE_URL}remove-friend/${curUser.id}`, {
+        const response = await axios.post(`${BASE_URL}remove-friend/${curUser._id}`, {
             friendId
         })
             .catch((err) => {

@@ -6,7 +6,7 @@ import base64 from 'react-native-base64';
 import * as WebBrowser from 'expo-web-browser';
 
 const Spotify = ({ navigation }) => {
-    const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
+    const { getUser, setCurUser, curUser, emailExist, setUserEmail, setSpotify } = useGlobalContext();
     const base64encode = (input) => {
         return base64.encode(input)
             .replace(/=/g, '')
@@ -77,7 +77,7 @@ const Spotify = ({ navigation }) => {
                 .then(response => response.json())
                 .then(data => {
                     //TODO: store the refresh token in MongoDB
-                    console.log(data.refresh_token);
+                    setSpotify(data.refresh_token)
                     navigation.navigate('Instagram');
                 })
                 .catch(error => {
