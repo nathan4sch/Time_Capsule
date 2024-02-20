@@ -21,6 +21,24 @@ const {
     deleteMoment,
 } = require('../controllers/moment')
 
+const { 
+    createCapsule, 
+    getCapsule, 
+    deleteCapsule,
+    removeSongFromCapsule,
+    addSongToCapsule,
+    addPhotoToCapsule,
+    removePhotoFromCapsule,
+    setPublish,
+    setQuote
+} = require('../controllers/capsule')
+
+const { 
+    createNotification, 
+    getNotification, 
+    deleteNotification
+} = require('../controllers/notification')
+
 const router = require('express').Router()
 
 //API endpoints for user operations
@@ -46,7 +64,25 @@ router
 //:id is the id of the moment to modify 
 router
     .post('/add-moment/:id', addMoment)
-    .get('/get-moment/:id', getMoment)
-    .delete('/delete-moment/:id', deleteMoment)
+    .get('/get-moment/:momentId', getMoment)
+    .delete('/delete-moment/:momentId', deleteMoment)
+
+//API endpoints for capsule operations
+router
+    .post('/create-capsule/:id', createCapsule)
+    .post('/get-capsule/:id', getCapsule)
+    .post('/delete-capsule/:id', deleteCapsule)
+    .delete('/remove-song/:capsuleId', removeSongFromCapsule)
+    .post('/add-song/:capsuleId', addSongToCapsule)
+    .post('/add-photo/:capsuleId', addPhotoToCapsule)
+    .delete('/remove-photo/:capsuleId', removePhotoFromCapsule)
+    .post('/set-publish/:capsuleId', setPublish)
+    .post('/set-quote/:capsuleId', setQuote)
+
+//API endpoints for notification operations
+router
+    .post('/send-notification/:senderId', createNotification)
+    .get('/get-notification/:notificationId', getNotification)
+    .delete('/delete-notification/:notificationId', deleteNotification)
 
 module.exports = router
