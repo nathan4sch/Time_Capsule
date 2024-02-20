@@ -27,7 +27,7 @@ exports.addUser = async (req, res) => {
         res.status(500).json({ message: 'Server Error' })
     }
 
-    console.log(user)
+    //console.log(user)
 }
 
 
