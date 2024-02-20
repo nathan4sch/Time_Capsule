@@ -113,17 +113,17 @@ exports.deleteUser = async (req, res) => {
 //FRIENDs
 /*add the current user's username to the friend requests list of the specified user*/
 exports.sendFriendRequest = async (req, res) => {
-    const { username } = req.params;
+    const { id } = req.params;
     const { friendUsername } = req.body;
 
     try {
         // Validate if both usernames are provided
-        if (!username || !friendUsername) {
-            return res.status(400).json({ message: 'Current username and friend username required' });
+        if (!id || !friendUsername) {
+            return res.status(400).json({ message: 'Current id and friend username required' });
         }
 
         // Find the user who is making the friend request
-        const user = await UserSchema.findOne({ username });
+        const user = await UserSchema.findOne({ _id: id });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -134,12 +134,12 @@ exports.sendFriendRequest = async (req, res) => {
             return res.status(404).json({ message: 'Friend not found' });
         }
 
-        if (friendUser.friendRequests.includes(username)) {
+        if (friendUser.friendRequests.includes(user.username)) {
             return res.status(400).json({ message: 'Friend request already sent' });
         }
 
         // Add the friend request to the user's friendRequests array
-        friendUser.friendRequests.push(username);
+        friendUser.friendRequests.push(user.username);
 
         // Save the updated friendUser document
         await friendUser.save();
@@ -153,16 +153,16 @@ exports.sendFriendRequest = async (req, res) => {
 
 /*remove the given 'requestUsername' from the user's friend requests */
 exports.removeFriendRequest = async (req, res) => {
-    const { username } = req.params;
+    const { id } = req.params;
     const { requestUsername } = req.body;
 
     try {
-        if (!username || !requestUsername) {
-            return res.status(400).json({ message: 'Current username and friend username required' });
+        if (!id || !requestUsername) {
+            return res.status(400).json({ message: 'Current id and friend username required' });
         }
 
         // Find the user who is making the friend request
-        const user = await UserSchema.findOne({ username });
+        const user = await UserSchema.findOne({ _id: id });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -185,15 +185,15 @@ exports.removeFriendRequest = async (req, res) => {
 Mongoose will automatically replace the stored objectids with the actual documents from 
 the user collection because of the red: 'User' */
 exports.addFriend = async (req, res) => {
-    const { username } = req.params;
+    const { id } = req.params;
     const { friendUsername } = req.body;
 
     try {
-        if (!username || !friendUsername) {
-            return res.status(400).json({ message: 'Current username and friend username required' });
+        if (!id || !friendUsername) {
+            return res.status(400).json({ message: 'Current id and friend username required' });
         }
 
-        const user = await UserSchema.findOne({ username });
+        const user = await UserSchema.findOne({ _id: id });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -216,15 +216,15 @@ exports.addFriend = async (req, res) => {
 
 /* remove the friendID from the user's friends list */
 exports.removeFriend = async (req, res) => {
-    const { username } = req.params;
+    const { id } = req.params;
     const { friendId } = req.body;
 
     try {
-        if (!username || !friendId) {
-            return res.status(400).json({ message: 'Current username and friend ID required' });
+        if (!id || !friendId) {
+            return res.status(400).json({ message: 'Current id and friend ID required' });
         }
 
-        const user = await UserSchema.findOne({ username });
+        const user = await UserSchema.findOne({ _id: id });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -241,6 +241,114 @@ exports.removeFriend = async (req, res) => {
         await user.save();
 
         res.status(200).json({ message: 'Friend removed successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+//PROFILE SETTINGS
+exports.setLDMode = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        if (!id) {
+            return res.status(400).json({ message: 'User id required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        //Switch boolean value
+        user.profileSettings.darkMode = !user.profileSettings.darkMode;
+
+        // Save the updated user document
+        await user.save();
+
+        res.status(200).json({ message: 'Light/Dark mode setting updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.setProfilePicture = async (req, res) => {
+    const { id } = req.params;
+    const { profilePicture } = req.body;
+
+    try {
+        if (!id || profilePicture === undefined) {
+            return res.status(400).json({ message: 'User id and profilePicture value required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update the profilePicture setting
+        user.profileSettings.profilePicture = profilePicture;
+
+        // Save the updated user document
+        await user.save();
+
+        res.status(200).json({ message: 'Profile picture updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.setSpotify = async (req, res) => {
+    const { id } = req.params;
+    const { spotify } = req.body;
+
+    try {
+        if (!id || spotify === undefined) {
+            return res.status(400).json({ message: 'User id and spotify value required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update the profilePicture setting
+        user.profileSettings.spotifyAccount = spotify;
+
+        // Save the updated user document
+        await user.save();
+
+        res.status(200).json({ message: 'spotify updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.setInstragram = async (req, res) => {
+    const { id } = req.params;
+    const { instagram } = req.body;
+
+    try {
+        if (!id || instagram === undefined) {
+            return res.status(400).json({ message: 'User id and instagram value required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update the profilePicture setting
+        user.profileSettings.instagramAccount = instagram;
+
+        // Save the updated user document
+        await user.save();
+
+        res.status(200).json({ message: 'instagram updated successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });

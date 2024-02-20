@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Moment = require('./MomentModel')
 const Capsule = require('./CapsuleModel')
 const Notification = require('./NotificationModel')
-const Profile = require('./ProfileModel')
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -16,19 +15,35 @@ const UserSchema = new mongoose.Schema({
     },
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User' //establish reference from user collection
+        ref: 'users' //establish reference from user collection
     }],
-    //moments: [Moment.schema], //Import schema from 'MomentModel.js'
     moments: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Moment'
+        ref: 'moments'
     }],
     capsules: [Capsule.schema], //Import schema from 'CapsuleModel.js'
     friendRequests: [{
         type: String //List of usernames
     }],
-    notifications: [Notification.schema], //Import schema from 'NotificationModel.js'
-    profileSettings: Profile.schema //Import schema from 'ProfileModel.js'
+    notifications: [Notification.schema],
+    profileSettings: {
+        darkMode: {
+            type: Boolean,
+            default: false 
+        },
+        profilePicture: {
+            type: String,
+            default: '' 
+        },
+        spotifyAccount: {
+            type: String,
+            default: '' 
+        },
+        instagramAccount: {
+            type: String,
+            default: ''
+        }
+    },
 })
 
 module.exports = mongoose.model('User', UserSchema)

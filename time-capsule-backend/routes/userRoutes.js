@@ -8,16 +8,23 @@ const {
     addFriend,
     removeFriend, 
     emailExist,
-    getUserbyID
+    getUserbyID,
+    setLDMode,
+    setProfilePicture,
+    setSpotify,
+    setInstragram,
 } = require('../controllers/user')
 
 const {
-    createMoment
+    addMoment,
+    getMoment,
+    deleteMoment,
 } = require('../controllers/moment')
 
 const router = require('express').Router()
 
 //API endpoints for user operations
+//most requests take an id in the route to indicate the current user
 router
     .post('/add-user', addUser)
     .get('/get-all-users', getAllUsers)
@@ -25,12 +32,21 @@ router
     .get('/get-user-byID/:id', getUserbyID)
     .get('/email-exist/:email', emailExist)
     .delete('/delete-user/:id', deleteUser)
-    .post('/send-friend-request/:username', sendFriendRequest)
-    .delete('/remove-friend-request/:username', removeFriendRequest)
-    .post('/add-friend/:username', addFriend)
-    .delete('/remove-friend/:username', removeFriend)
+    .post('/send-friend-request/:id', sendFriendRequest)     
+    .delete('/remove-friend-request/:id', removeFriendRequest) 
+    .post('/add-friend/:id', addFriend) 
+    .delete('/remove-friend/:id', removeFriend) 
+    //Profile setting routes
+    .post('/set-LD-mode/:id', setLDMode)
+    .post('/set-profile-picture/:id', setProfilePicture)
+    .post('/set-spotify-account/:id', setSpotify)
+    .post('/set-instagram-account/:id', setInstragram)
 
+//API endpoints for moment operations
+//:id is the id of the moment to modify 
 router
-    .post('/add-moment/:username', createMoment)
+    .post('/add-moment/:id', addMoment)
+    .get('/get-moment/:id', getMoment)
+    .delete('/delete-moment/:id', deleteMoment)
 
 module.exports = router
