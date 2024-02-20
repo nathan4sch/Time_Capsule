@@ -114,7 +114,7 @@ exports.addSongToCapsule = async (req, res) => {
 
 exports.addPhotoToCapsule = async (req, res) => {
     const { capsuleId } = req.params;
-    const { photo } = req.body;
+    const { photoLink } = req.body;
 
     try {
         const capsule = await CapsuleSchema.findOne({ _id: capsuleId });
@@ -123,7 +123,7 @@ exports.addPhotoToCapsule = async (req, res) => {
             return res.status(404).json({ message: "Capsule not found" });
         }
 
-        capsule.usedPhotos.push(photo)
+        capsule.usedPhotos.push(photoLink)
 
         await capsule.save();
 
@@ -131,5 +131,73 @@ exports.addPhotoToCapsule = async (req, res) => {
     } catch (error) {
         console.error("Error adding photo to capsule:", error);
         res.status(500).json({ message: "Server Error" });
+    }
+};
+
+exports.removePhotoFromCapsule = async (req, res) => {
+    const { capsuleId } = req.params;
+    const { photoLink } = req.body;
+
+    try {
+        const capsule = await CapsuleSchema.findOne({ _id: capsuleId });
+
+        if (!capsule) {
+            return res.status(404).json({ message: "Capsule not found" });
+        }
+
+        const updatedPhotos = capsule.usedPhotos.filter((photo) => photo !== photoLink);
+        capsule.usedPhotos = updatedPhotos;
+
+        await capsule.save();
+
+        res.status(200).json({ message: "Photo removed from capsule" });
+    } catch (error) {
+        console.error("Error removing photo from capsule:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+exports.setPublish = async (req, res) => {
+    const { capsuleId } = req.params;
+
+    try {
+        const capsule = await CapsuleSchema.findOne({ _id: capsuleId });
+        if (!capsule) {
+            return res.status(404).json({ message: 'capsule not found' });
+        }
+
+        //Switch boolean value
+        capsule.published = !capsule.published;
+
+        // Save the updated user document
+        await capsule.save();
+
+        res.status(200).json({ message: 'Capsule publish setting changed' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.setQuote = async (req, res) => {
+    const { capsuleId } = req.params;
+    const { quote } = req.body;
+
+    try {
+        const capsule = await CapsuleSchema.findOne({ _id: capsuleId });
+        if (!capsule) {
+            return res.status(404).json({ message: 'capsule not found' });
+        }
+
+        //Switch boolean value
+        capsule.quote = quote;
+
+        // Save the updated user document
+        await capsule.save();
+
+        res.status(200).json({ message: 'Capsule quote changed' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
     }
 };
