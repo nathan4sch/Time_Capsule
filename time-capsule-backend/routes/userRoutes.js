@@ -21,6 +21,15 @@ const {
     deleteMoment,
 } = require('../controllers/moment')
 
+const { 
+    createCapsule, 
+    getCapsule, 
+    deleteCapsule,
+    removeSongFromCapsule,
+    addSongToCapsule,
+    addPhotoToCapsule
+} = require('../controllers/capsule')
+
 const router = require('express').Router()
 
 //API endpoints for user operations
@@ -48,5 +57,15 @@ router
     .post('/add-moment/:id', addMoment)
     .get('/get-moment/:id', getMoment)
     .delete('/delete-moment/:id', deleteMoment)
+
+//API endpoints for capsule operations
+router
+    .post('/create-capsule/:id', createCapsule)
+    .post('/get-capsule/:id', getCapsule)
+    .post('/delete-capsule/:id', deleteCapsule)
+    .delete('/remove-song-capsule/:capsuleId', removeSongFromCapsule)
+    .post('/add-song-capsule/:capsuleId', addSongToCapsule)
+    .post('/add-photo-capsule/:capsuleId', addPhotoToCapsule)
+
 
 module.exports = router

@@ -1,5 +1,5 @@
 const MomentSchema = require("../models/MomentModel");
-const User = require("../models/UserModel");
+const UserSchema = require("../models/UserModel");
 
 exports.addMoment = async (req, res) => {
     const { description } = req.body;
@@ -15,7 +15,7 @@ exports.addMoment = async (req, res) => {
         })
         
         await moment.save()
-        const user = await User.findOne({ _id: id });
+        const user = await UserSchema.findOne({ _id: id });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

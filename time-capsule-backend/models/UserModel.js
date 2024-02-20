@@ -21,7 +21,10 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'moments'
     }],
-    capsules: [Capsule.schema], //Import schema from 'CapsuleModel.js'
+    capsules: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'capsules'
+    }],
     friendRequests: [{
         type: String //List of usernames
     }],
