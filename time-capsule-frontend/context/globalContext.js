@@ -5,6 +5,8 @@ import axios from 'axios'
 
 //CHANGE TO YOUR OWN IP ADDRESS
 const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+//http://100.70.0.251:3000/api/v1/
+//https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
 
@@ -101,6 +103,62 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
+    
+
+    const setSpotify = async (spotifyKey) => {
+        const response = await axios.post(`${BASE_URL}set-spotify-account/${curUser.id}`, {
+            spotify: spotifyKey
+        })
+            .catch((err) => {
+                setError(err.response.data.message)
+            })
+    }
+
+    const setInstragram = async (instagramKey) => {
+        const response = await axios.post(`${BASE_URL}set-instagram-account/${curUser.id}`, {
+            spotify: instagramKey
+        })
+            .catch((err) => {
+                setError(err.response.data.message)
+            })
+    }
+
+    const removeFriendRequest = async (requestUsername) => {
+        const response = await axios.delete(`${BASE_URL}remove-friend-request/${curUser.id}`, {
+            requestUsername
+        })
+            .catch((err) => {
+                setError(err.response.data.message)
+            })
+    }
+
+    const sendFriendRequest = async (friendUsername) => {
+        const response = await axios.post(`${BASE_URL}send-friend-request/${curUser.id}`, {
+            friendUsername
+        })
+            .catch((err) => {
+                setError(err.response.data.message)
+            })
+    }
+
+    const addFriend = async (friendUsername) => {
+        const response = await axios.post(`${BASE_URL}add-friend/${curUser.id}`, {
+            friendUsername
+        })
+            .catch((err) => {
+                setError(err.response.data.message)
+            })
+    }
+
+    const removeFriend = async (friendId) => {
+        const response = await axios.post(`${BASE_URL}remove-friend/${curUser.id}`, {
+            friendId
+        })
+            .catch((err) => {
+                setError(err.response.data.message)
+            })
+    }
+
 
     // Provide the context value to child components
     return (
@@ -118,6 +176,12 @@ export const GlobalProvider = ({ children }) => {
             userEmail,
             setUserEmail,
             getUserbyID,
+            setSpotify,
+            setInstragram,
+            removeFriendRequest,
+            sendFriendRequest,
+            addFriend,
+            removeFriend,
         }}>
             {children}
         </GlobalContext.Provider>
