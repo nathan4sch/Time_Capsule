@@ -2,95 +2,90 @@ import React, { useState, useEffect } from "react";
 import { Platform, StyleSheet, TouchableOpacity, Text, Image, Linking } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
-import Sha256 from '../util/sha256.js';
 import base64 from 'react-native-base64';
 import * as WebBrowser from 'expo-web-browser';
 
 const Spotify = ({ navigation }) => {
     const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
-
-    const spotifyLogin = async () => {
-        // const generateRandomString = (length) => {
-        //     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        //     const values = crypto.getRandomValues(new Uint8Array(length));
-        //     return values.reduce((acc, x) => acc + possible[x % possible.length], "");
-        //   }
-        const generateRandomString = (length) => {
-            const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let randomString = '';
-            for (let i = 0; i < length; i++) {
-              const randomIndex = Math.floor(Math.random() * possible.length);
-              randomString += possible.charAt(randomIndex);
-            }
-            return randomString;
-          };
-          
-        const codeVerifier  = generateRandomString(64);
-
-        const hash = Sha256.hash(codeVerifier)
-        const codeChallenge = base64.encode(hash);
-    
-        const clientId = '5a58784e6d234424b485e4add1ea7166';
-        const redirectUri = 'com.anonymous.timecapsule:/oauthSpotify';
-    
-        const scope = 'user-read-private user-read-email';
-        const authUrl = new URL("https://accounts.spotify.com/authorize")
-    
-        // generated in the previous step
-    
-        const params =  {
-            response_type: 'code',
-            client_id: clientId,
-            scope,
-            code_challenge_method: 'S256',
-            code_challenge: codeChallenge,
-            redirect_uri: redirectUri,
-        }
-
-        //const queryParams = `client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&code_challenge_method=S256&code_challenge=${codeChallenge}`;
-        //Linking.openURL(`https://accounts.spotify.com/authorize?${queryParams}`);
-
-        //const redirect = await Linking.getInitialURL('/');
-        const queryParams = `client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&code_challenge_method=S256&code_challenge=${codeChallenge}`;
-        const result = await WebBrowser.openAuthSessionAsync(`https://accounts.spotify.com/authorize?${queryParams}`);
-        if (result.type === 'success') {
-            const { code } = result.params;
-            console.log('code: ')
-            console.log(code);
-            const tokens = await getToken(code, codeVerifier);
-            this.setState(tokens);
-        }
-    
-        // authUrl.search = new URLSearchParams(params).toString();
-        // window.location.href = authUrl.toString();
-    
-        // const urlParams = new URLSearchParams(window.location.search);
-        // let code = urlParams.get('code');
-
-        //getToken(code, codeVerifier);
-
+    const base64encode = (input) => {
+        return base64.encode(input)
+            .replace(/=/g, '')
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_');
     }
 
-    const getToken = async (code, codeVerifier) => {      
-        const payload = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            client_id: clientId,
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: redirectUri,
-            code_verifier: codeVerifier,
-          }),
+    const generateRandomString = (length) => {
+        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * possible.length);
+            randomString += possible.charAt(randomIndex);
         }
-      
-        const body = await fetch(url, payload);
-        const response =await body.json();
-      
-        console.log(response);
-      }
+        return randomString;
+    };
+
+    const client_id = '5a58784e6d234424b485e4add1ea7166';
+    const client_secret = 'secret'; //TODO: need to probably store in Mongo and the request?s
+    const redirect_uri = 'exp://localhost:19000/--/oauth2callback';
+    const scope = 'user-read-private user-read-email';
+    const state = generateRandomString(16);
+
+    const skipToInsta = () => {
+        //TODO: store null or something for refresh token because user didn't link spotify
+        navigation.navigate('Instagram');
+    }
+
+    const spotifyLogin = async () => {
+        let authUrl =
+            `https://accounts.spotify.com/authorize?` +
+            `client_id=${client_id}` +
+            `&redirect_uri=${encodeURIComponent(redirect_uri)}` +
+            `&response_type=code` +
+            `&scope=${encodeURIComponent(scope)}` +
+            `&state=${state}`;
+
+        let result = await WebBrowser.openAuthSessionAsync(authUrl, redirect_uri);
+
+        if (result.type === 'success' && result.url) {
+            const responseUrl = decodeURIComponent(result.url);
+            const urlParams = new URLSearchParams(responseUrl.split('?')[1]);
+            const code = urlParams.get('code');
+            const returnedState = urlParams.get('state');
+
+            if (returnedState !== state) {
+                console.error('State mismatch!');
+                return;
+            }
+
+            const base64Credentials = base64encode(`${client_id}:${client_secret}`);
+
+            const authOptions = {
+                url: 'https://accounts.spotify.com/api/token',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': `Basic ${base64Credentials}`
+                },
+                body: `code=${code}&redirect_uri=${encodeURIComponent(redirect_uri)}&grant_type=authorization_code`
+            };
+
+            fetch(authOptions.url, {
+                method: authOptions.method,
+                headers: authOptions.headers,
+                body: authOptions.body
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //TODO: store the refresh token in MongoDB
+                    console.log(data.refresh_token);
+                    navigation.navigate('Instagram');
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+        };
+    }
 
     return (
         <GreenBackground>
@@ -99,8 +94,8 @@ const Spotify = ({ navigation }) => {
                 <Text style={styles.text}>Link Spotify</Text>
                 <Image style={styles.spotify} source={require('../icons/spotify-.png')} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.press} onPress={() => 1}>
-                    <Text  style={styles.text2}>skip for now</Text>
+            <TouchableOpacity style={styles.press} onPress={() => skipToInsta()}>
+                <Text style={styles.text2}>skip for now</Text>
             </TouchableOpacity>
         </GreenBackground>
     );
@@ -182,6 +177,3 @@ const styles = StyleSheet.create({
         }),
     }
 });
-/* Rectangle 1 */
-
-
