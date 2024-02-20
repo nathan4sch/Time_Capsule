@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Platform, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, Text, Image, Linking } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
 import Sha256 from '../util/sha256.js';
 import base64 from 'react-native-base64';
-
+import * as WebBrowser from 'expo-web-browser';
 
 const Spotify = ({ navigation }) => {
     const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
@@ -26,16 +26,12 @@ const Spotify = ({ navigation }) => {
           };
           
         const codeVerifier  = generateRandomString(64);
-        
-        const base64encode = (input) => {
-            return base64.encode(input);
-        }
 
         const hash = Sha256.hash(codeVerifier)
-        const codeChallenge = base64encode(hash);
+        const codeChallenge = base64.encode(hash);
     
         const clientId = '5a58784e6d234424b485e4add1ea7166';
-        const redirectUri = 'com.anonymous.timecapsule:/oauth2callback';
+        const redirectUri = 'com.anonymous.timecapsule:/oauthSpotify';
     
         const scope = 'user-read-private user-read-email';
         const authUrl = new URL("https://accounts.spotify.com/authorize")
@@ -43,21 +39,35 @@ const Spotify = ({ navigation }) => {
         // generated in the previous step
     
         const params =  {
-        response_type: 'code',
-        client_id: clientId,
-        scope,
-        code_challenge_method: 'S256',
-        code_challenge: codeChallenge,
-        redirect_uri: redirectUri,
+            response_type: 'code',
+            client_id: clientId,
+            scope,
+            code_challenge_method: 'S256',
+            code_challenge: codeChallenge,
+            redirect_uri: redirectUri,
+        }
+
+        //const queryParams = `client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+        //Linking.openURL(`https://accounts.spotify.com/authorize?${queryParams}`);
+
+        //const redirect = await Linking.getInitialURL('/');
+        const queryParams = `client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+        const result = await WebBrowser.openAuthSessionAsync(`https://accounts.spotify.com/authorize?${queryParams}`);
+        if (result.type === 'success') {
+            const { code } = result.params;
+            console.log('code: ')
+            console.log(code);
+            const tokens = await getToken(code, codeVerifier);
+            this.setState(tokens);
         }
     
-        authUrl.search = new URLSearchParams(params).toString();
-        window.location.href = authUrl.toString();
+        // authUrl.search = new URLSearchParams(params).toString();
+        // window.location.href = authUrl.toString();
     
-        const urlParams = new URLSearchParams(window.location.search);
-        let code = urlParams.get('code');
+        // const urlParams = new URLSearchParams(window.location.search);
+        // let code = urlParams.get('code');
 
-        getToken(code, codeVerifier);
+        //getToken(code, codeVerifier);
 
     }
 
