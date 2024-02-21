@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Platform, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
-import GoogleLogo from '../icons/google-.png';
 import GreenBackground from "../Components/GreenBackground";
 import * as Google from "expo-auth-session/providers/google";
 import base64 from 'react-native-base64';
 import { useGlobalContext } from "../context/globalContext";
+import { ANDROID_CLIENT_ID, IOS_CLIENT_ID, WEB_CLIENT_ID } from '../env.js';
+
 
 const Login = ({ navigation }) => {
     const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
-
-    const ANDROID_CLIENT_ID = '457222296603-f24r4dn3je9vsctojduvh8a55f01dcf5.apps.googleusercontent.com'
-    const IOS_CLIENT_ID = '457222296603-d9o7m2le03mov1r3h3o4ettlodekdkp9.apps.googleusercontent.com'
-    const WEB_CLIENT_ID = '457222296603-r8cej7d4qa3420a2du8gv59p9qkavc54.apps.googleusercontent.com'
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: ANDROID_CLIENT_ID,

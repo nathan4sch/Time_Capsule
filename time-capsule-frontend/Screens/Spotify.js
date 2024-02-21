@@ -4,6 +4,7 @@ import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
 import base64 from 'react-native-base64';
 import * as WebBrowser from 'expo-web-browser';
+import { SPOTIFY_SECRET } from '../env.js';
 
 const Spotify = ({ navigation }) => {
     const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
@@ -25,7 +26,7 @@ const Spotify = ({ navigation }) => {
     };
 
     const client_id = '5a58784e6d234424b485e4add1ea7166';
-    const client_secret = 'secret'; //TODO: need to probably store in Mongo and the request?s
+    const client_secret = SPOTIFY_SECRET; //TODO: need to probably store in Mongo and the request?s
     const redirect_uri = 'exp://localhost:19000/--/oauth2callback';
     const scope = 'user-read-private user-read-email';
     const state = generateRandomString(16);
