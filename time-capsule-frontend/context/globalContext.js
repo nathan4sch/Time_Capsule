@@ -5,7 +5,7 @@ import axios from 'axios'
 
 //CHANGE TO YOUR OWN IP ADDRESS
 const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-//http://100.70.0.251:3000/api/v1/
+//const BASE_URL = "http://100.67.14.38:3000/api/v1/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -103,7 +103,7 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
-    
+
 
     const setSpotify = async (spotify) => {
         const response = await axios.post(`${BASE_URL}set-spotify-account/${curUser._id}`, {
@@ -125,7 +125,7 @@ export const GlobalProvider = ({ children }) => {
 
     const removeFriendRequest = async (requestUsername) => {
         const response = await axios.delete(`${BASE_URL}remove-friend-request/${curUser._id}`, {
-            requestUsername
+            data: { requestUsername }
         })
             .catch((err) => {
                 setError(err.response.data.message)
@@ -133,14 +133,23 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const sendFriendRequest = async (friendUsername) => {
-        const response = await axios.post(`${BASE_URL}send-friend-request/${curUser._id}`, {
-            friendUsername
-        })
-            .catch((err) => {
-                setError(err.response.data.message)
-            })
-    }
+        try {
+            const response = await axios.post(`${BASE_URL}send-friend-request/${curUser._id}`, {
+                friendUsername
+            });
+    
+            return "Success";
+    
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                return "Not Found";
+            } else if (error.response && error.response.status === 400) {
+                return "Already Sent";
+            }
+        }
+    };
 
+    //post request so don't need to specify data
     const addFriend = async (friendUsername) => {
         const response = await axios.post(`${BASE_URL}add-friend/${curUser._id}`, {
             friendUsername
@@ -150,13 +159,20 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
+    //delete request so specify data
     const removeFriend = async (friendId) => {
-        const response = await axios.post(`${BASE_URL}remove-friend/${curUser._id}`, {
-            friendId
-        })
-            .catch((err) => {
-                setError(err.response.data.message)
-            })
+        try {
+            const response = await axios.delete(`${BASE_URL}remove-friend/${curUser._id}`, {
+                data: { friendId }  // Pass the data in the 'data' property
+            });
+        } catch (error) {
+            // Handle errors
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
     }
 
 
