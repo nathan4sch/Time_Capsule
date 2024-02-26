@@ -1,39 +1,46 @@
 import React from "react";
-import { StyleSheet, View, Text, Button, BackHandler, Pressable, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Image, BackHandler, Pressable, TouchableOpacity } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
+import { commonStyles } from "../Components/ProfilePageStyling";
+import { buttonStyle } from "../Components/Button";
 
 const Profile = ({ navigation }) => {
     return (
         <BlackBackground>
-            <TouchableOpacity style={styles.container} onPress={() => navigation.navigate('TempMain')} title=''>
-                <Text style={styles.text}>Back</Text>
+            <View style={commonStyles.profileContainer}>
+                <Text style={commonStyles.username}>phenwood</Text>
+                <View style={commonStyles.profileIconContainer}>
+                    <Image style={commonStyles.icon} source={require('../icons/profile-.png')} />
+                </View>
+            </View>
+            <View style={commonStyles.tempMargin}></View>
+            <View style={commonStyles.buttonContainer}>
+                <View style={buttonStyle.button}>
+                    <Image style={commonStyles.icon} source={require('../icons/spotify-.png')} />
+                    <Text style={commonStyles.buttonText}>   Link Spotify Account</Text>
+                </View>
+            </View>
+            <View style={commonStyles.buttonContainer}>
+                <View style={buttonStyle.button}>
+                    <Image style={commonStyles.icon} source={require('../icons/instagram-.png')} />
+                    <Text style={commonStyles.buttonText}>   Link Instagram Account</Text>
+                </View>
+            </View>
+            <TouchableOpacity style={commonStyles.buttonContainer} onPress={() => navigation.navigate('Friends')}>
+                <View style={buttonStyle.button}>
+                    <Image style={commonStyles.icon} source={require('../icons/friends-.png')} />
+                    <Text style={commonStyles.buttonText}>Friends</Text>
+                </View>
             </TouchableOpacity>
+            <TouchableOpacity style={commonStyles.buttonContainer} onPress={() => navigation.navigate('History')}>
+                <View style={buttonStyle.button}>
+                    <Image style={commonStyles.icon} source={require('../icons/history-.png')} />
+                    <Text style={commonStyles.buttonText}>History</Text>
+                </View>
+            </TouchableOpacity>
+
         </BlackBackground>
     );  
 }
 
 export default Profile;
-
-const styles = StyleSheet.create({  
-    container: {
-        position: 'absolute',
-        width: 296,
-        height: 50,
-        left: 47,
-        top: 695, 
-        backgroundColor: 'rgba(255, 255, 255, 0.48)',
-        borderRadius: 10,
-    },
-    text: {
-        position: 'absolute',
-        left: '35%',
-        top: '10%',
-        fontStyle: 'normal',
-        fontWeight: '400',
-        fontSize: 20,
-        lineHeight: 36,
-        textAlign: 'center',
-        color: '#000000',
-    },
-
-});
