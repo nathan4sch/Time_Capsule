@@ -188,6 +188,19 @@ export const GlobalProvider = ({ children }) => {
         }
     }
 
+    const setLDMode = async () => {
+        try {
+            const response = await axios.post(`${BASE_URL}set-LD-mode/${curUser._id}`);
+        
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
+
 
     // Provide the context value to child components
     return (
@@ -211,6 +224,7 @@ export const GlobalProvider = ({ children }) => {
             sendFriendRequest,
             addFriend,
             removeFriend,
+            setLDMode,
         }}>
             {children}
         </GlobalContext.Provider>
