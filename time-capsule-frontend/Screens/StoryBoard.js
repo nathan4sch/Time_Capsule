@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
         lineHeight: 36,
         textAlign: 'center',
         color: '#000000',
+        padding: 15,
     },
     capsuleContainer: {
         padding: 10,
-    }
-
+    },
 });
