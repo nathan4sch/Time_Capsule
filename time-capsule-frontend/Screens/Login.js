@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Platform, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
+import BackButton from '../Components/darkBackButton';
 import GreenBackground from "../Components/GreenBackground";
 import * as Google from "expo-auth-session/providers/google";
 import base64 from 'react-native-base64';
@@ -54,6 +55,7 @@ const Login = ({ navigation }) => {
 
     return (
         <GreenBackground>
+            <BackButton onPress={() => navigation.navigate('TempMain')} />
             <Image style={styles.capsule} source={require('../icons/capsule-.png')} />
             <TouchableOpacity style={styles.container} onPress={() => promptAsync()} title=''>
                 <Text style={styles.text}>Sign in with Google</Text>

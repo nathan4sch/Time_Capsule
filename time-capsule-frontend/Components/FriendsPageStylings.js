@@ -1,13 +1,6 @@
 import { StyleSheet } from 'react-native';
 
 export const commonStyles = StyleSheet.create({
-backButtonTop: {
-    position: 'absolute',
-    top: 30,
-    left: 10,
-    width: 45,
-    height: 45,
-},
 arrowIconContainer: {
   position: 'absolute',
   alignSelf: 'flex-start',

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Image, Text, TextInput, TouchableOpacity, FlatList, Keyboard, Alert } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
+import BackButton from '../Components/lightBackButton';
 import { commonStyles } from "../Components/FriendsPageStylings";
 import { useGlobalContext } from "../context/globalContext";
 
@@ -90,13 +91,7 @@ const Friends = ({ navigation }) => {
             onPress={() => Keyboard.dismiss()} // Dismiss the keyboard on press
         >
             <BlackBackground>
-
-                <TouchableOpacity style={commonStyles.backButtonTop} onPress={() => navigation.navigate('TempMain')}>
-                    <View style={commonStyles.arrowContainer}>
-                        <Image style={commonStyles.arrowIconContainer} source={require('../icons/tempbackarrow-.png')} />
-                    </View>
-                </TouchableOpacity>
-
+                <BackButton onPress={() => navigation.navigate('TempMain')} />
                 <View style={commonStyles.searchContainer}>
                     <View style={commonStyles.searchBar} />
                     <Image style={commonStyles.searchIconContainer} source={require('../icons/search-.png')} />

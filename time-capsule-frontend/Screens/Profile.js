@@ -1,16 +1,18 @@
 import React from "react";
-import { StyleSheet, View, Text, Image, BackHandler, Pressable, TouchableOpacity } from "react-native";
+import { View, Text, Image, BackHandler, Pressable, TouchableOpacity } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
+import BackButton from '../Components/lightBackButton';
 import { commonStyles } from "../Components/ProfilePageStyling";
 import { buttonStyle } from "../Components/Button";
 
 const Profile = ({ navigation }) => {
     return (
         <BlackBackground>
+            <BackButton onPress={() => navigation.navigate('TempMain')} />
             <View style={commonStyles.profileContainer}>
                 <Text style={commonStyles.username}>phenwood</Text>
                 <View style={commonStyles.profileIconContainer}>
-                    <Image style={commonStyles.icon} source={require('../icons/profile-.png')} />
+                    <Image style={commonStyles.icon} resizeMode="cover" source={require('../icons/profile-.png')} />
                 </View>
             </View>
             <View style={commonStyles.tempMargin}></View>

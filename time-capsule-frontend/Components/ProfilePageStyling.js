@@ -6,7 +6,7 @@ export const commonStyles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     height: '45%',
-    width: '100%',
+    width: '50%',
   },
   username: {
     top: '10%',
@@ -17,6 +17,8 @@ export const commonStyles = StyleSheet.create({
     top: '15%',
     height: '40%',
     aspectRatio: 1,
+    borderColor: 'red',
+    borderWidth: 1,
   },
   buttonContainer: {
     position: 'relative',
