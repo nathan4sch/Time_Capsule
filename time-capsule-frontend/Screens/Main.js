@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, FlatList, Keyboard} from "react-native";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard} from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import BlackBackground from "../Components/BlackBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
@@ -14,6 +14,9 @@ const Main = ({ navigation }) => {
         >
             <BlackBackground>
                 <PageNavBar onBackPress={() => navigation.goBack()} title="Main Page"/>
+                <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
+                    <Image style={styles.profileIcon} source={require('../icons/profile-.png')} />
+                </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
                     <Text style={styles.timerText}>28:17:50:39</Text>
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
@@ -30,6 +33,21 @@ const Main = ({ navigation }) => {
 export default Main;
 
 const styles = StyleSheet.create({
+    profileContainer: {
+        position: 'absolute',
+        top: 115,
+        left: 25,
+        height: '13%',
+        aspectRatio: 1,
+        borderRadius: 80,
+    },
+    profileIcon: {
+        position: 'absolute',
+        top: '-15%',
+        left: '-15%',
+        height: '130%',
+        width: '130%',
+    },
     tempTimeContainer: {
         position: 'absolute',
         flexDirection: 'column',
