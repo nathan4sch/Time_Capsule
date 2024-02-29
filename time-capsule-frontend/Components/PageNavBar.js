@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     position: 'absolute', // Position the title container absolutely to center it
-    left: 0,
-    right: 0,
+    left: 100,
+    right: 100,
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,
