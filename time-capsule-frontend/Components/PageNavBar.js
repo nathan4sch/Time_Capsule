@@ -21,9 +21,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     height: 110, // Adjust the height as needed
-    width: '100%', // Adjust the height as needed
+    width: '100%',
     paddingHorizontal: 16, // Side padding
-    backgroundColor: '#FFF', // Change the background color as needed
+    backgroundColor: 'transparent', // Change the background color as needed
     elevation: 4, // Adds shadow for Android
     shadowOpacity: 0.1, // Adds shadow for iOS
     shadowRadius: 10,
