@@ -1,14 +1,17 @@
 import React from "react";
 import { StyleSheet, View, Text, Button, BackHandler, Pressable, TouchableOpacity } from "react-native";
 import StoryBoardBackground from "../Components/StoryBoardBackground";
+import PageNavBar from "../Components/PageNavBar";
+import { useGlobalContext } from "../context/globalContext";
+
 
 const StoryBoard = ({ navigation }) => {
+    // set up global context for friend list.
+
     return (
-        <StoryBoardBackground>
-            <TouchableOpacity style={styles.container} onPress={() => navigation.navigate('TempMain')} title=''>
-                <Text style={styles.text}>Back</Text>
-            </TouchableOpacity>
-        </StoryBoardBackground>
+        <>
+        <PageNavBar onBackPress={() => navigation.goBack()} title="Story Board"/>
+        </>
     );  
 }
 
