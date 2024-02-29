@@ -151,13 +151,26 @@ export const GlobalProvider = ({ children }) => {
 
     //post request so don't need to specify data
     const addFriend = async (friendUsername) => {
-        const response = await axios.post(`${BASE_URL}add-friend/${curUser._id}`, {
-            friendUsername
-        })
-            .catch((err) => {
-                setError(err.response.data.message)
-            })
-    }
+        try {
+            // First request to add friend to current user
+            const response1 = await axios.post(`${BASE_URL}add-friend/${curUser._id}`, {
+                friendUsername
+            });
+    
+            const otherUser = await getUser(friendUsername)
+            const otherUserID = otherUser._id
+            friendUsername = curUser.username   
+            // Second request to add current user as a friend to the other user
+            const response2 = await axios.post(`${BASE_URL}add-friend/${otherUserID}`, {
+                friendUsername
+            });
+    
+            // Handle success if needed
+        } catch (err) {
+            // Handle errors for both requests
+            setError(err.response.data.message);
+        }
+    };
 
     //delete request so specify data
     const removeFriend = async (friendId) => {
