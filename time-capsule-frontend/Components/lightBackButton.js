@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 const BackButton = ({ onPress }) => {
   return (
     <TouchableOpacity style={styles.backButtonTop} onPress={onPress}>
-        <Image style={styles.arrowIconContainer} source={require('../icons/lightbackarrow-.png')} />
+        <Image style={styles.arrowIconContainer} source={require('../icons/lightbackbutton-.png')} />
     </TouchableOpacity>
   );
 };
