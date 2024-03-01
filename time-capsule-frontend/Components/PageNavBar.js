@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 const PageNavBar = ({ onBackPress, title }) => {
   return (
     <View style={styles.navbar}>
       <TouchableOpacity onPress={onBackPress} style={styles.backArrowContainer}>
-        <Text style={styles.backArrowText}>back</Text>
+      <Image style={styles.backArrowIconContainer} source={require('../icons/lightbackbutton-.png')} />
       </TouchableOpacity>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{title}</Text>
@@ -34,9 +34,10 @@ const styles = StyleSheet.create({
   backArrowContainer: {
     padding: 10, // Makes it easier to touch
   },
-  backArrowText: {
-    // Style for the back arrow, adjust according to the icon you use
-    fontSize: 18, // Adjust size as needed
+  backArrowIconContainer: {
+    position: 'relative',
+    height: 25,
+    width: 25,
   },
   titleContainer: {
     position: 'absolute', // Position the title container absolutely to center it

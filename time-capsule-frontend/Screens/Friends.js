@@ -3,6 +3,7 @@ import { View, Image, Text, TextInput, TouchableOpacity, FlatList, Keyboard, Ale
 import BlackBackground from "../Components/BlackBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import { useGlobalContext } from "../context/globalContext";
+import BackButton from "../Components/lightBackButton";
 
 const Friends = ({ navigation }) => {
     const { setCurUser, curUser, getUserbyID, addFriend, removeFriendRequest, removeFriend, getUser, sendFriendRequest, error } = useGlobalContext();
@@ -126,11 +127,7 @@ const Friends = ({ navigation }) => {
         >
             <BlackBackground>
 
-                <TouchableOpacity style={commonStyles.backButtonTop} onPress={() => navigation.navigate('Profile')}>
-                    <View style={commonStyles.arrowContainer}>
-                        <Image style={commonStyles.arrowIconContainer} source={require('../icons/tempbackarrow-.png')} />
-                    </View>
-                </TouchableOpacity>
+            <BackButton onPress={() => navigation.goBack()} />
 
                 <View style={commonStyles.searchContainer}>
                     <View style={commonStyles.searchBar} />

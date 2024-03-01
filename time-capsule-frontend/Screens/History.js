@@ -7,7 +7,7 @@ import HistoryBackground from "../Components/HistoryBackground";
 
 const History = ({ navigation }) => {
     const { curUser, getCapsule } = useGlobalContext();
-    const [capsules, setCapsules] = useState([]);
+    const [capsulesArray, setCapsules] = useState([]);
 
     useEffect(() => {
         const getCapsulesFunc = async () => {
@@ -25,15 +25,21 @@ const History = ({ navigation }) => {
     return (
         <HistoryBackground>
             <PageNavBar onBackPress={() => navigation.goBack()} title="History Page" />
-            <FlatList
-                style={styles.capsuleList}
-                data={capsules}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                    <Image style={styles.capsuleListItem} source={{ uri: item }} />
-                )}
-            />
-        </HistoryBackground>
+            {capsulesArray.length > 0 ? (
+                <FlatList
+                    style={styles.capsuleList}
+                    data={capsulesArray}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item }) => (
+                        <Image style={styles.capsuleListItem} source={{ uri: item }} />
+                    )}
+                />
+            ) : (
+                <View style={styles.textBox}>
+                    <Text style={styles.overlayText}>No Capsule Available</Text>
+                </View>
+            )}
+        </BlackBackground>
     );
 };
 
@@ -51,5 +57,16 @@ const styles = StyleSheet.create({
         width: '75%',
         aspectRatio: 1,
         marginVertical: 15,
+    },
+    textBox: {
+        position: "absolute",
+        top: "45%",
+        width: "50%",
+        height: '5%',
+    },
+    overlayText: {
+        alignSelf: 'center',
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
