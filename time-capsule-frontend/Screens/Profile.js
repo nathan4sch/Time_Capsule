@@ -10,7 +10,6 @@ const Profile = ({ navigation }) => {
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
 
     profilePicture = curUser.profileSettings.profilePicture;
-    console.log(curUser.profileSettings.profilePicture)
 
     const toggleDarkMode = () => {
         setLDMode();

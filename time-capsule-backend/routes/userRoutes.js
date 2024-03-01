@@ -70,7 +70,7 @@ router
 //API endpoints for capsule operations
 router
     .post('/create-capsule/:id', createCapsule)
-    .post('/get-capsule/:id', getCapsule)
+    .get('/get-capsule/:id', getCapsule)
     .post('/delete-capsule/:id', deleteCapsule)
     .delete('/remove-song/:capsuleId', removeSongFromCapsule)
     .post('/add-song/:capsuleId', addSongToCapsule)

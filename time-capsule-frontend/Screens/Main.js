@@ -1,33 +1,98 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard} from "react-native";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import BlackBackground from "../Components/BlackBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import { useGlobalContext } from "../context/globalContext";
 
 const Main = ({ navigation }) => {
+    const { curUser, getCapsule } = useGlobalContext();
+    const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
+    const [shownCapsule, setShownCapsule] = useState("");
+
+    useEffect(() => {
+        const getCapsuleFunc = async () => {
+            if (curUser.capsules.length !== 0) {
+                const capsule = await getCapsule(curUser.capsules[0]);
+                setShownCapsule(capsule.snapshot);
+            }
+        };
+        getCapsuleFunc();
+    }, []);
+
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setTimer(calculateTimeUntilNextMonth());
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
+    function calculateTimeUntilNextMonth() {
+        const now = new Date();
+        const nextMonth = new Date(now);
+        nextMonth.setMonth(now.getMonth() + 1);
+        nextMonth.setDate(1);
+        nextMonth.setHours(0, 0, 0, 0);
+
+        const timeDifference = nextMonth - now;
+        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+        const padWithZero = (value) => (value < 10 ? `0${value}` : value);
+
+        return `${padWithZero(days)}:${padWithZero(hours)}:${padWithZero(minutes)}:${padWithZero(seconds)}`;
+    }
+
+    const handleOverlayButtonPress = () => {
+        // Add the function to be executed when the overlay button is pressed
+        console.log("Overlay button pressed!");
+        // You can add your logic here
+    };
+
     return (
         <TouchableOpacity
-            style={{ flex: 1 }} // Ensure the TouchableOpacity takes up the entire screen
-            activeOpacity={1} // Ensure the TouchableOpacity is touchable
-            onPress={() => Keyboard.dismiss()} // Dismiss the keyboard on press
+            style={{ flex: 1 }}
+            activeOpacity={1}
+            onPress={() => Keyboard.dismiss()}
         >
             <BlackBackground>
-                <PageNavBar onBackPress={() => navigation.goBack()} title="Main Page"/>
+                <PageNavBar onBackPress={() => navigation.goBack()} title="Main Page" />
                 <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
-                    <Image style={styles.profileIcon} source={require('../icons/profile-.png')} />
+                    <Image style={styles.profileIcon}
+                        source={{
+                            uri: curUser.profileSettings.profilePicture,
+                        }}
+                    />
                 </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
-                    <Text style={styles.timerText}>28:17:50:39</Text>
+                    <Text style={styles.timerText}>{timer}</Text>
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
                 </View>
-                <View style={styles.capsuleList}/>
+                <View style={styles.imageContainer}>
+                    {shownCapsule ? (
+                        <Image
+                            style={styles.backgroundImage}
+                            source={{ uri: shownCapsule }}
+                        />
+                    ) : (
+                        // Render something else when shownCapsule is empty
+                        <Text style={styles.overlayButtonText}>No Capsule Available</Text>
+                    )}
+                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
+                        <Text style={styles.overlayButtonText}>Overlay Button</Text>
+                    </TouchableOpacity>
+                </View>
                 <TextInput style={styles.momentButton}
-                        placeholder="Enter Moment"
-                        returnKeyType="done"/>
+                    placeholder="Enter Moment"
+                    returnKeyType="done" />
+                <View style={styles.capsuleList} />
             </BlackBackground>
         </TouchableOpacity>
-    );  
+    );
 }
 
 export default Main;
@@ -43,19 +108,19 @@ const styles = StyleSheet.create({
     },
     profileIcon: {
         position: 'absolute',
-        top: '-15%',
-        left: '-15%',
-        height: '130%',
-        width: '130%',
+        left: '-5%',
+        height: '100%',
+        aspectRatio: 1,
+        borderRadius: 100,
     },
     tempTimeContainer: {
         position: 'absolute',
         flexDirection: 'column',
         width: 230,
         height: 70,
-        left: 180,
+        left: 150,
         top: 130,
-      },
+    },
     timerText: {
         fontFamily: 'Arial',
         fontStyle: 'normal',
@@ -64,7 +129,7 @@ const styles = StyleSheet.create({
         lineHeight: 45,
         textAlign: 'center',
         color: 'white',
-      },
+    },
     unitText: {
         fontFamily: 'Arial',
         fontStyle: 'normal',
@@ -90,5 +155,31 @@ const styles = StyleSheet.create({
         height: '50%',
         backgroundColor: '#8E8E8E',
         borderRadius: 20,
-      },
+    },
+    imageContainer: {
+        position: 'absolute',
+        top: '30%',
+        left: 0,
+        width: '100%',
+        height: '50%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'red',
+        zIndex: 1,  
+    },
+    backgroundImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
+    },
+    overlayButton: {
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        padding: 10,
+        borderRadius: 10,
+    },
+    overlayButtonText: {
+        color: 'black',
+        fontWeight: 'bold',
+    },
 });
