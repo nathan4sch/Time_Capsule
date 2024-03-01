@@ -36,7 +36,7 @@ const History = ({ navigation }) => {
                 />
             ) : (
                 <View style={styles.textBox}>
-                    <Text style={styles.overlayText}>No Capsule Available</Text>
+                    <Text style={styles.overlayText}>No Past Capsules</Text>
                 </View>
             )}
         </BlackBackground>
