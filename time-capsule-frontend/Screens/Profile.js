@@ -6,6 +6,7 @@ import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
 import { spotifyLogin } from "../utils/spotifyLogin";
 import { instagramLogin } from "../utils/instagramLogin";
+import BackButton from "../Components/lightBackButton";
 
 const Profile = ({ navigation }) => {
     const { curUser, setLDMode, setSpotify, setCurUser, getUser } = useGlobalContext();
