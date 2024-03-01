@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
-import PageNavBar from "../Components/PageNavBar";
+import { commonStyles } from "../Components/FriendsPageStylings";
 import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
 import { spotifyLogin } from "../utils/spotifyLogin";
@@ -35,9 +35,10 @@ const Profile = ({ navigation }) => {
     return (
         <>
             <BlackBackground>
-                <PageNavBar
-                    onBackPress={() => navigation.goBack()}
-                />
+                <TouchableOpacity style={commonStyles.backButtonTop} onPress={() => navigation.goBack()}>
+                    <Image style={commonStyles.arrowIconContainer} source={require('../icons/tempbackarrow-.png')} />
+                </TouchableOpacity>
+                <View style={styles.separator} />
                 <View style={styles.profileContainer}>
                     <Text style={styles.username}>  {curUser.username}</Text>
                     <Image
@@ -90,6 +91,9 @@ const Profile = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
+    separator: {
+        marginVertical: 50,
+      },
     profileContainer: {
         top: '-5%',
         position: 'relative',

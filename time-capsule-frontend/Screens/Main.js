@@ -58,7 +58,6 @@ const Main = ({ navigation }) => {
             onPress={() => Keyboard.dismiss()}
         >
             <BlackBackground>
-                <PageNavBar onBackPress={() => navigation.goBack()} title="Main Page" />
                 <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
                     <Image style={styles.profileIcon}
                         source={{

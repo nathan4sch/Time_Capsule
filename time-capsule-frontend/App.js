@@ -23,7 +23,7 @@ export default function App() {
     <GlobalProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="TempMain" component={TempMain} options={{ headerLeft: null }} />
+          {/* {<Stack.Screen name="TempMain" component={TempMain} options={{ headerLeft: null }} />} */}
           <Stack.Screen name="Login" component={Login} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Registration" component={Registration} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Spotify" component={Spotify} options={{ headerLeft: null, gestureEnabled: false }} />
