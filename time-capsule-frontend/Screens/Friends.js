@@ -29,6 +29,7 @@ const Friends = ({ navigation }) => {
         };
 
         fetchData();
+        console.log(friendObj.concat(friendRequests));
     }, [reloadApp]);
 
     const acceptFriendRequest = async (requestUsername) => {
@@ -60,36 +61,64 @@ const Friends = ({ navigation }) => {
         setSearchInput(""); // Clear the TextInput
     };
 
-    //<TouchableOpacity style={commonStyles.rejectButton} onPress={() => navigation.navigate('TempMain')}>
-
-    const renderFriendRequestsItem = ({ item }) => (
-        <View style={commonStyles.listItemContainer}>
-            <Text style={commonStyles.usernameText}>{item}</Text>
-            <TouchableOpacity style={commonStyles.rejectButton} onPress={() => rejectFriendRequest(item)}>
-                <Text style={commonStyles.buttonText}>Reject</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={commonStyles.acceptButton} onPress={() => acceptFriendRequest(item)}>
-                <Text style={commonStyles.buttonText}>Accept</Text>
-            </TouchableOpacity>
-        </View>
-    );
-
-    const renderUsernamesItem = ({ item }) => (
-        <View style={commonStyles.listItemContainer}>
-            <Image
-                style={commonStyles.friendIcon}
-                source={{
-                    uri: item.profileSettings.profilePicture,
-                }}
-                onError={(error) => console.error("Image load error:", error)}
-            />
-            <Text style={commonStyles.usernameText}>{item.username}</Text>
-            <TouchableOpacity style={commonStyles.removeButton} onPress={() => removeFriendObj(item)}>
-                <Text style={commonStyles.buttonText}>Remove</Text>
-            </TouchableOpacity>
-        </View>
-    );
-
+    const renderFriendItems = ({ item }) => {    
+        let content;
+    
+        if (typeof item === "string") {
+            content = (
+                <View style={commonStyles.listItemContainer}>
+                    <Text style={commonStyles.usernameText}>{item}</Text>
+                    <TouchableOpacity style={commonStyles.rejectButton} onPress={() => rejectFriendRequest(item)}>
+                        <Text style={commonStyles.buttonText}>Reject</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={commonStyles.acceptButton} onPress={() => acceptFriendRequest(item)}>
+                        <Text style={commonStyles.buttonText}>Accept</Text>
+                    </TouchableOpacity>
+                </View>
+            );
+        } else if (typeof item === "object") {
+            content = (
+                <View style={commonStyles.listItemContainer}>
+                    <Image
+                      style={commonStyles.friendIcon}
+                      source={{
+                      uri: item.profileSettings.profilePicture,
+                      }}
+                      onError={(error) => console.error("Image load error:", error)}
+                    />
+                    <Text style={commonStyles.usernameText}>{item.username}</Text>
+                    <TouchableOpacity style={commonStyles.removeButton} onPress={() => removeFriendObj(item)}>
+                        <Text style={commonStyles.buttonText}>Remove</Text>
+                    </TouchableOpacity>
+                </View>
+            );
+        } else {
+            if (item == 1) {
+                content = (
+                    <>
+                        <Text style={commonStyles.title}>Friend Requests</Text>
+                        <View style={commonStyles.line} />
+                    </>
+                )
+            }
+            else if (item == 2) {
+                content = (
+                    <>
+                        <Text style={commonStyles.title}>Friends</Text>
+                        <View style={commonStyles.line} />
+                    </>
+                )
+            }
+            else {
+                content = (
+                    <Text style={commonStyles.title1}>Friends will be displayed here</Text>
+                )
+            }
+        }
+    
+        return content;
+    };
+    
     return (
         <TouchableOpacity
             style={{ flex: 1 }} // Ensure the TouchableOpacity takes up the entire screen
@@ -109,7 +138,7 @@ const Friends = ({ navigation }) => {
                     <Image style={commonStyles.searchIconContainer} source={require('../icons/search-.png')} />
                     <TextInput
                         style={commonStyles.searchTextContainer}
-                        placeholder="Type here..."
+                        placeholder="add friends..."
                         returnKeyType="done"
                         value={searchInput}
                         onChangeText={(text) => setSearchInput(text)}
@@ -120,52 +149,12 @@ const Friends = ({ navigation }) => {
 
                 <View style={commonStyles.listContainer}>
 
-                    {friendRequests.length > 0 ? (
-                        <>
-                            <Text style={commonStyles.title}>Friend Requests</Text>
-                            <View style={commonStyles.line} />
-                            <FlatList
-                                data={friendRequests}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={renderFriendRequestsItem}
-                                ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <Text style={commonStyles.title}>Friend Requests</Text>
-                            <View style={commonStyles.line} />
-                            <FlatList
-                                ListEmptyComponent={() => (
-                                    <Text style={commonStyles.title}>No Friend Requests</Text>
-                                )}
-                            />
-                        </>
-                    )}
-
-                    {friendObj.length > 0 ? (
-                        <>
-                            <Text style={commonStyles.title}>Friends</Text>
-                            <View style={commonStyles.line} />
-                            <FlatList
-                                data={friendObj}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={renderUsernamesItem}
-                                ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <Text style={commonStyles.title}>Friends </Text>
-                            <View style={commonStyles.line} />
-                            <FlatList
-                                ListEmptyComponent={() => (
-                                    <Text style={commonStyles.title}>No Friend</Text>
-                                )}
-                            />
-                        </>
-                    )}
-
+                    <FlatList
+                        data={friendObj.length > 0 ? (friendRequests.length > 0 ? [1].concat(friendRequests.concat([2]).concat(friendObj)) : [2].concat(friendObj)) : (friendRequests.length > 0 ? [1].concat(friendRequests.concat([2,3])) : [2,3])}
+                        keyExtractor={(item) => item.toString()}
+                        renderItem={renderFriendItems}
+                        ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+                    />
                 </View>
             </BlackBackground>
         </TouchableOpacity>
