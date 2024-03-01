@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     },
     momentButton: {
         position: 'absolute',
+        paddingLeft: 20,
         left: '10%',
         top: '87%',
         width: '80%',
@@ -159,8 +160,6 @@ const styles = StyleSheet.create({
         height: '50%',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'red',
         zIndex: 1,  
     },
     capsuleImage: {
