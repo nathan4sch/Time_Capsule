@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
+import BackButton from "../Components/lightBackButton";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
@@ -36,7 +37,7 @@ const Profile = ({ navigation }) => {
     return (
         <>
             <BlackBackground>
-                <BackButton onPress={() => navigation.goBack()} />
+            <BackButton onPress={() => navigation.goBack()} />
                 <View style={styles.separator} />
                 <View style={styles.profileContainer}>
                     <Text style={styles.username}>  {curUser.username}</Text>
