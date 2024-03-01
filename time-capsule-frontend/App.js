@@ -29,9 +29,9 @@ export default function App() {
           <Stack.Screen name="Spotify" component={Spotify} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Instagram" component={Instagram} options={{ headerLeft: null, gestureEnabled: false }} />
           <Stack.Screen name="Friends" component={Friends} options={{ headerLeft: null, gestureEnabled: true }} />
-          <Stack.Screen name="Profile" component={Profile} options={{ headerLeft: null, gestureEnabled: false }} />
+          <Stack.Screen name="Profile" component={Profile} options={{ headerLeft: null, gestureEnabled: true }} />
           <Stack.Screen name="Main" component={Main} options={{ headerLeft: null, gestureEnabled: false }} />
-          <Stack.Screen name="StoryBoard" component={StoryBoard} options={{ headerLeft: null, gestureEnabled: false }} />
+          <Stack.Screen name="StoryBoard" component={StoryBoard} options={{ headerLeft: null, gestureEnabled: true }} />
           <Stack.Screen name="History" component={History} options={{ headerLeft: null, gestureEnabled: true }} />
         </Stack.Navigator>
       </NavigationContainer>

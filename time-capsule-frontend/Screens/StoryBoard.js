@@ -57,13 +57,14 @@ const StoryBoard = ({ navigation }) => {
     return (
         <HistoryBackground>
             <PageNavBar onBackPress={() => navigation.goBack()} title="StoryBoard" />
-            <FlatList
+            {friendObj.length > 0 ? (<FlatList
                 style={styles.capsuleList}
                 data={friendObj}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderFriendCapsule}
                 ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
             />
+            ) : <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>}
         </HistoryBackground>
     );
 };
@@ -100,4 +101,10 @@ const styles = StyleSheet.create({
         left: '15%',
         color: 'black',
       },
+      overlayText: {
+        alignSelf: 'center',
+        color: 'black',
+        fontWeight: 'bold',
+        top: '35%'
+    },
 });

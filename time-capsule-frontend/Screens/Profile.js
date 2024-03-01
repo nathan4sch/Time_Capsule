@@ -6,6 +6,7 @@ import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
 import { spotifyLogin } from "../utils/spotifyLogin";
 import { instagramLogin } from "../utils/instagramLogin";
+import BackButton from "../Components/lightBackButton";
 
 
 const Profile = ({ navigation }) => {
@@ -35,9 +36,7 @@ const Profile = ({ navigation }) => {
     return (
         <>
             <BlackBackground>
-                <TouchableOpacity style={commonStyles.backButtonTop} onPress={() => navigation.goBack()}>
-                    <Image style={commonStyles.arrowIconContainer} source={require('../icons/tempbackarrow-.png')} />
-                </TouchableOpacity>
+                <BackButton onPress={() => navigation.goBack()} />
                 <View style={styles.separator} />
                 <View style={styles.profileContainer}>
                     <Text style={styles.username}>  {curUser.username}</Text>
