@@ -66,6 +66,7 @@ const StoryBoard = ({ navigation }) => {
 
     return (
         <HistoryBackground>
+            <PageNavBar onBackPress={() => navigation.goBack()} title="StoryBoard" />
             {/* Add the rest of your components here */}
             {capsuleList.length > 0 ? (
                 <FlatList
