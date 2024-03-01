@@ -4,10 +4,15 @@ import BlackBackground from "../Components/BlackBackground";
 import PageNavBar from "../Components/PageNavBar";
 import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
+import { spotifyLogin } from "../utils/spotifyLogin";
+import { instagramLogin } from "../utils/instagramLogin";
+
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode } = useGlobalContext();
+    const { curUser, setLDMode, setSpotify } = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
+    const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
+    const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
 
     profilePicture = curUser.profileSettings.profilePicture;
     console.log(curUser.profileSettings.profilePicture)
@@ -18,6 +23,15 @@ const Profile = ({ navigation }) => {
         setIsDarkMode(!isDarkMode)
     };
 
+    const handleSpotifyLogin = async () => {
+        await spotifyLogin({ navigation, page: "Profile", setSpotify });
+        setShowSpotifyButton(false);
+    };
+
+    const handleInstagramLogin = async () => {
+        await instagramLogin({ navigation, page: "Profile" });
+        setShowInstagramButton(false);
+    };
 
     return (
         <>
@@ -36,22 +50,21 @@ const Profile = ({ navigation }) => {
                     />
                     <Text style={styles.editPhotoText}>Edit Photo</Text>
                 </View>
-                {/* Render Spotify button only if the field is empty */}
-                {curUser.profileSettings.spotifyAccount === "" && (
-                    <View style={styles.buttonContainer}>
-                        <View style={buttonStyle.button}>
-                            <Image style={styles.icon} source={require('../icons/spotify-.png')} />
-                            <Text style={styles.buttonText}>   Link Spotify Account</Text>
-                        </View>
-                    </View>
+                {showSpotifyButton && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={buttonStyle.button} onPress={handleSpotifyLogin} title=''>
+                        <Image style={styles.icon} source={require('../icons/spotify-.png')} />
+                        <Text style={styles.buttonText}>   Link Spotify Account</Text>
+                    </TouchableOpacity>
+                </View>
                 )}
                 {/* Render Instagram button only if the field is empty */}
-                {curUser.profileSettings.instagramAccount === "" && (
+                {showInstagramButton && (
                     <View style={styles.buttonContainer}>
-                        <View style={buttonStyle.button}>
+                        <TouchableOpacity style={buttonStyle.button} onPress={handleInstagramLogin} title=''>
                             <Image style={styles.icon} source={require('../icons/instagram-.png')} />
                             <Text style={styles.buttonText}>   Link Instagram Account</Text>
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 )}
                 <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Friends')}>
@@ -113,7 +126,7 @@ const styles = StyleSheet.create({
     icon: {
         position: 'absolute',
         left: '2%',
-        top: '15%',
+        top: '11%',
         width: 47,
         height: 47,
     },

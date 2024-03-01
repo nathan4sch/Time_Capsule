@@ -48,15 +48,15 @@ export const GlobalProvider = ({ children }) => {
             //console.error('Axios Error:', error); // Overall error type
 
             // Log specific error properties conditionally
-            if (error.response) {
-                console.error('Response Data:', error.response.data);
-                //console.error('Response Status:', error.response.status);
-                //console.error('Response Headers:', error.response.headers);
-            } else if (error.request) {
-                console.error('Request:', error.request);
-            } else {
-                console.error('Error:', error.message);
-            }
+            // if (error.response) {
+            //     console.error('Response Data:', error.response.data);
+            //     //console.error('Response Status:', error.response.status);
+            //     //console.error('Response Headers:', error.response.headers);
+            // } else if (error.request) {
+            //     console.error('Request:', error.request);
+            // } else {
+            //     console.error('Error:', error.message);
+            // }
             setError(error);
             return null;
         }
