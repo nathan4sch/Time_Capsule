@@ -8,6 +8,7 @@ import { commonStyles } from "../Components/FriendsPageStylings";
 const StoryBoard = ({ navigation }) => {
     const { setCurUser, curUser, getUserbyID, getCapsule } = useGlobalContext();
     const [friendObj, setFriendObj] = useState([]);
+    const [shownCapsule, setShownCapsule] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -26,10 +27,14 @@ const StoryBoard = ({ navigation }) => {
         fetchData();
     }, []);
 
-    const renderFriendCapsule ({ item }) => {    
+    const getCapsuleSnapshot = async (capsuleID) => {
+        const capsule = await getCapsule(capsuleID);
+        setShownCapsule(capsule.snapshot);
+    }
+
+    const renderFriendCapsule = ({ item }) => {    
         let content;
-        const ss = await getCapsule(item.capsules[0]);
-        console.log(ss);
+        getCapsuleSnapshot(item.capsules[0]);
         content = (
             <TouchableOpacity activeOpacity={1} style={styles.container}>
                 <TouchableOpacity activeOpacity={1} style={styles.listItemContainer}>
@@ -42,7 +47,7 @@ const StoryBoard = ({ navigation }) => {
                     />
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
-                <Image style={styles.capsuleListItem} source={{ uri: ss}} />
+                <Image style={styles.capsuleListItem} source={{ uri: shownCapsule}} />
             </TouchableOpacity>
         );
     
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: "15%",
         width: "100%",
-        height: '85%',
+        height: '80%',
     },
     capsuleListItem: {
         alignSelf: 'center',
@@ -81,8 +86,7 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: 350,
-        borderWidth: 1,
-        borderColor: 'red'
+        overflow: 'hidden', // This will clip the child elements that overflow the container
     },
     listItemContainer: {
         width: '100%',

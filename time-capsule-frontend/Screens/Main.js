@@ -160,8 +160,6 @@ const styles = StyleSheet.create({
         height: '50%',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'red',
         zIndex: 1,  
     },
     capsuleImage: {
