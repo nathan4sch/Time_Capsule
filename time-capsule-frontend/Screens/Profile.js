@@ -7,10 +7,11 @@ import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
 import { spotifyLogin } from "../utils/spotifyLogin";
 import { instagramLogin } from "../utils/instagramLogin";
+import BackButton from "../Components/lightBackButton";
 
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify } = useGlobalContext();
+    const { curUser, setLDMode, setSpotify, setCurUser, getUser } = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
@@ -44,18 +45,18 @@ const Profile = ({ navigation }) => {
                         style={styles.profileIcon}
                         source={{
                             uri: curUser.profileSettings.profilePicture,
-                          }}
+                        }}
                         onError={(error) => console.error("Image load error:", error)}
                     />
                     <Text style={styles.editPhotoText}>Edit Photo</Text>
                 </View>
                 {showSpotifyButton && (
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={buttonStyle.button} onPress={handleSpotifyLogin} title=''>
-                        <Image style={styles.icon} source={require('../icons/spotify-.png')} />
-                        <Text style={styles.buttonText}>   Link Spotify Account</Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={buttonStyle.button} onPress={handleSpotifyLogin} title=''>
+                            <Image style={styles.icon} source={require('../icons/spotify-.png')} />
+                            <Text style={styles.buttonText}>   Link Spotify Account</Text>
+                        </TouchableOpacity>
+                    </View>
                 )}
                 {/* Render Instagram button only if the field is empty */}
                 {showInstagramButton && (
@@ -92,7 +93,7 @@ const Profile = ({ navigation }) => {
 const styles = StyleSheet.create({
     separator: {
         marginVertical: 50,
-      },
+    },
     profileContainer: {
         top: '-5%',
         position: 'relative',

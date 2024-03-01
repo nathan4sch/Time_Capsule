@@ -70,6 +70,7 @@ const Main = ({ navigation }) => {
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
                 </View>
                 <View style={styles.imageContainer}>
+                <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
                     {shownCapsule ? (
                         <Image
                             style={styles.capsuleImage}
@@ -79,7 +80,7 @@ const Main = ({ navigation }) => {
                         // Render something else when shownCapsule is empty
                         <Text style={styles.overlayText}>No Capsule Available</Text>
                     )}
-                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}></TouchableOpacity>
+                    </TouchableOpacity>
                 </View>
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
@@ -169,13 +170,14 @@ const styles = StyleSheet.create({
     overlayButton: {
         backgroundColor: 'transparent',
         padding: 10,
-        marginTop: '-70%',
-        width: '80%',
-        height: '65%',
+        width: '100%',
+        height: '100%',
         zIndex: 2,
     },
     overlayText: {
         color: 'black',
         fontWeight: 'bold',
+        alignSelf: 'center',
+        top: '50%'
     },
 });
