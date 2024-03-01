@@ -60,13 +60,14 @@ const styles = StyleSheet.create({
     },
     textBox: {
         position: "absolute",
+        alignSelf: 'center',
         top: "45%",
         width: "50%",
         height: '5%',
     },
     overlayText: {
         alignSelf: 'center',
-        color: 'white',
+        color: 'black',
         fontWeight: 'bold',
     },
 });
