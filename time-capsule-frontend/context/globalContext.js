@@ -178,6 +178,9 @@ export const GlobalProvider = ({ children }) => {
             const response = await axios.delete(`${BASE_URL}remove-friend/${curUser._id}`, {
                 data: { friendId }  // Pass the data in the 'data' property
             });
+            const response2 = await axios.delete(`${BASE_URL}remove-friend/${friendId}`, {
+                data: { friendId: curUser._id }  // Pass the data in the 'data' property
+            });
         } catch (error) {
             // Handle errors
             if (error.response) {
