@@ -39,7 +39,7 @@ const History = ({ navigation }) => {
                     <Text style={styles.overlayText}>No Past Capsules</Text>
                 </View>
             )}
-        </BlackBackground>
+        </HistoryBackground>
     );
 };
 
