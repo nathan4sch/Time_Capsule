@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
-import BackButton from "../Components/lightBackButton";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
@@ -17,6 +16,18 @@ const Profile = ({ navigation }) => {
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
 
     profilePicture = curUser.profileSettings.profilePicture;
+
+    useEffect(() => {
+        const fetchData = async (name) => {
+            const findUser = await getUser(name);
+            setCurUser(findUser); 
+            setShowSpotifyButton(findUser.profileSettings.spotifyAccount === "");
+            setShowInstagramButton(findUser.profileSettings.instagramAccount === "");
+        };
+    
+        fetchData(curUser.username);
+    }, []);
+    
 
     const toggleDarkMode = () => {
         setLDMode();
