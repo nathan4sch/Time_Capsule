@@ -201,6 +201,20 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
+    const getCapsule = async (id) => {
+        try {
+            const response = await axios.get(`${BASE_URL}get-capsule/${id}`);
+            return response;
+        
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
+
 
     // Provide the context value to child components
     return (
@@ -225,6 +239,7 @@ export const GlobalProvider = ({ children }) => {
             addFriend,
             removeFriend,
             setLDMode,
+            getCapsule,
         }}>
             {children}
         </GlobalContext.Provider>

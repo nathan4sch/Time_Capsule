@@ -15,7 +15,6 @@ const Profile = ({ navigation }) => {
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
 
     profilePicture = curUser.profileSettings.profilePicture;
-    console.log(curUser.profileSettings.profilePicture)
 
     const toggleDarkMode = () => {
         setLDMode();
