@@ -76,6 +76,13 @@ const Friends = ({ navigation }) => {
 
     const renderUsernamesItem = ({ item }) => (
         <View style={commonStyles.listItemContainer}>
+            <Image
+                style={commonStyles.friendIcon}
+                source={{
+                    uri: item.profileSettings.profilePicture,
+                }}
+                onError={(error) => console.error("Image load error:", error)}
+            />
             <Text style={commonStyles.usernameText}>{item.username}</Text>
             <TouchableOpacity style={commonStyles.removeButton} onPress={() => removeFriendObj(item)}>
                 <Text style={commonStyles.buttonText}>Remove</Text>
