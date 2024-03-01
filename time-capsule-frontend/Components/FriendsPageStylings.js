@@ -141,7 +141,15 @@ buttonText: {
 },
   usernameText: {
     fontSize: 16,
-    top: '25%',
+    top: '-35%',
+    left: '10%',
     color: 'black',
   },
+  friendIcon: {
+    top: '20%',
+    height: '70%',
+    left: '-2%',
+    aspectRatio: 1,
+    borderRadius: 100,
+  }
 });
