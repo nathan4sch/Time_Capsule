@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     },
     momentButton: {
         position: 'absolute',
+        paddingLeft: 20,
         left: '10%',
         top: '87%',
         width: '80%',

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image, FlatList } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
-import BlackBackground from "../Components/BlackBackground";
+import HistoryBackground from "../Components/HistoryBackground";
 
 
 const History = ({ navigation }) => {
@@ -23,7 +23,7 @@ const History = ({ navigation }) => {
     }, [curUser.capsules]);
 
     return (
-        <BlackBackground>
+        <HistoryBackground>
             <PageNavBar onBackPress={() => navigation.goBack()} title="History Page" />
             <FlatList
                 style={styles.capsuleList}
@@ -33,7 +33,7 @@ const History = ({ navigation }) => {
                     <Image style={styles.capsuleListItem} source={{ uri: item }} />
                 )}
             />
-        </BlackBackground>
+        </HistoryBackground>
     );
 };
 

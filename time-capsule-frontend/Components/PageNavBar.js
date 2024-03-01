@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     fontSize: 20, // Adjust the font size as needed
     fontWeight: 'bold', // Makes the title bold
     padding: 10,
+    color: 'white',
   },
   placeholder: {
     width: 40, // Should be approximately the same size as the back arrow container to balance the title
