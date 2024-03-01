@@ -44,7 +44,7 @@ const Login = ({ navigation }) => {
                 } else {
                     setCurUser(existResponse.user)
                     //navigation.navigate('Main');
-                    navigation.navigate('TempMain');
+                    navigation.navigate('Main');
                 }
             }
         };

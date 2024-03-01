@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, Text, TextInput, TouchableOpacity, FlatList, Keyboard, Alert } from "react-native";
+import { View, Image, Text, TextInput, TouchableOpacity, FlatList, Keyboard, Alert, ScrollView } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import { useGlobalContext } from "../context/globalContext";
@@ -29,7 +29,6 @@ const Friends = ({ navigation }) => {
         };
 
         fetchData();
-        console.log(friendObj.concat(friendRequests));
     }, [reloadApp]);
 
     const acceptFriendRequest = async (requestUsername) => {
@@ -66,19 +65,19 @@ const Friends = ({ navigation }) => {
     
         if (typeof item === "string") {
             content = (
-                <View style={commonStyles.listItemContainer}>
-                    <Text style={commonStyles.usernameText}>{item}</Text>
+                <TouchableOpacity activeOpacity={1} style={commonStyles.listItemContainer}>
+                    <Text style={commonStyles.usernameTextRequest}>{item}</Text>
                     <TouchableOpacity style={commonStyles.rejectButton} onPress={() => rejectFriendRequest(item)}>
                         <Text style={commonStyles.buttonText}>Reject</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={commonStyles.acceptButton} onPress={() => acceptFriendRequest(item)}>
                         <Text style={commonStyles.buttonText}>Accept</Text>
                     </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
             );
         } else if (typeof item === "object") {
             content = (
-                <View style={commonStyles.listItemContainer}>
+                <TouchableOpacity activeOpacity={1} style={commonStyles.listItemContainer}>
                     <Image
                       style={commonStyles.friendIcon}
                       source={{
@@ -90,7 +89,7 @@ const Friends = ({ navigation }) => {
                     <TouchableOpacity style={commonStyles.removeButton} onPress={() => removeFriendObj(item)}>
                         <Text style={commonStyles.buttonText}>Remove</Text>
                     </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
             );
         } else {
             if (item == 1) {
@@ -127,7 +126,7 @@ const Friends = ({ navigation }) => {
         >
             <BlackBackground>
 
-                <TouchableOpacity style={commonStyles.backButtonTop} onPress={() => navigation.navigate('TempMain')}>
+                <TouchableOpacity style={commonStyles.backButtonTop} onPress={() => navigation.navigate('Profile')}>
                     <View style={commonStyles.arrowContainer}>
                         <Image style={commonStyles.arrowIconContainer} source={require('../icons/tempbackarrow-.png')} />
                     </View>
@@ -146,14 +145,15 @@ const Friends = ({ navigation }) => {
                     />
                 </View>
 
-
                 <View style={commonStyles.listContainer}>
 
                     <FlatList
                         data={friendObj.length > 0 ? (friendRequests.length > 0 ? [1].concat(friendRequests.concat([2]).concat(friendObj)) : [2].concat(friendObj)) : (friendRequests.length > 0 ? [1].concat(friendRequests.concat([2,3])) : [2,3])}
-                        keyExtractor={(item) => item.toString()}
+                        keyExtractor={(item) => Math.random().toString()}
                         renderItem={renderFriendItems}
                         ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+                        showsVerticalScrollIndicator={true} 
+                        showsHorizontalScrollIndicator={false}                     
                     />
                 </View>
             </BlackBackground>
