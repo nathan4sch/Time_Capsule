@@ -48,9 +48,7 @@ const Main = ({ navigation }) => {
     }
 
     const handleOverlayButtonPress = () => {
-        // Add the function to be executed when the overlay button is pressed
-        console.log("Overlay button pressed!");
-        // You can add your logic here
+        navigation.navigate('StoryBoard');
     };
 
     return (
@@ -75,16 +73,14 @@ const Main = ({ navigation }) => {
                 <View style={styles.imageContainer}>
                     {shownCapsule ? (
                         <Image
-                            style={styles.backgroundImage}
+                            style={styles.capsuleImage}
                             source={{ uri: shownCapsule }}
                         />
                     ) : (
                         // Render something else when shownCapsule is empty
-                        <Text style={styles.overlayButtonText}>No Capsule Available</Text>
+                        <Text style={styles.overlayText}>No Capsule Available</Text>
                     )}
-                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
-                        <Text style={styles.overlayButtonText}>Overlay Button</Text>
-                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}></TouchableOpacity>
                 </View>
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
@@ -168,17 +164,19 @@ const styles = StyleSheet.create({
         borderColor: 'red',
         zIndex: 1,  
     },
-    backgroundImage: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
+    capsuleImage: {
+        height: '65%',
+        width: '80%'
     },
     overlayButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: 'transparent',
         padding: 10,
-        borderRadius: 10,
+        marginTop: '-70%',
+        width: '80%',
+        height: '65%',
+        zIndex: 2,
     },
-    overlayButtonText: {
+    overlayText: {
         color: 'black',
         fontWeight: 'bold',
     },

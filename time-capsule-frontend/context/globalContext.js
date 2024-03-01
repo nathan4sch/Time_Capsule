@@ -204,7 +204,7 @@ export const GlobalProvider = ({ children }) => {
     const getCapsule = async (id) => {
         try {
             const response = await axios.get(`${BASE_URL}get-capsule/${id}`);
-            return response;
+            return response.data;
         
         } catch (error) {
             if (error.response) {
