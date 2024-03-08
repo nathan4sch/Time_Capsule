@@ -35,7 +35,8 @@
     "react-native-screens": "~3.29.0",
     "react-native-sha256": "^1.4.9",
     "react-native-web": "~0.19.6",
-    "react-native-webview": "^13.8.1"
+    "react-native-webview": "^13.8.1",
+    "expo-updates": "~0.24.11"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

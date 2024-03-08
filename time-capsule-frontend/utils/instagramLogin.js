@@ -55,10 +55,10 @@ export const instagramLogin = async ({navigation, page}) => {
     };
 
     console.log("here");
-    let redirectUrl = 'exp://localhost:19000/--/oauth2callback'; // Get the redirect URL
+    let redirectUrl = 'https://auth.expo.io/@kpjones/time-capsule'; // Get the redirect URL
     let authUrl =
         `https://api.instagram.com/oauth/authorize` +
-        `?client_id=956916255292975` +
+        `?client_id=706561624702232` +
         `&redirect_uri=${encodeURIComponent(redirectUrl)}` +
         `&scope=user_profile,user_media` +
         `&response_type=code`;
@@ -73,8 +73,11 @@ export const instagramLogin = async ({navigation, page}) => {
             // Extract the access token from the result
             let { code } = result.params;
             console.log(code);
-            handleTokenRequest('956916255292975', INSTAGRAM_SECRET, redirectUrl, code);
+            handleTokenRequest('706561624702232', INSTAGRAM_SECRET, redirectUrl, code);
             // Use the code to make further API calls or perform other tasks
         }
+    }
+    else {
+        console.error(result);
     }
 };
