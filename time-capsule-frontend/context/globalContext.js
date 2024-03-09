@@ -218,6 +218,69 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
+    const deleteNotification = async (notificationId) => {
+        try {
+            const response = await axios.delete(`${BASE_URL}delete-notification/${notificationId}`);        
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
+
+    const deleteMoment = async (momentId) => {
+        try {
+            const response = await axios.delete(`${BASE_URL}delete-moment/${momentId}`);        
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
+
+    const deleteCapsule = async (capsuleId) => {
+        try {
+            const response = await axios.delete(`${BASE_URL}delete-capsule/${capsuleId}`);        
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
+
+    const deleteAccount = async (id) => {
+        try {
+            let response = await axios.delete(`${BASE_URL}delete-user/${id}`);
+            for (friendId in curUser.friends) {
+                response = await axios.delete(`${BASE_URL}remove-friend/${friendId}`, {
+                    data: { id }  // Pass the data in the 'data' property
+                });
+            }
+            
+            for (capsuleId in curUser.capsules) {
+                response = await deleteCapsule(capsuleId);
+            }
+            for (momentId in curUser.moments) {
+                response = await deleteMoment(momentId);
+            }
+            for (notificationId in curUser.notifications) {
+                response = await deleteNotification(notificationId);
+            }
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
+
 
     // Provide the context value to child components
     return (
@@ -243,6 +306,10 @@ export const GlobalProvider = ({ children }) => {
             removeFriend,
             setLDMode,
             getCapsule,
+            deleteAccount,
+            deleteCapsule,
+            deleteMoment,
+            deleteNotification,
         }}>
             {children}
         </GlobalContext.Provider>
