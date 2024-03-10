@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import { buttonStyle } from "../Components/Button";
@@ -9,7 +9,7 @@ import { instagramLogin } from "../utils/instagramLogin";
 import BackButton from "../Components/lightBackButton";
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify, setCurUser, getUser } = useGlobalContext();
+    const { curUser, setLDMode, setSpotify, setCurUser, getUser, deleteAccount } = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
@@ -19,14 +19,14 @@ const Profile = ({ navigation }) => {
     useEffect(() => {
         const fetchData = async (name) => {
             const findUser = await getUser(name);
-            setCurUser(findUser); 
+            setCurUser(findUser);
             setShowSpotifyButton(findUser.profileSettings.spotifyAccount === "");
             setShowInstagramButton(findUser.profileSettings.instagramAccount === "");
         };
-    
+
         fetchData(curUser.username);
     }, []);
-    
+
 
     const toggleDarkMode = () => {
         setLDMode();
@@ -44,10 +44,27 @@ const Profile = ({ navigation }) => {
         setShowInstagramButton(false);
     };
 
+    const handleDeleteAccount = () => {
+        Alert.alert(
+            'Delete Account',
+            'Are you sure you want to delete your account?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete', onPress: () => confirmDeleteAccount() },
+            ],
+            { cancelable: true }
+        );
+    };
+
+    const confirmDeleteAccount = async () => {
+        await deleteAccount(curUser._id);
+        navigation.navigate('Login')
+    }
+
     return (
         <>
             <BlackBackground>
-            <BackButton onPress={() => navigation.goBack()} />
+                <BackButton onPress={() => navigation.goBack()} />
                 <View style={styles.separator} />
                 <View style={styles.profileContainer}>
                     <Text style={styles.username}>  {curUser.username}</Text>
@@ -89,10 +106,15 @@ const Profile = ({ navigation }) => {
                         <Text style={styles.buttonText}>History</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonContainer} onPress={toggleDarkMode}>
+                {/*<TouchableOpacity style={styles.buttonContainer} onPress={toggleDarkMode}>
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/history-.png')} />
                         <Text style={styles.buttonText}>{curUser.profileSettings.darkMode ? 'Light Mode' : 'Dark Mode'}</Text>
+                    </View>
+                </TouchableOpacity>*/}
+                <TouchableOpacity style={styles.buttonContainer} onPress={handleDeleteAccount}>
+                    <View style={{ ...buttonStyle.button, backgroundColor: '#ff5a50' }}>
+                        <Text style={{...styles.buttonText, color: 'white'}}>Delete Account</Text>
                     </View>
                 </TouchableOpacity>
             </BlackBackground>
