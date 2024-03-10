@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 const express = require('express') // Express framework for building web applications
 const cors = require('cors'); // (Cross-Origin Resource Sharing) middleware for handling CORS issues
