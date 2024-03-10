@@ -35,8 +35,8 @@ const History = ({ navigation }) => {
                     )}
                 />
             ) : (
-                <View style={styles.textBox}>
-                    <Text style={styles.overlayText}>No Past Capsules</Text>
+                <View style={styles.noPastCapsulesContainer}>
+                        <Text style={styles.overlayText}>No Past Capsules</Text>
                 </View>
             )}
         </HistoryBackground>
@@ -69,5 +69,16 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         color: 'black',
         fontWeight: 'bold',
+    },
+    noPastCapsulesContainer: {
+        position: "absolute",
+        alignSelf: 'center',
+        justifyContent: 'center',
+        top: "44.5%",
+        width: "50%",
+        height: '5.25%',
+        padding: '25px',
+        backgroundColor: 'white',
+        borderRadius: '10px',
     },
 });
