@@ -1,4 +1,5 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const multer = require('multer');
 
 const express = require('express') // Express framework for building web applications
 const cors = require('cors'); // (Cross-Origin Resource Sharing) middleware for handling CORS issues
@@ -11,6 +12,9 @@ require('dotenv').config()
 const PORT = process.env.PORT
 
 //new
+const storage = multer.memoryStorage()
+const upload = multer({storage: storage})
+
 const bucketName = process.env.BUCKET_NAME
 const region = process.env.BUCKET_REGION
 const accessKeyId = process.env.ACCESS_KEY
