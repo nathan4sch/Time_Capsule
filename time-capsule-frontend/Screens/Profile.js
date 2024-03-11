@@ -1,20 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
-import { commonStyles } from "../Components/FriendsPageStylings";
 import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
 import { spotifyLogin } from "../utils/spotifyLogin";
 import { instagramLogin } from "../utils/instagramLogin";
 import BackButton from "../Components/lightBackButton";
+import * as ImagePicker from 'expo-image-picker';
 
 const Profile = ({ navigation }) => {
     const { curUser, setLDMode, setSpotify, setCurUser, getUser, deleteAccount } = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
+    const [profileImage, setProfileImage] = useState(null);
 
     profilePicture = curUser.profileSettings.profilePicture;
+
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.canceled) {
+          setProfileImage(result.assets[0].uri);
+        }
+      };
+
 
     useEffect(() => {
         const fetchData = async (name) => {
@@ -75,7 +93,9 @@ const Profile = ({ navigation }) => {
                         }}
                         onError={(error) => console.error("Image load error:", error)}
                     />
-                    <Text style={styles.editPhotoText}>Edit Photo</Text>
+                    <TouchableOpacity style={styles.press} onPress={pickImage}>
+                        <Text style={styles.editPhotoText}>Edit Profile Picture</Text>
+                    </TouchableOpacity>
                 </View>
                 {showSpotifyButton && (
                     <View style={styles.buttonContainer}>
