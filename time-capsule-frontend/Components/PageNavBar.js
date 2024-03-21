@@ -17,19 +17,20 @@ const PageNavBar = ({ onBackPress, title }) => {
 
 const styles = StyleSheet.create({
   navbar: {
+    borderRadius: '10px',
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    height: 110, // Adjust the height as needed
+    height: 130, // Adjust the height as needed
     width: '100%',
     paddingHorizontal: 16, // Side padding
-    backgroundColor: 'transparent', // Change the background color as needed
+    backgroundColor: '#33b898', // Change the background color as needed
     elevation: 4, // Adds shadow for Android
     shadowOpacity: 0.1, // Adds shadow for iOS
     shadowRadius: 10,
     shadowColor: '#000',
     shadowOffset: { height: 0, width: 0 },
-    paddingBottom: 10,
+    paddingBottom: 20,
   },
   backArrowContainer: {
     padding: 10, // Makes it easier to touch
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     right: 100,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 10,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 20, // Adjust the font size as needed
