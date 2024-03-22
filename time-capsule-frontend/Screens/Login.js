@@ -6,9 +6,11 @@ import base64 from 'react-native-base64';
 import { useGlobalContext } from "../context/globalContext";
 import { ANDROID_CLIENT_ID, IOS_CLIENT_ID, WEB_CLIENT_ID } from '../env.js';
 
+const BASE_URL = "https://time-capsule-server.onrender.com/";
+
 
 const Login = ({ navigation }) => {
-    const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
+    const { getUser, setCurUser, curUser, emailExist, setUserEmail, setProfilePictureUrl } = useGlobalContext();
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: ANDROID_CLIENT_ID,
@@ -43,8 +45,13 @@ const Login = ({ navigation }) => {
                     navigation.navigate('Registration');
                 } else {
                     setCurUser(existResponse.user)
-                    //navigation.navigate('Main');
-                    navigation.navigate('Main');
+                    if (curUser.profileSettings.profilePictureKey != "default") {
+                        const urlRes = await axios.get(`${BASE_URL}api/get/${curUser.profileSettings.profilePictureKey}`);
+                        const url = urlRes.data.url
+                        await setProfilePictureUrl(url);
+                        //navigation.navigate('Main');
+                        navigation.navigate('Main');
+                    }
                 }
             }
         };

@@ -274,9 +274,9 @@ exports.setLDMode = async (req, res) => {
     }
 };
 
-exports.setProfilePicture = async (req, res) => {
+exports.setProfilePictureUrl = async (req, res) => {
     const { id } = req.params;
-    const { profilePicture } = req.body;
+    const { profilePictureUrl } = req.body;
 
     try {
         if (!id || profilePicture === undefined) {
@@ -289,12 +289,39 @@ exports.setProfilePicture = async (req, res) => {
         }
 
         // Update the profilePicture setting
-        user.profileSettings.profilePicture = profilePicture;
+        user.profileSettings.profilePictureUrl = profilePictureUrl;
 
         // Save the updated user document
         await user.save();
 
         res.status(200).json({ message: 'Profile picture updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+exports.setProfilePictureKey = async (req, res) => {
+    const { id } = req.params;
+    const { setProfilePictureKey } = req.body;
+
+    try {
+        if (!id || profilePicture === undefined) {
+            return res.status(400).json({ message: 'User id and profilePicture value required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update the profilePicture setting
+        user.profileSettings.setProfilePictureKey = setProfilePictureKey;
+
+        // Save the updated user document
+        await user.save();
+
+        res.status(200).json({ message: 'setProfilePictureKey updated successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
