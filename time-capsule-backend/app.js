@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require('multer');
 
 const express = require('express') // Express framework for building web applications
@@ -7,13 +7,15 @@ const { db } = require('./db/db');
 const { readdirSync, read } = require('fs')
 const app = express()
 
+const crypto = require('crypto')
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
 require('dotenv').config()
 
 const PORT = process.env.PORT
 
-//new
-const storage = multer.memoryStorage()
-const upload = multer({storage: storage})
+
+const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
 
 const bucketName = process.env.BUCKET_NAME
 const region = process.env.BUCKET_REGION
@@ -28,20 +30,63 @@ const s3 = new S3Client({
     }
 })
 
-app.post('/posts', upload.single('image'), async (req, res) => {
-    req.file.buffer
+const upload = multer({ storage: multer.memoryStorage() });
+
+//handle photo upload to the aws s3 bucket
+app.post('/api/posts', upload.single('image'), async (req, res) => {
+    console.log("Server received a request to /api/posts");
+    if (!req.file) {
+        console.error("No file was uploaded.");
+        return res.status(400).json({ error: "File not provided" });
+    }
+
+    //use sharp to modify the height and width of the photo. 
+
+    imageName = randomImageName()
     const params = {
         Bucket: bucketName,
         Body: req.file.buffer,
-        Key: req.file.originalName,
-        ContentType: req.file.mimetype
+        Key: imageName,  //key is the image name, unique or else rewrite image
+        ContentType: req.file.mimetype,
+    };
+
+    try {
+        await s3.send(new PutObjectCommand(params));
+        console.log("File uploaded successfully to S3");
+        res.json({ message: "Image uploaded successfully", imageName: imageName });
+    } catch (error) {
+        console.error('Error uploading image to S3:', error);
+        res.status(500).json({ error: "Error uploading image to S3" });
+    }
+});
+
+app.get("/api/get/:imageName", async (req, res) => {
+    const { imageName } = req.params;
+    const getObjectParams = {
+        Bucket: bucketName,
+        Key: imageName,
+    }
+    const command = new GetObjectCommand(getObjectParams)
+    const url = await getSignedUrl(s3,command, {expiresIn:3600})
+    res.send({ url });
+});
+
+app.get("/", async (req, res) => {
+    //const posts = await prisma.posts.findMany({ orderBy: [{ created: 'desc' }] }) // Get all posts from the database
+
+    for (let post of posts) { // For each post, generate a signed URL and save it to the post object
+        const getObjectParams = {
+            Bucket: bucketName,
+            Key: post.imageName,
+        }
+        const command = new GetObjectCommand(getObjectParams)
+        const url = await getSignedUrl(s3,command, {expiresIn:3600})
+        post.imageUrl = url
     }
 
-    const command = new PutObjectCommand(params)
-    await s3.send(command)
-
-    res.send({})
+    res.send(posts)
 })
+
 
 //end new
 

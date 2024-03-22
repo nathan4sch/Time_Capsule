@@ -10,6 +10,7 @@ const Registration = ({ navigation }) => {
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [profileImage, setProfileImage] = useState(null);
+    //const BASE_URL = "http://100.67.14.25:3000/api/v1/";
     const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 
     const pickImage = async () => {
@@ -22,6 +23,7 @@ const Registration = ({ navigation }) => {
         });
     
         console.log(result);
+        console.log(result.assets[0].uri)
     
         if (!result.canceled) {
           setProfileImage(result.assets[0].uri);
@@ -57,17 +59,19 @@ const Registration = ({ navigation }) => {
                     fetch(`${BASE_URL}posts`, {
                         method: 'POST',
                         body: formData,
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
                     })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            console.log('Image uploaded successfully:', data);
-                        })
-                        .catch((error) => {
-                            console.error('Error uploading image:', error);
-                        });
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => { throw new Error(text) });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Image uploaded successfully:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error uploading image:', error);
+                    });
                 }
                 await addUser(curUsername, userEmail)
                 Alert.alert("Success", "Account Created");

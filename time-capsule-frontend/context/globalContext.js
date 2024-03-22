@@ -5,7 +5,7 @@ import axios from 'axios'
 
 //CHANGE TO YOUR OWN IP ADDRESS
 const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-//const BASE_URL = "http://100.67.14.38:3000/api/v1/"
+//const BASE_URL = "http://100.67.14.25:3000/api/v1/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -204,6 +204,21 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
+    const setProfilePicture = async (profilePicture) => {
+        try {
+            const response = await axios.post(`${BASE_URL}set-profile-picture/${curUser._id}`, {
+                profilePicture
+            });
+        
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    }
+
     const getCapsule = async (id) => {
         try {
             const response = await axios.get(`${BASE_URL}get-capsule/${id}`);
@@ -282,6 +297,7 @@ export const GlobalProvider = ({ children }) => {
     };
 
 
+
     // Provide the context value to child components
     return (
         <GlobalContext.Provider value={{
@@ -310,6 +326,7 @@ export const GlobalProvider = ({ children }) => {
             deleteCapsule,
             deleteMoment,
             deleteNotification,
+            setProfilePicture
         }}>
             {children}
         </GlobalContext.Provider>
