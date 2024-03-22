@@ -204,10 +204,25 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
-    const setProfilePicture = async (profilePicture) => {
+    const setProfilePictureUrl = async (profilePictureUrl) => {
         try {
-            const response = await axios.post(`${BASE_URL}set-profile-picture/${curUser._id}`, {
-                profilePicture
+            const response = await axios.post(`${BASE_URL}set-profile-picture-url/${curUser._id}`, {
+                profilePictureUrl
+            });
+        
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    }
+
+    const setProfilePictureKey = async (setProfilePictureKey) => {
+        try {
+            const response = await axios.post(`${BASE_URL}set-profile-picture-key/${curUser._id}`, {
+                setProfilePictureKey
             });
         
         } catch (error) {
@@ -326,7 +341,8 @@ export const GlobalProvider = ({ children }) => {
             deleteCapsule,
             deleteMoment,
             deleteNotification,
-            setProfilePicture
+            setProfilePictureUrl,
+            setProfilePictureKey
         }}>
             {children}
         </GlobalContext.Provider>

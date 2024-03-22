@@ -10,10 +10,10 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 //const BASE_URL = "http://100.67.14.25:3000/"
-const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify, setCurUser, getUser, deleteAccount, setProfilePicture} = useGlobalContext();
+    const { curUser, setLDMode, setSpotify, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl} = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
@@ -45,10 +45,11 @@ const Profile = ({ navigation }) => {
                 });
                 console.log('Upload successful, Image Name:', response.data.imageName);
                 imageName = response.data.imageName
+                await setProfilePhotoKey(imageName)
                 const urlRes = await axios.get(`${BASE_URL}api/get/${imageName}`);
                 const url = urlRes.data.url
                 console.log('URL: ', url)
-                await setProfilePicture(url);
+                await setProfilePictureUrl(url);
                 setProfileImage(url);
 
                 //setProfileImage(uri); // Update the state with the new image URI
@@ -113,7 +114,7 @@ const Profile = ({ navigation }) => {
                     <Image
                         style={styles.profileIcon}
                         source={{
-                            uri: curUser.profileSettings.profilePicture,
+                            uri: curUser.profileSettings.profilePictureUrl,
                         }}
                         onError={(error) => console.error("Image load error:", error)}
                     />

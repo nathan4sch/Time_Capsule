@@ -61,7 +61,7 @@ const Main = ({ navigation }) => {
                 <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
                     <Image style={styles.profileIcon}
                         source={{
-                            uri: curUser.profileSettings.profilePicture,
+                            uri: curUser.profileSettings.profilePictureUrl,
                         }}
                     />
                 </TouchableOpacity>
