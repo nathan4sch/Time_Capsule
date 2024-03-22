@@ -279,7 +279,7 @@ exports.setProfilePictureUrl = async (req, res) => {
     const { profilePictureUrl } = req.body;
 
     try {
-        if (!id || profilePicture === undefined) {
+        if (!id || profilePictureUrl === undefined) {
             return res.status(400).json({ message: 'User id and profilePicture value required' });
         }
 
@@ -303,10 +303,10 @@ exports.setProfilePictureUrl = async (req, res) => {
 
 exports.setProfilePictureKey = async (req, res) => {
     const { id } = req.params;
-    const { setProfilePictureKey } = req.body;
+    const { profilePictureKey } = req.body;
 
     try {
-        if (!id || profilePicture === undefined) {
+        if (!id || profilePictureKey === undefined) {
             return res.status(400).json({ message: 'User id and profilePicture value required' });
         }
 
@@ -316,7 +316,7 @@ exports.setProfilePictureKey = async (req, res) => {
         }
 
         // Update the profilePicture setting
-        user.profileSettings.setProfilePictureKey = setProfilePictureKey;
+        user.profileSettings.profilePictureKey = profilePictureKey;
 
         // Save the updated user document
         await user.save();
