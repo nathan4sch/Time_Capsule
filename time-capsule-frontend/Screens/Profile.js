@@ -4,6 +4,7 @@ import BlackBackground from "../Components/BlackBackground";
 import { buttonStyle } from "../Components/Button";
 import { useGlobalContext } from "../context/globalContext";
 import { spotifyLogin } from "../utils/spotifyLogin";
+import { getTopSong } from "../utils/getTopSong";
 import { instagramLogin } from "../utils/instagramLogin";
 import BackButton from "../Components/lightBackButton";
 import * as ImagePicker from 'expo-image-picker';
@@ -124,6 +125,12 @@ const Profile = ({ navigation }) => {
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/history-.png')} />
                         <Text style={styles.buttonText}>History</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonContainer} onPress={() => getTopSong(curUser)}>
+                    <View style={buttonStyle.button}>
+                        <Image style={styles.icon} source={require('../icons/spotify-.png')} />
+                        <Text style={styles.buttonText}>Get Top Spotify Song</Text>
                     </View>
                 </TouchableOpacity>
                 {/*<TouchableOpacity style={styles.buttonContainer} onPress={toggleDarkMode}>
