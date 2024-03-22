@@ -71,23 +71,6 @@ app.get("/api/get/:imageName", async (req, res) => {
     res.send({ url });
 });
 
-app.get("/", async (req, res) => {
-    //const posts = await prisma.posts.findMany({ orderBy: [{ created: 'desc' }] }) // Get all posts from the database
-
-    for (let post of posts) { // For each post, generate a signed URL and save it to the post object
-        const getObjectParams = {
-            Bucket: bucketName,
-            Key: post.imageName,
-        }
-        const command = new GetObjectCommand(getObjectParams)
-        const url = await getSignedUrl(s3,command, {expiresIn:3600})
-        post.imageUrl = url
-    }
-
-    res.send(posts)
-})
-
-
 //end new
 
 // Middleware setup

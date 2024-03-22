@@ -43,12 +43,12 @@ const Profile = ({ navigation }) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-                console.log('Upload successful, Image Name:', response.data.imageName);
+                //console.log('Upload successful, Image Name:', response.data.imageName);
                 imageName = response.data.imageName
                 await setProfilePictureKey(imageName)
                 const urlRes = await axios.get(`${BASE_URL}api/get/${imageName}`);
                 const url = urlRes.data.url
-                console.log('URL: ', url)
+                //console.log('URL: ', url)
                 await setProfilePictureUrl(url);
                 setProfileImage(url);
 
