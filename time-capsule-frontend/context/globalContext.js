@@ -219,10 +219,10 @@ export const GlobalProvider = ({ children }) => {
         }
     }
 
-    const setProfilePictureKey = async (setProfilePictureKey) => {
+    const setProfilePictureKey = async (profilePictureKey) => {
         try {
             const response = await axios.post(`${BASE_URL}set-profile-picture-key/${curUser._id}`, {
-                setProfilePictureKey
+                profilePictureKey
             });
         
         } catch (error) {

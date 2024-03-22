@@ -44,14 +44,16 @@ const Login = ({ navigation }) => {
                     setUserEmail(userEmail)
                     navigation.navigate('Registration');
                 } else {
-                    setCurUser(existResponse.user)
-                    if (curUser.profileSettings.profilePictureKey != "default") {
-                        const urlRes = await axios.get(`${BASE_URL}api/get/${curUser.profileSettings.profilePictureKey}`);
+                    await setCurUser(existResponse.user)
+                    curUserHere = existResponse.user
+                    if (curUserHere.profileSettings.profilePictureKey != "default") {
+                        const urlRes = await axios.get(`${BASE_URL}api/get/${curUserHere.profileSettings.profilePictureKey}`);
                         const url = urlRes.data.url
                         await setProfilePictureUrl(url);
                         //navigation.navigate('Main');
                         navigation.navigate('Main');
                     }
+                    navigation.navigate('Main');
                 }
             }
         };
