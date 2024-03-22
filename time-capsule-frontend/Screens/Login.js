@@ -5,6 +5,7 @@ import * as Google from "expo-auth-session/providers/google";
 import base64 from 'react-native-base64';
 import { useGlobalContext } from "../context/globalContext";
 import { ANDROID_CLIENT_ID, IOS_CLIENT_ID, WEB_CLIENT_ID } from '../env.js';
+import axios from 'axios';
 
 const BASE_URL = "https://time-capsule-server.onrender.com/";
 
