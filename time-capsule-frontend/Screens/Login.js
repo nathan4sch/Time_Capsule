@@ -11,7 +11,7 @@ const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 
 const Login = ({ navigation }) => {
-    const { getUser, setCurUser, curUser, emailExist, setUserEmail, setProfilePictureUrl } = useGlobalContext();
+    const { getUser, setCurUser, curUser, emailExist, setUserEmail, setProfilePictureUrl, getUserbyID } = useGlobalContext();
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: ANDROID_CLIENT_ID,
@@ -46,13 +46,15 @@ const Login = ({ navigation }) => {
                     navigation.navigate('Registration');
                 } else {
                     await setCurUser(existResponse.user)
-                    curUserHere = existResponse.user
-                    if (curUserHere.profileSettings.profilePictureKey != "default") {
-                        const urlRes = await axios.get(`${BASE_URL}api/get/${curUserHere.profileSettings.profilePictureKey}`);
+                    //curUserHere = existResponse.user
+                    //console.log(existResponse.user.profileSettings.profilePictureKey)
+                    //console.log(existResponse.user.profileSettings.profilePictureUrl)
+                    if (existResponse.user.profileSettings.profilePictureKey != "default") {
+                        const urlRes = await axios.get(`${BASE_URL}api/get/${existResponse.user.profileSettings.profilePictureKey}`);
                         const url = urlRes.data.url
                         await setProfilePictureUrl(url);
-                        //navigation.navigate('Main');
-                        navigation.navigate('Main');
+                        user = await getUserbyID(existResponse.user._id)
+                        await setCurUser(user)
                     }
                     navigation.navigate('Main');
                 }
