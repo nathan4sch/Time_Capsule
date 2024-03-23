@@ -17,7 +17,8 @@ const Profile = ({ navigation }) => {
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
-    const [profileImage, setProfileImage] = useState(null);
+
+    const [reload, setReload] = useState(true);
 
     const pickImage = async () => {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -49,8 +50,11 @@ const Profile = ({ navigation }) => {
                 const urlRes = await axios.get(`${BASE_URL}api/get/${imageName}`);
                 const url = urlRes.data.url
                 //console.log('URL: ', url)
-                await setProfilePictureUrl(url);
-                setProfileImage(url);
+                let urlResponse = await setProfilePictureUrl(url);
+                curUser.profileSettings.profilePictureUrl = url
+                setCurUser(curUser)
+                setReload(!reload)
+                //console.log(urlResponse)
 
                 //setProfileImage(uri); // Update the state with the new image URI
             } catch (error) {
@@ -68,7 +72,7 @@ const Profile = ({ navigation }) => {
         };
 
         fetchData(curUser.username);
-    }, []);
+    }, [reload]);
 
 
     const toggleDarkMode = () => {

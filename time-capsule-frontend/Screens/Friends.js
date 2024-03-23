@@ -82,7 +82,7 @@ const Friends = ({ navigation }) => {
                     <Image
                       style={commonStyles.friendIcon}
                       source={{
-                      uri: item.profileSettings.profilePicture,
+                      uri: item.profileSettings.profilePictureUrl,
                       }}
                       onError={(error) => console.error("Image load error:", error)}
                     />
