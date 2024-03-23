@@ -4,8 +4,8 @@ import axios from 'axios'
 // Defines the base URL for API calls
 
 //CHANGE TO YOUR OWN IP ADDRESS
-const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-//const BASE_URL = "http://100.67.14.25:3000/api/v1/"
+//const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+const BASE_URL = "http://10.186.91.72:3000/api/v1/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -311,7 +311,17 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
-
+    const selectPhotos = async (id) => {
+        try {
+            let response = await axios.delete(`${BASE_URL}select-photos/${id}`);
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
 
     // Provide the context value to child components
     return (
@@ -342,7 +352,8 @@ export const GlobalProvider = ({ children }) => {
             deleteMoment,
             deleteNotification,
             setProfilePictureUrl,
-            setProfilePictureKey
+            setProfilePictureKey,
+            selectPhotos
         }}>
             {children}
         </GlobalContext.Provider>

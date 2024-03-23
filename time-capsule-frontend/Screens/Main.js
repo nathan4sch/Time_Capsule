@@ -6,7 +6,7 @@ import { commonStyles } from "../Components/FriendsPageStylings";
 import { useGlobalContext } from "../context/globalContext";
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
 
@@ -82,6 +82,7 @@ const Main = ({ navigation }) => {
                     )}
                     </TouchableOpacity>
                 </View>
+                <TouchableOpacity style={styles.tempImageSelect} onPress={() => selectPhotos()}/>
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
@@ -94,6 +95,15 @@ const Main = ({ navigation }) => {
 export default Main;
 
 const styles = StyleSheet.create({
+    tempImageSelect: {
+        position: 'absolute',
+        left: '10%',
+        top: '81%',
+        width: '80%',
+        height: 45,
+        backgroundColor: 'rgba(255, 50, 90, 0.67)',
+        borderRadius: 10,
+    },
     profileContainer: {
         position: 'absolute',
         top: 115,
