@@ -122,8 +122,10 @@ async function analyzeImage(imageUri) {
       
     const labels = result.labelAnnotations;
     const faces = result.faceAnnotations;
-    const dominantColors = result.imagePropertiesAnnotation.dominantColors.colors;
-
+    let dominantColors = null;
+    if (result.imagePropertiesAnnotation) {
+        dominantColors = result.imagePropertiesAnnotation.dominantColors.colors;
+    }
     let joy = 0;
     if (faces && faces.length > 0) {
         faces.forEach((face, index) => {
@@ -156,11 +158,12 @@ async function analyzeImage(imageUri) {
                 joy++;
             }
             else if (landscape_keywords.includes(labelData.description.toLowerCase())) {
-                landscape += labelData.score;
+                landscape += 1;
             }
 
         });
     }
+    console.log("joy ", joy, "landscape", landscape)
     return [joy, landscape, dominantColors];
   }
 
@@ -173,17 +176,22 @@ function similarPicture(color1, color2) {
         dist = (d1 + d2 + d3) ** .5
         sum += dist
     }
-    return (sum / color1.length) < 70;
+    return (sum / color1.length) < 45;
+}
+
+function addDefaults(image_data) {
+    // ADD DEFAULTS
+    return image_data;
 }
 
 exports.selectPhotos = async (req, res) => {
     const { id } = req.params;
     const image_data = []
-    for (let i = 1; i <= 12; i++) {
-        const imageName = "Kevin-test-" + i + ".jpg";
+    for (let i = 103; i <= 143; i++) {
+        const imageName = "kevin-temp-" + i + ".jpg";
         const urlRes = await axios.get(`https://time-capsule-server.onrender.com/api/get/${imageName}`);
         const [joy, landscape, dominantColors] = await analyzeImage(urlRes.data.url)
-        if (joy == 0 && landscape == 0) {
+        if ((joy == 0 && landscape == 0) || dominantColors == null) {
             continue;
         }
         let add = true;
@@ -195,8 +203,25 @@ exports.selectPhotos = async (req, res) => {
         }
         if (add)
             image_data.push([imageName, urlRes.data.url, joy, landscape, dominantColors])
+        console.log("Finished ", i)
     }
-    for (const data of image_data) {
-        console.log(data);
+    let new_image_data = []
+    if (image_data.length < 6) {
+        new_image_data = image_data.map(pair => pair[1])
+        addDefaults(new_image_data);
     }
+    else if (image_data.length > 6) {
+        let sort_data = []
+        for (const [name, url, j, l, dC] of image_data) {
+            sort_data.push([url, j+l])          
+        }
+        sort_data.sort((a, b) => a[1] - b[1])
+        sort_data = sort_data.slice(-6)
+        new_image_data = sort_data.map(pair => pair[0])
+    }
+    else {
+        new_image_data = image_data.map(pair => pair[1])
+    }
+    //CREATE CAPSULE FROM new_image_data
+    console.log(new_image_data)
 };
