@@ -84,7 +84,7 @@ router
     .delete('/remove-photo/:capsuleId', removePhotoFromCapsule)
     .post('/set-publish/:capsuleId', setPublish)
     .post('/set-quote/:capsuleId', setQuote)
-    .delete('/select-photos/:id', selectPhotos)
+    .delete('/select-photos/:id', selectPhotos) //TODO change to get
 
 //API endpoints for notification operations
 router
