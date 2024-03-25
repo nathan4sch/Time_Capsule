@@ -12,6 +12,7 @@ const {
     setLDMode,
     setProfilePicture,
     setSpotify,
+    getSpotifyAccess,
     setInstragram,
 } = require('../controllers/user')
 
@@ -58,6 +59,7 @@ router
     .post('/set-LD-mode/:id', setLDMode)
     .post('/set-profile-picture/:id', setProfilePicture)
     .post('/set-spotify-account/:id', setSpotify)
+    .post('/get-spotify-access-token/:id', getSpotifyAccess)
     .post('/set-instagram-account/:id', setInstragram)
 
 //API endpoints for moment operations

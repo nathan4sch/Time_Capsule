@@ -88,7 +88,7 @@ exports.emailExist = async (req, res) => {
     try {
         const user = await UserSchema.findOne({ email });
         if (!user) {
-            return res.status(200).json({ exists: false, user: ''  });
+            return res.status(200).json({ exists: false, user: '' });
         }
 
         res.status(200).json({ exists: true, user: user });
@@ -100,12 +100,12 @@ exports.emailExist = async (req, res) => {
 
 /*delete a user by unique id (id in mongo object)*/
 exports.deleteUser = async (req, res) => {
-    const {id} = req.params
+    const { id } = req.params
     UserSchema.findByIdAndDelete(id)
         .then((user) => {
             res.status(200).json({ message: 'User deleted' })
         })
-        .catch((err)=> {
+        .catch((err) => {
             res.status(500).json({ message: 'Server Error' })
         })
 }
@@ -327,6 +327,87 @@ exports.setSpotify = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+exports.getSpotifyAccess = async (req, res) => {
+    console.log("Recieved Spotify Access Request.");
+    const { id } = req.params;
+    const { spotify } = req.body;
+    try {
+        if (!id) {
+            return res.status(400).json({ message: 'User id required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+
+        //console.log(spotify);
+
+        /*
+        if (spotify === undefined) {
+            return res.status(404).json({ message: 'No Spotify information found' })
+        }
+        */
+        const authOptions = {
+            method: 'POST',
+            url: 'https://accounts.spotify.com/api/token',
+            headers: {
+                'Authorization': 'Basic ' + (Buffer.from('5a58784e6d234424b485e4add1ea7166' + ':' + '230e160afc41447794cd5598c31c18b6').toString('base64')),
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: spotify
+            })
+        };
+
+        fetch(authOptions.url, {
+            method: authOptions.method,
+            headers: authOptions.headers,
+            body: authOptions.body
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Request failed: ' + response.statusText);
+            })
+            .then(body => {
+                const access_token = body.access_token;
+                console.log(access_token);
+                res.send({
+                    'access_token': access_token
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        /*
+
+        const authOptions = {
+            url: 'https://accounts.spotify.com/api/token',
+            headers: { 'Authorization': 'Basic ' + (Buffer.from('5a58784e6d234424b485e4add1ea7166' + ':' + '230e160afc41447794cd5598c31c18b6').toString('base64')) },
+            form: {
+              grant_type: 'refresh_token',
+              refresh_token: spotify
+            },
+            json: true
+        };
+        
+        request.post(authOptions, function(error, response, body) {
+            if (!error && response.statusCode === 200) {
+                const access_token = body.access_token;
+                console.log(access_token);
+                res.send({
+                    'access_token': access_token
+                });
+            }
+          });
+          */
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+}
 
 exports.setInstragram = async (req, res) => {
     const { id } = req.params;
