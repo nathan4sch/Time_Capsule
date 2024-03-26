@@ -214,6 +214,7 @@ export const GlobalProvider = ({ children }) => {
             return "success"
         
         } catch (error) {
+            console.log(error)
             if (error.response) {
                 setError(error.response.data.message);
             } else {
@@ -223,12 +224,14 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const setProfilePictureKey = async (profilePictureKey) => {
+        console.log("ID: ", curUser._id)
         try {
             const response = await axios.post(`${BASE_URL}set-profile-picture-key/${curUser._id}`, {
                 profilePictureKey
             });
         
         } catch (error) {
+            console.log(error)
             if (error.response) {
                 setError(error.response.data.message);
             } else {
@@ -289,31 +292,28 @@ export const GlobalProvider = ({ children }) => {
 
     const deleteAccount = async (id) => {
         try {
-            let response = await axios.delete(`${BASE_URL}delete-user/${id}`);
-            for (friendId in curUser.friends) {
-                response = await axios.delete(`${BASE_URL}remove-friend/${friendId}`, {
-                    data: { id }  // Pass the data in the 'data' property
-                });
+            for (const friendId of curUser.friends) {
+                const response = await removeFriend(friendId)
             }
-            
-            for (capsuleId in curUser.capsules) {
-                response = await deleteCapsule(capsuleId);
+            for (const capsuleId of curUser.capsules) {
+                const response = await deleteCapsule(capsuleId);
             }
-            for (momentId in curUser.moments) {
-                response = await deleteMoment(momentId);
+            for (const momentId of curUser.moments) {
+                const response = await deleteMoment(momentId);
             }
-            for (notificationId in curUser.notifications) {
-                response = await deleteNotification(notificationId);
+            for (const notificationId of curUser.notifications) {
+                const response = await deleteNotification(notificationId);
             }
+            const response = await axios.delete(`${BASE_URL}delete-user/${id}`);
         } catch (error) {
             if (error.response) {
+                console.log(error.response.data.message)
                 setError(error.response.data.message);
             } else {
                 console.error('Error:', error.message);
             }
         }
     };
-
 
 
     // Provide the context value to child components

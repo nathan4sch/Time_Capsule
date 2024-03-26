@@ -52,6 +52,8 @@ const Login = ({ navigation }) => {
                     if (existResponse.user.profileSettings.profilePictureKey != "default") {
                         const urlRes = await axios.get(`${BASE_URL}api/get/${existResponse.user.profileSettings.profilePictureKey}`);
                         const url = urlRes.data.url
+                        //console.log("New url: ", url)
+                        //randomly breaks when the url expires
                         await setProfilePictureUrl(url);
                         user = await getUserbyID(existResponse.user._id)
                         await setCurUser(user)

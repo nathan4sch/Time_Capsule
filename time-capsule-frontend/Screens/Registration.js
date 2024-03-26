@@ -3,32 +3,59 @@ import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image, Keyboar
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios'
 
 const Registration = ({ navigation }) => {
-    const { userEmail, getUser, addUser, setCurUser } = useGlobalContext();
+    const { userEmail, getUser, addUser, setCurUser, setProfilePictureKey, setProfilePictureUrl, curUser } = useGlobalContext();
     const [username, setUsername] = useState('');
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [profileImage, setProfileImage] = useState(null);
     //const BASE_URL = "http://100.67.14.25:3000/api/v1/";
-    const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+    //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+
+    const [profileUrl, setProfileUrl] = useState('');
+    const [profileKey, setProfileKey] = useState('');
 
     const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0,
         });
-    
-        console.log(result);
-        console.log(result.assets[0].uri)
-    
+
         if (!result.canceled) {
-          setProfileImage(result.assets[0].uri);
+            //from react client, to express server, to s3 bucket
+            const formData = new FormData();
+            formData.append("image", {
+                uri: result.assets[0].uri,
+                type: 'image/jpeg',
+                name: 'photo.jpg',
+            });
+
+            try {
+                const response = await axios.post(`https://time-capsule-server.onrender.com/api/posts`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                setProfileKey(response.data.imageName)
+                //await setProfilePictureKey(imageName)
+                const urlRes = await axios.get(`https://time-capsule-server.onrender.com/api/get/${response.data.imageName}`);
+                setProfileUrl(urlRes.data.url)
+
+                //let urlResponse = await setProfilePictureUrl(url);
+                //curUser.profileSettings.profilePictureUrl = url
+                //setCurUser(curUser)
+
+                //setProfileImage(uri); // Update the state with the new image URI
+            } catch (error) {
+                console.error('Upload error', error);
+                console.log(error)
+            }
         }
-      };
+    };
 
     const handleSubmission = async () => {
         // Perform actions with the username, such as storing it
@@ -47,36 +74,19 @@ const Registration = ({ navigation }) => {
                 Alert.alert("Error", "Username already exists. Please choose another username.");
             } else {
                 // Check if a profile image is selected
-                if (profileImage) {
-                    const formData = new FormData();
-                    formData.append('image', {
-                        uri: profileImage.uri,
-                        type: profileImage.type,
-                        name: 'profile_image.jpg',
-                    });
-
-                    // Call the server's post image function
-                    fetch(`${BASE_URL}posts`, {
-                        method: 'POST',
-                        body: formData,
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(text => { throw new Error(text) });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Image uploaded successfully:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error uploading image:', error);
-                    });
-                }
+                
                 await addUser(curUsername, userEmail)
                 Alert.alert("Success", "Account Created");
                 const findUser = await getUser(curUsername)
-                setCurUser(findUser)
+                await setCurUser(findUser)
+                if (profileUrl != "") {
+                    console.log("RegIst: ", profileKey, profileUrl)
+                    await setProfilePictureKey(profileKey);
+                    await setProfilePictureUrl(profileUrl);
+                    curUser.profileSettings.profilePictureUrl = profileUrl
+                    curUser.profileSettings.profilePictureKey = profileKey
+                    await setCurUser(curUser)
+                }
                 navigation.navigate('Spotify');
             }
         }

@@ -63,6 +63,7 @@ const Main = ({ navigation }) => {
                         source={{
                             uri: curUser.profileSettings.profilePictureUrl,
                         }}
+                        cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.photoButton} onPress={() => navigation.navigate('Photos')}>
