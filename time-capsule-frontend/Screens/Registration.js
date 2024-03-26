@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image, Keyboard, Alert } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
@@ -15,6 +15,15 @@ const Registration = ({ navigation }) => {
 
     const [profileUrl, setProfileUrl] = useState('');
     const [profileKey, setProfileKey] = useState('');
+
+    useEffect(() => {
+        // This effect will run whenever curUser changes
+        if (profileUrl != "") {
+            //console.log("RegIst: ", profileKey, profileUrl)
+            setProfilePictureKey(profileKey);
+            setProfilePictureUrl(profileUrl);
+        }
+    }, [curUser]);
 
     const pickImage = async () => {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -78,15 +87,11 @@ const Registration = ({ navigation }) => {
                 await addUser(curUsername, userEmail)
                 Alert.alert("Success", "Account Created");
                 const findUser = await getUser(curUsername)
-                await setCurUser(findUser)
                 if (profileUrl != "") {
-                    console.log("RegIst: ", profileKey, profileUrl)
-                    await setProfilePictureKey(profileKey);
-                    await setProfilePictureUrl(profileUrl);
-                    curUser.profileSettings.profilePictureUrl = profileUrl
-                    curUser.profileSettings.profilePictureKey = profileKey
-                    await setCurUser(curUser)
+                    findUser.profileSettings.profilePictureUrl = profileUrl
+                    findUser.profileSettings.profilePictureKey = profileKey
                 }
+                await setCurUser(findUser)
                 navigation.navigate('Spotify');
             }
         }

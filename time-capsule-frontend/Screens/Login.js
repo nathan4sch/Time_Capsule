@@ -40,6 +40,7 @@ const Login = ({ navigation }) => {
                 // Check if email is new or not
                 const existResponse = await emailExist(userEmail);
                 const newEmail = !existResponse.exists;
+                setCurUser("")
 
                 if (newEmail) {
                     setUserEmail(userEmail)
