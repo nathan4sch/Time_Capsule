@@ -67,19 +67,19 @@ app.get("/api/get/:imageName", async (req, res) => {
         Key: imageName,
     }
     const command = new GetObjectCommand(getObjectParams)
-    const url = await getSignedUrl(s3,command, {expiresIn:3600})
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
     res.send({ url });
 });
 
 app.delete("/api/del/:imageName", async (req, res) => {
     const { imageName } = req.params;
     const deleteParams = {
-      Bucket: bucketName,
-      Key: imageName,
+        Bucket: bucketName,
+        Key: imageName,
     }
-  
+
     return s3.send(new DeleteObjectCommand(deleteParams))
-  })
+})
 
 //end new
 
