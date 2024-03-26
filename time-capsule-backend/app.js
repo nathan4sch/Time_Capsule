@@ -78,7 +78,7 @@ app.delete("/api/del/:imageName", async (req, res) => {
       Key: imageName,
     }
   
-    return s3Client.send(new DeleteObjectCommand(deleteParams))
+    return s3.send(new DeleteObjectCommand(deleteParams))
   })
 
 //end new
