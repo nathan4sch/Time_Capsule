@@ -214,6 +214,7 @@ export const GlobalProvider = ({ children }) => {
             return "success"
         
         } catch (error) {
+            console.log(error)
             if (error.response) {
                 setError(error.response.data.message);
             } else {
@@ -223,12 +224,14 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const setProfilePictureKey = async (profilePictureKey) => {
+        console.log("ID: ", curUser._id)
         try {
             const response = await axios.post(`${BASE_URL}set-profile-picture-key/${curUser._id}`, {
                 profilePictureKey
             });
         
         } catch (error) {
+            console.log(error)
             if (error.response) {
                 setError(error.response.data.message);
             } else {

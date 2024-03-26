@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios'
 
 const Registration = ({ navigation }) => {
-    const { userEmail, getUser, addUser, setCurUser, setProfilePictureKey, setProfilePictureUrl } = useGlobalContext();
+    const { userEmail, getUser, addUser, setCurUser, setProfilePictureKey, setProfilePictureUrl, curUser } = useGlobalContext();
     const [username, setUsername] = useState('');
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
@@ -22,7 +22,7 @@ const Registration = ({ navigation }) => {
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
+            quality: 0,
         });
 
         if (!result.canceled) {
@@ -40,10 +40,10 @@ const Registration = ({ navigation }) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-                await setProfileKey(response.data.imageName)
+                setProfileKey(response.data.imageName)
                 //await setProfilePictureKey(imageName)
-                const urlRes = await axios.get(`https://time-capsule-server.onrender.com/api/get/${profileKey}`);
-                await setProfileUrl(urlRes.data.url)
+                const urlRes = await axios.get(`https://time-capsule-server.onrender.com/api/get/${response.data.imageName}`);
+                setProfileUrl(urlRes.data.url)
 
                 //let urlResponse = await setProfilePictureUrl(url);
                 //curUser.profileSettings.profilePictureUrl = url
@@ -52,6 +52,7 @@ const Registration = ({ navigation }) => {
                 //setProfileImage(uri); // Update the state with the new image URI
             } catch (error) {
                 console.error('Upload error', error);
+                console.log(error)
             }
         }
     };
@@ -78,10 +79,10 @@ const Registration = ({ navigation }) => {
                 Alert.alert("Success", "Account Created");
                 const findUser = await getUser(curUsername)
                 await setCurUser(findUser)
-                console.log("profileURL: ", profileUrl)
                 if (profileUrl != "") {
-                    await setProfilePictureKey(profileKey)
-                    await setProfilePictureUrl(profileUrl)
+                    console.log("RegIst: ", profileKey, profileUrl)
+                    await setProfilePictureKey(profileKey);
+                    await setProfilePictureUrl(profileUrl);
                     curUser.profileSettings.profilePictureUrl = profileUrl
                     curUser.profileSettings.profilePictureKey = profileKey
                     await setCurUser(curUser)

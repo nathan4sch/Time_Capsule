@@ -63,6 +63,7 @@ const Main = ({ navigation }) => {
                         source={{
                             uri: curUser.profileSettings.profilePictureUrl,
                         }}
+                        cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
