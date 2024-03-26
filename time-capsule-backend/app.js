@@ -71,6 +71,16 @@ app.get("/api/get/:imageName", async (req, res) => {
     res.send({ url });
 });
 
+app.delete("/api/del/:imageName", async (req, res) => {
+    const { imageName } = req.params;
+    const deleteParams = {
+      Bucket: bucketName,
+      Key: imageName,
+    }
+  
+    return s3Client.send(new DeleteObjectCommand(deleteParams))
+  })
+
 //end new
 
 // Middleware setup
