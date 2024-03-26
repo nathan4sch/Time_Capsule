@@ -39,6 +39,9 @@ const Profile = ({ navigation }) => {
             });
 
             try {
+                if (curUser.profileSettings.profilePictureKey != "default") {
+                    await axios.delete(`${BASE_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
+                }
                 const response = await axios.post(`${BASE_URL}api/posts`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
