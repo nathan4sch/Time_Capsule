@@ -11,7 +11,10 @@ const Photos = ({ navigation }) => {
     (async () => {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status === 'granted') {
-        const media = await MediaLibrary.getAssetsAsync({ first: 20, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+        const month = new Date();
+        month.setDate(1);
+        //EDIT HOW MANY PHOTOS HERE WITH FIRST
+        const media = await MediaLibrary.getAssetsAsync({first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
         setPhotos(media.assets);
       } else {
         alert('Permission to access camera roll denied!');
@@ -23,7 +26,7 @@ const Photos = ({ navigation }) => {
     <>
         <BlackBackground>
             <BackButton onPress={() => navigation.goBack()} />
-            <Text style={styles.title}>Last 20 Photos</Text>
+            <Text style={styles.title}>Last Months Photos</Text>
             <ScrollView>
                 {photos.map((photo, index) => (
                 <Image key={index} source={{ uri: photo.uri }} style={styles.photo} />
