@@ -13,7 +13,7 @@ const Registration = ({ navigation }) => {
     //const BASE_URL = "http://100.67.14.25:3000/api/v1/";
     //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 
-    const [profileUrl, setProfileUrl] = useState('');
+    const [profileUrl, setProfileUrl] = useState('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png');
     const [profileKey, setProfileKey] = useState('');
 
     const curUserChangedReg = useRef(false);
@@ -111,7 +111,13 @@ const Registration = ({ navigation }) => {
             onPress={() => Keyboard.dismiss()} // Dismiss the keyboard on press
         >
             <GreenBackground>
-                <Image style={styles.image} source={require('../icons/profile-.png')} />
+                <Image
+                    style={styles.image}
+                    source={{
+                        uri: profileUrl,
+                    }}
+                    onError={(error) => console.error("Image load error:", error)}
+                />
                 <TouchableOpacity style={styles.press} onPress={pickImage}>
                     <Text style={styles.text2}>Set Profile Picture</Text>
                 </TouchableOpacity>
@@ -243,10 +249,11 @@ const styles = StyleSheet.create({
     },
     image: {
         position: 'absolute',
-        width: 212,
-        height: 212,
-        left: 82,
-        top: 35,
+        height: '20%',
+        left: 105,
+        top: 65,
+        aspectRatio: 1,
+        borderRadius: 100,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
