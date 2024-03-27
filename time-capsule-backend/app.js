@@ -78,7 +78,14 @@ app.delete("/api/del/:imageName", async (req, res) => {
         Key: imageName,
     }
 
-    return s3.send(new DeleteObjectCommand(deleteParams))
+    try {
+        await s3.send(new DeleteObjectCommand(deleteParams))
+        console.log("File deleted successfully");
+        res.json({ message: "Image deleted successfully", imageName: imageName });
+    } catch (error) {
+        console.error('Error deleting image to S3:', error);
+        res.status(500).json({ error: "Error deleting image to S3" });
+    }
 })
 
 //end new

@@ -27,8 +27,6 @@ const Login = ({ navigation }) => {
 
     useEffect(() => {
         if (curUserChanged.current) {
-            console.log(curUser)
-            console.log("login curUser")
             setProfilePictureUrl(profileUrl);
             curUserChanged.current = false; // Reset the flag after execution
         }

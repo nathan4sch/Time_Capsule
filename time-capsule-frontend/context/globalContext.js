@@ -206,16 +206,11 @@ export const GlobalProvider = ({ children }) => {
 
     const setProfilePictureUrl = async (profilePictureUrl) => {
         try {
-            console.log("setURL")
-
             //console.log("settingProfileURL")
-            console.log(curUser._id)
             const response = await axios.post(`${BASE_URL}set-profile-picture-url/${curUser._id}`, {
                 profilePictureUrl
             });
-            console.log("good")        
         } catch (error) {
-            console.log("bad")
             console.log(error)
             console.log(error.response.data.message)
             if (error.response) {

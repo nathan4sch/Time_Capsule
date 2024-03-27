@@ -21,7 +21,6 @@ const Registration = ({ navigation }) => {
     useEffect(() => {
         // This effect will run whenever curUser changes
         if (curUserChangedReg.current) {
-            console.log("regist curuser")
             if (profileUrl != "") {
                 //console.log("RegIst: ", profileKey, profileUrl)
                 setProfilePictureKey(profileKey);
