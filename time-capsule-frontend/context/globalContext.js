@@ -114,9 +114,18 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
+    const getSpotifyTopSong = async () => {
+        const response = await axios.post(`${BASE_URL}get-spotify-top-song/${curUser._id}`, {
+            spotify: curUser.profileSettings.spotifyAccount
+        })
+        // The return value contains TONS of information about the top song, which we can use for graphics or other stuff.
+        //console.log(response.data.data);
+        console.log(response.data.data.items[0].name)
+    }
+
     const setInstragram = async (instagramKey) => {
         const response = await axios.post(`${BASE_URL}set-instagram-account/${curUser._id}`, {
-            spotify: instagramKey
+            instagram: instagramKey
         })
             .catch((err) => {
                 setError(err.response.data.message)
@@ -332,6 +341,7 @@ export const GlobalProvider = ({ children }) => {
             setUserEmail,
             getUserbyID,
             setSpotify,
+            getSpotifyTopSong,
             setInstragram,
             removeFriendRequest,
             sendFriendRequest,

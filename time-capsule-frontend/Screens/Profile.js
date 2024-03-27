@@ -13,7 +13,7 @@ import axios from 'axios';
 const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl} = useGlobalContext();
+    const { curUser, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl} = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
@@ -156,6 +156,12 @@ const Profile = ({ navigation }) => {
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/history-.png')} />
                         <Text style={styles.buttonText}>History</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonContainer} onPress={getSpotifyTopSong}>
+                    <View style={buttonStyle.button}>
+                        <Image style={styles.icon} source={require('../icons/spotify-.png')} />
+                        <Text style={styles.buttonText}>Get Top Spotify Song</Text>
                     </View>
                 </TouchableOpacity>
                 {/*<TouchableOpacity style={styles.buttonContainer} onPress={toggleDarkMode}>

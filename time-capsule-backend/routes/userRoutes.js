@@ -13,6 +13,7 @@ const {
     setProfilePictureUrl,
     setProfilePictureKey,
     setSpotify,
+    getSpotifyTopSong,
     setInstragram,
 } = require('../controllers/user')
 
@@ -60,6 +61,7 @@ router
     .post('/set-profile-picture-url/:id', setProfilePictureUrl)
     .post('/set-profile-picture-key/:id', setProfilePictureKey)
     .post('/set-spotify-account/:id', setSpotify)
+    .post('/get-spotify-top-song/:id', getSpotifyTopSong)
     .post('/set-instagram-account/:id', setInstragram)
 
 //API endpoints for moment operations

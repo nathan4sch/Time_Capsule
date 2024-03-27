@@ -1,4 +1,5 @@
 const UserSchema = require("../models/UserModel")
+require('dotenv').config()
 
 //USERS
 exports.addUser = async (req, res) => {
@@ -88,7 +89,7 @@ exports.emailExist = async (req, res) => {
     try {
         const user = await UserSchema.findOne({ email });
         if (!user) {
-            return res.status(200).json({ exists: false, user: ''  });
+            return res.status(200).json({ exists: false, user: '' });
         }
 
         res.status(200).json({ exists: true, user: user });
@@ -100,12 +101,12 @@ exports.emailExist = async (req, res) => {
 
 /*delete a user by unique id (id in mongo object)*/
 exports.deleteUser = async (req, res) => {
-    const {id} = req.params
+    const { id } = req.params
     UserSchema.findByIdAndDelete(id)
         .then((user) => {
             res.status(200).json({ message: 'User deleted' })
         })
-        .catch((err)=> {
+        .catch((err) => {
             res.status(500).json({ message: 'Server Error' })
         })
 }
@@ -354,6 +355,93 @@ exports.setSpotify = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+exports.getSpotifyTopSong = async (req, res) => {
+    //console.log("Recieved Spotify Access Request.");
+    const { id } = req.params;
+    const { spotify } = req.body;
+    try {
+        if (!id) {
+            return res.status(400).json({ message: 'User id required' });
+        }
+
+        const user = await UserSchema.findOne({ _id: id });
+
+        //console.log(spotify);
+
+        
+        if (spotify === undefined) {
+            return res.status(404).json({ message: 'No Spotify information found' })
+        }
+        
+        const authOptions = {
+            method: 'POST',
+            url: 'https://accounts.spotify.com/api/token',
+            headers: {
+                'Authorization': 'Basic ' + (Buffer.from(process.env.SPOTIFYCLIENTID + ':' + process.env.SPOTIFYCLIENTSECRET).toString('base64')),
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: spotify,
+                client_id: '5a58784e6d234424b485e4add1ea7166'
+            })
+        };
+        
+        //var access_token;
+        fetch(authOptions.url, {
+            method: authOptions.method,
+            headers: authOptions.headers,
+            body: authOptions.body
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Request failed: ' + response.statusText);
+            })
+            .then(body => {
+                const access_token = body.access_token;
+                //console.log(access_token);
+
+                // GET TOP SONG DATA FROM SPOTIFY HERE
+                const spotifyAPIUrl = 'https://api.spotify.com/v1/me/top/tracks?limit=1&offset=0';
+                const options = {
+                    method: 'GET', // GET is the default method, but it's good to be explicit
+                    headers: {
+                        'Authorization': `Bearer ${access_token}`
+                    }
+                };
+
+                fetch(spotifyAPIUrl, options)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json(); // If the response is successful, parse it as JSON
+                        }
+                        //console.log(response)
+                        throw new Error('Request failed: ' + response.statusText); // If response is not successful, throw an error
+                    })
+                    .then(data => {
+                        //console.log(data); // Here you can process the data received from the API
+                        // For example, you might want to send this data back in your server's response or process it further
+                        res.send({
+                            'data': data
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error); // Handle any errors that occurred during the fetch
+                    });
+            
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+}
 
 exports.setInstragram = async (req, res) => {
     const { id } = req.params;
