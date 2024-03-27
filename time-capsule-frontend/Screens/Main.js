@@ -14,7 +14,8 @@ const Main = ({ navigation }) => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
                 const capsule = await getCapsule(curUser.capsules[0]);
-                setShownCapsule(capsule.snapshot);
+                //get url from key
+                setShownCapsule(capsule.snapshotUrl);
             }
         };
         getCapsuleFunc();

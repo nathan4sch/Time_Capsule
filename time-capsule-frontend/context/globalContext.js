@@ -315,7 +315,7 @@ export const GlobalProvider = ({ children }) => {
                 const response = await deleteNotification(notificationId);
             }
             if (curUser.profileSettings.profilePictureKey != "default") {
-                await axios.delete(`https://time-capsule-server.onrender.com/api/del/${curUser.profileSettings.profilePictureKey}`);
+                await axios.delete(`${BASE_S3_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
             }
             const response = await axios.delete(`${BASE_URL}delete-user/${id}`);
         } catch (error) {

@@ -10,10 +10,10 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 //const BASE_URL = "http://100.67.14.25:3000/"
-const BASE_URL = "https://time-capsule-server.onrender.com/";
+//const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl} = useGlobalContext();
+    const { curUser, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl, BASE_S3_URL} = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
@@ -40,9 +40,9 @@ const Profile = ({ navigation }) => {
 
             try {
                 if (curUser.profileSettings.profilePictureKey != "default") {
-                    await axios.delete(`${BASE_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
+                    await axios.delete(`${BASE_S3_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
                 }
-                const response = await axios.post(`${BASE_URL}api/posts`, formData, {
+                const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -50,7 +50,7 @@ const Profile = ({ navigation }) => {
                 //console.log('Upload successful, Image Name:', response.data.imageName);
                 imageName = response.data.imageName
                 await setProfilePictureKey(imageName)
-                const urlRes = await axios.get(`${BASE_URL}api/get/${imageName}`);
+                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
                 const url = urlRes.data.url
                 //console.log('URL: ', url)
                 let urlResponse = await setProfilePictureUrl(url);
