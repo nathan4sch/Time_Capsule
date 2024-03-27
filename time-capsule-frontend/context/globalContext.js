@@ -278,6 +278,7 @@ export const GlobalProvider = ({ children }) => {
     };
 
     const deleteCapsule = async (capsuleId) => {
+        //delete the photos from s3
         try {
             const response = await axios.delete(`${BASE_URL}delete-capsule/${capsuleId}`);        
         } catch (error) {
@@ -302,6 +303,9 @@ export const GlobalProvider = ({ children }) => {
             }
             for (const notificationId of curUser.notifications) {
                 const response = await deleteNotification(notificationId);
+            }
+            if (curUser.profileSettings.profilePictureKey != "default") {
+                await axios.delete(`https://time-capsule-server.onrender.com/api/del/${curUser.profileSettings.profilePictureKey}`);
             }
             const response = await axios.delete(`${BASE_URL}delete-user/${id}`);
         } catch (error) {
