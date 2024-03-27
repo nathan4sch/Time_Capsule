@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         width: '80%',
         height: '6.5%',
-        marginBottom: '7%',
+        marginBottom: '4%',
     },
     buttonText: {
         top: '30%',

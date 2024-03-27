@@ -3,16 +3,17 @@ const UserSchema = require("../models/UserModel");
 
 //add functionality to automatically populate the capsule with moments from the last month
 exports.createCapsule = async (req, res) => {
-    const { snapshot, usedPhotos, quote, spotifySongs } = req.body;
+    const { snapshotUrl, snapshotKey, usedPhotos, quote, spotifySongs } = req.body;
     const { id } = req.params;
 
     try {
-        if (!snapshot || !usedPhotos || !quote || !spotifySongs || !id) {
+        if (!snapshotKey || !snapshotUrl || !usedPhotos || !quote || !spotifySongs || !id) {
             return res.status(400).json({ message: 'All Fields Required' });
         }
         // Save the new moment to the database
         const capsule = CapsuleSchema({
-            snapshot,
+            snapshotUrl,
+            snapshotKey,
             usedPhotos,
             quote,
             spotifySongs,
@@ -112,6 +113,7 @@ exports.addSongToCapsule = async (req, res) => {
     }
 };
 
+//will not work
 exports.addPhotoToCapsule = async (req, res) => {
     const { capsuleId } = req.params;
     const { photoLink } = req.body;
@@ -134,6 +136,7 @@ exports.addPhotoToCapsule = async (req, res) => {
     }
 };
 
+//will not work
 exports.removePhotoFromCapsule = async (req, res) => {
     const { capsuleId } = req.params;
     const { photoLink } = req.body;

@@ -5,6 +5,7 @@ import axios from 'axios'
 
 //CHANGE TO YOUR OWN IP ADDRESS
 const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 //const BASE_URL = "http://100.67.14.25:3000/api/v1/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
@@ -358,7 +359,9 @@ export const GlobalProvider = ({ children }) => {
             deleteMoment,
             deleteNotification,
             setProfilePictureUrl,
-            setProfilePictureKey
+            setProfilePictureKey,
+            BASE_S3_URL,
+            BASE_URL,
         }}>
             {children}
         </GlobalContext.Provider>
