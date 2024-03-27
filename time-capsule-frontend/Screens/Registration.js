@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image, Keyboard, Alert } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
@@ -16,12 +16,18 @@ const Registration = ({ navigation }) => {
     const [profileUrl, setProfileUrl] = useState('');
     const [profileKey, setProfileKey] = useState('');
 
+    const curUserChangedReg = useRef(false);
+
     useEffect(() => {
         // This effect will run whenever curUser changes
-        if (profileUrl != "") {
-            //console.log("RegIst: ", profileKey, profileUrl)
-            setProfilePictureKey(profileKey);
-            setProfilePictureUrl(profileUrl);
+        if (curUserChangedReg.current) {
+            if (profileUrl != "") {
+                //console.log("RegIst: ", profileKey, profileUrl)
+                setProfilePictureKey(profileKey);
+                setProfilePictureUrl(profileUrl);
+                curUserChangedReg.current = false
+            }
+            curUserChangedReg.current = false
         }
     }, [curUser]);
 
@@ -83,7 +89,7 @@ const Registration = ({ navigation }) => {
                 Alert.alert("Error", "Username already exists. Please choose another username.");
             } else {
                 // Check if a profile image is selected
-                
+
                 await addUser(curUsername, userEmail)
                 Alert.alert("Success", "Account Created");
                 const findUser = await getUser(curUsername)
@@ -91,6 +97,7 @@ const Registration = ({ navigation }) => {
                     findUser.profileSettings.profilePictureUrl = profileUrl
                     findUser.profileSettings.profilePictureKey = profileKey
                 }
+                curUserChangedReg.current = true
                 await setCurUser(findUser)
                 navigation.navigate('Spotify');
             }

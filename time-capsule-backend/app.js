@@ -67,19 +67,26 @@ app.get("/api/get/:imageName", async (req, res) => {
         Key: imageName,
     }
     const command = new GetObjectCommand(getObjectParams)
-    const url = await getSignedUrl(s3,command, {expiresIn:3600})
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
     res.send({ url });
 });
 
 app.delete("/api/del/:imageName", async (req, res) => {
     const { imageName } = req.params;
     const deleteParams = {
-      Bucket: bucketName,
-      Key: imageName,
+        Bucket: bucketName,
+        Key: imageName,
     }
-  
-    return s3.send(new DeleteObjectCommand(deleteParams))
-  })
+
+    try {
+        await s3.send(new DeleteObjectCommand(deleteParams))
+        console.log("File deleted successfully");
+        res.json({ message: "Image deleted successfully", imageName: imageName });
+    } catch (error) {
+        console.error('Error deleting image to S3:', error);
+        res.status(500).json({ error: "Error deleting image to S3" });
+    }
+})
 
 //end new
 

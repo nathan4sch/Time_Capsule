@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Platform, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import * as Google from "expo-auth-session/providers/google";
@@ -12,6 +12,8 @@ const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 const Login = ({ navigation }) => {
     const { getUser, setCurUser, curUser, emailExist, setUserEmail, setProfilePictureUrl, getUserbyID } = useGlobalContext();
+    const [profileUrl, setProfileUrl] = useState('');
+    const curUserChanged = useRef(false);
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: ANDROID_CLIENT_ID,
@@ -22,6 +24,13 @@ const Login = ({ navigation }) => {
         // NOTE: For iOS, specify the scopes required
         scopes: ['email'],
     });
+
+    useEffect(() => {
+        if (curUserChanged.current) {
+            setProfilePictureUrl(profileUrl);
+            curUserChanged.current = false; // Reset the flag after execution
+        }
+    }, [curUser]);
 
     React.useEffect(() => {
         const handleResponse = async () => {
@@ -40,25 +49,21 @@ const Login = ({ navigation }) => {
                 // Check if email is new or not
                 const existResponse = await emailExist(userEmail);
                 const newEmail = !existResponse.exists;
-                setCurUser("")
 
                 if (newEmail) {
                     setUserEmail(userEmail)
                     navigation.navigate('Registration');
                 } else {
-                    await setCurUser(existResponse.user)
-                    //curUserHere = existResponse.user
-                    //console.log(existResponse.user.profileSettings.profilePictureKey)
-                    //console.log(existResponse.user.profileSettings.profilePictureUrl)
+                    user = await getUserbyID(existResponse.user._id)
                     if (existResponse.user.profileSettings.profilePictureKey != "default") {
-                        const urlRes = await axios.get(`${BASE_URL}api/get/${existResponse.user.profileSettings.profilePictureKey}`);
+                        const urlRes = await axios.get(`${BASE_URL}api/get/${user.profileSettings.profilePictureKey}`);
                         const url = urlRes.data.url
-                        //console.log("New url: ", url)
                         //randomly breaks when the url expires
-                        await setProfilePictureUrl(url);
-                        user = await getUserbyID(existResponse.user._id)
-                        await setCurUser(user)
+                        user.profileSettings.profilePictureUrl = url
+                        setProfileUrl(url)
+                        curUserChanged.current = true
                     }
+                    await setCurUser(user)
                     navigation.navigate('Main');
                 }
             }
