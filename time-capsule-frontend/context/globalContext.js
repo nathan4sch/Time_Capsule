@@ -5,8 +5,7 @@ import axios from 'axios'
 
 //CHANGE TO YOUR OWN IP ADDRESS
 const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-//const BASE_URL = "http://10.136.170.121:3000/api/v1/"
-//const BASE_URL = "http://100.67.14.38:3000/api/v1/"
+//const BASE_URL = "http://100.67.14.25:3000/api/v1/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -214,6 +213,41 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
+    const setProfilePictureUrl = async (profilePictureUrl) => {
+        try {
+            //console.log("settingProfileURL")
+            const response = await axios.post(`${BASE_URL}set-profile-picture-url/${curUser._id}`, {
+                profilePictureUrl
+            });
+        } catch (error) {
+            console.log(error)
+            console.log(error.response.data.message)
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    }
+
+    const setProfilePictureKey = async (profilePictureKey) => {
+        try {
+            const response = await axios.post(`${BASE_URL}set-profile-picture-key/${curUser._id}`, {
+                profilePictureKey
+            });
+        
+        } catch (error) {
+            console.log(error)
+            console.log(error.response.data.message)
+
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    }
+
     const getCapsule = async (id) => {
         try {
             const response = await axios.get(`${BASE_URL}get-capsule/${id}`);
@@ -266,24 +300,22 @@ export const GlobalProvider = ({ children }) => {
 
     const deleteAccount = async (id) => {
         try {
-            let response = await axios.delete(`${BASE_URL}delete-user/${id}`);
-            for (friendId in curUser.friends) {
-                response = await axios.delete(`${BASE_URL}remove-friend/${friendId}`, {
-                    data: { id }  // Pass the data in the 'data' property
-                });
+            for (const friendId of curUser.friends) {
+                const response = await removeFriend(friendId)
             }
-            
-            for (capsuleId in curUser.capsules) {
-                response = await deleteCapsule(capsuleId);
+            for (const capsuleId of curUser.capsules) {
+                const response = await deleteCapsule(capsuleId);
             }
-            for (momentId in curUser.moments) {
-                response = await deleteMoment(momentId);
+            for (const momentId of curUser.moments) {
+                const response = await deleteMoment(momentId);
             }
-            for (notificationId in curUser.notifications) {
-                response = await deleteNotification(notificationId);
+            for (const notificationId of curUser.notifications) {
+                const response = await deleteNotification(notificationId);
             }
+            const response = await axios.delete(`${BASE_URL}delete-user/${id}`);
         } catch (error) {
             if (error.response) {
+                console.log(error.response.data.message)
                 setError(error.response.data.message);
             } else {
                 console.error('Error:', error.message);
@@ -321,6 +353,8 @@ export const GlobalProvider = ({ children }) => {
             deleteCapsule,
             deleteMoment,
             deleteNotification,
+            setProfilePictureUrl,
+            setProfilePictureKey
         }}>
             {children}
         </GlobalContext.Provider>

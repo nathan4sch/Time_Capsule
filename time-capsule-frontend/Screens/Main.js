@@ -41,7 +41,7 @@ const Main = ({ navigation }) => {
         const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
+ 
         const padWithZero = (value) => (value < 10 ? `0${value}` : value);
 
         return `${padWithZero(days)}:${padWithZero(hours)}:${padWithZero(minutes)}:${padWithZero(seconds)}`;
@@ -61,9 +61,13 @@ const Main = ({ navigation }) => {
                 <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
                     <Image style={styles.profileIcon}
                         source={{
-                            uri: curUser.profileSettings.profilePicture,
+                            uri: curUser.profileSettings.profilePictureUrl,
                         }}
+                        cachePolicy='memory-disk'
                     />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.photoButton} onPress={() => navigation.navigate('Photos')}>
+                    <Text style={styles.buttonText}>Temp Photo Button</Text>
                 </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
                     <Text style={styles.timerText}>{timer}</Text>
@@ -77,7 +81,6 @@ const Main = ({ navigation }) => {
                             source={{ uri: shownCapsule }}
                         />
                     ) : (
-                        // Render something else when shownCapsule is empty
                         <Text style={styles.overlayText}>No Capsule Available</Text>
                     )}
                     </TouchableOpacity>
@@ -180,4 +183,14 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         top: '50%'
     },
+    photoButton: {
+        position:'absolute',
+        top: '5%',
+        left: '83%',
+        aspectRatio: 1,
+        height: '6%',
+        borderRadius: 10,
+        backgroundColor: 'aquamarine',
+        alignItems: 'center',
+    }
 });

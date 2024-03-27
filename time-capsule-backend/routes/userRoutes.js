@@ -10,7 +10,8 @@ const {
     emailExist,
     getUserbyID,
     setLDMode,
-    setProfilePicture,
+    setProfilePictureUrl,
+    setProfilePictureKey,
     setSpotify,
     getSpotifyTopSong,
     setInstragram,
@@ -57,7 +58,8 @@ router
     .delete('/remove-friend/:id', removeFriend) 
     //Profile setting routes
     .post('/set-LD-mode/:id', setLDMode)
-    .post('/set-profile-picture/:id', setProfilePicture)
+    .post('/set-profile-picture-url/:id', setProfilePictureUrl)
+    .post('/set-profile-picture-key/:id', setProfilePictureKey)
     .post('/set-spotify-account/:id', setSpotify)
     .post('/get-spotify-top-song/:id', getSpotifyTopSong)
     .post('/set-instagram-account/:id', setInstragram)

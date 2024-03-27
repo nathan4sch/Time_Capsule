@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Platform, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import * as Google from "expo-auth-session/providers/google";
 import base64 from 'react-native-base64';
 import { useGlobalContext } from "../context/globalContext";
 import { ANDROID_CLIENT_ID, IOS_CLIENT_ID, WEB_CLIENT_ID } from '../env.js';
+import axios from 'axios';
+
+const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 
 const Login = ({ navigation }) => {
-    const { getUser, setCurUser, curUser, emailExist, setUserEmail } = useGlobalContext();
+    const { getUser, setCurUser, curUser, emailExist, setUserEmail, setProfilePictureUrl, getUserbyID } = useGlobalContext();
+    const [profileUrl, setProfileUrl] = useState('');
+    const curUserChanged = useRef(false);
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: ANDROID_CLIENT_ID,
@@ -19,6 +24,13 @@ const Login = ({ navigation }) => {
         // NOTE: For iOS, specify the scopes required
         scopes: ['email'],
     });
+
+    useEffect(() => {
+        if (curUserChanged.current) {
+            setProfilePictureUrl(profileUrl);
+            curUserChanged.current = false; // Reset the flag after execution
+        }
+    }, [curUser]);
 
     React.useEffect(() => {
         const handleResponse = async () => {
@@ -42,8 +54,16 @@ const Login = ({ navigation }) => {
                     setUserEmail(userEmail)
                     navigation.navigate('Registration');
                 } else {
-                    setCurUser(existResponse.user)
-                    //navigation.navigate('Main');
+                    user = await getUserbyID(existResponse.user._id)
+                    if (existResponse.user.profileSettings.profilePictureKey != "default") {
+                        const urlRes = await axios.get(`${BASE_URL}api/get/${user.profileSettings.profilePictureKey}`);
+                        const url = urlRes.data.url
+                        //randomly breaks when the url expires
+                        user.profileSettings.profilePictureUrl = url
+                        setProfileUrl(url)
+                        curUserChanged.current = true
+                    }
+                    await setCurUser(user)
                     navigation.navigate('Main');
                 }
             }

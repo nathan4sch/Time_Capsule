@@ -7,32 +7,64 @@ import { spotifyLogin } from "../utils/spotifyLogin";
 import { instagramLogin } from "../utils/instagramLogin";
 import BackButton from "../Components/lightBackButton";
 import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+
+//const BASE_URL = "http://100.67.14.25:3000/"
+const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount } = useGlobalContext();
+    const { curUser, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl} = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
-    const [profileImage, setProfileImage] = useState(null);
 
-    profilePicture = curUser.profileSettings.profilePicture;
+    const [reload, setReload] = useState(true);
 
     const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0,
         });
-    
-        console.log(result);
-    
-        if (!result.canceled) {
-          setProfileImage(result.assets[0].uri);
-        }
-      };
 
+        if (!result.canceled) {
+            //from react client, to express server, to s3 bucket
+            const formData = new FormData();
+            formData.append("image", {
+                uri: result.assets[0].uri,
+                type: 'image/jpeg',
+                name: 'photo.jpg',
+            });
+
+            try {
+                if (curUser.profileSettings.profilePictureKey != "default") {
+                    await axios.delete(`${BASE_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
+                }
+                const response = await axios.post(`${BASE_URL}api/posts`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                //console.log('Upload successful, Image Name:', response.data.imageName);
+                imageName = response.data.imageName
+                await setProfilePictureKey(imageName)
+                const urlRes = await axios.get(`${BASE_URL}api/get/${imageName}`);
+                const url = urlRes.data.url
+                //console.log('URL: ', url)
+                let urlResponse = await setProfilePictureUrl(url);
+                curUser.profileSettings.profilePictureUrl = url
+                setCurUser(curUser)
+                setReload(!reload)
+                //console.log(urlResponse)
+
+                //setProfileImage(uri); // Update the state with the new image URI
+            } catch (error) {
+                console.error('Upload error', error);
+            }
+        }
+    };
 
     useEffect(() => {
         const fetchData = async (name) => {
@@ -43,7 +75,7 @@ const Profile = ({ navigation }) => {
         };
 
         fetchData(curUser.username);
-    }, []);
+    }, [reload]);
 
 
     const toggleDarkMode = () => {
@@ -89,7 +121,7 @@ const Profile = ({ navigation }) => {
                     <Image
                         style={styles.profileIcon}
                         source={{
-                            uri: curUser.profileSettings.profilePicture,
+                            uri: curUser.profileSettings.profilePictureUrl,
                         }}
                         onError={(error) => console.error("Image load error:", error)}
                     />
@@ -140,7 +172,7 @@ const Profile = ({ navigation }) => {
                 </TouchableOpacity>*/}
                 <TouchableOpacity style={styles.buttonContainer} onPress={handleDeleteAccount}>
                     <View style={{ ...buttonStyle.button, backgroundColor: '#ff5a50' }}>
-                        <Text style={{...styles.buttonText, color: 'white'}}>Delete Account</Text>
+                        <Text style={{ ...styles.buttonText, color: 'white' }}>Delete Account</Text>
                     </View>
                 </TouchableOpacity>
             </BlackBackground>
