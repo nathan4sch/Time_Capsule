@@ -4,8 +4,8 @@ import axios from 'axios'
 // Defines the base URL for API calls
 
 //CHANGE TO YOUR OWN IP ADDRESS
-//const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-const BASE_URL = "http://100.69.11.19:3000/api/v1/"
+const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+//const BASE_URL = "http://10.136.170.121:3000/api/v1/"
 //const BASE_URL = "http://100.67.14.38:3000/api/v1/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
@@ -115,11 +115,13 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
-    const getSpotifyAccess = async () => {
-        const reponse = await axios.post(`${BASE_URL}get-spotify-access-token/${curUser._id}`, {
-            
+    const getSpotifyTopSong = async () => {
+        const response = await axios.post(`${BASE_URL}get-spotify-top-song/${curUser._id}`, {
+            spotify: curUser.profileSettings.spotifyAccount
         })
-        console.log(response);
+        // The return value contains TONS of information about the top song, which we can use for graphics or other stuff.
+        //console.log(response.data.data);
+        console.log(response.data.data.items[0].name)
     }
 
     const setInstragram = async (instagramKey) => {
@@ -307,7 +309,7 @@ export const GlobalProvider = ({ children }) => {
             setUserEmail,
             getUserbyID,
             setSpotify,
-            getSpotifyAccess,
+            getSpotifyTopSong,
             setInstragram,
             removeFriendRequest,
             sendFriendRequest,

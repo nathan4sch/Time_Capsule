@@ -1,4 +1,5 @@
 const UserSchema = require("../models/UserModel")
+require('dotenv').config()
 
 //USERS
 exports.addUser = async (req, res) => {
@@ -328,8 +329,8 @@ exports.setSpotify = async (req, res) => {
     }
 };
 
-exports.getSpotifyAccess = async (req, res) => {
-    console.log("Recieved Spotify Access Request.");
+exports.getSpotifyTopSong = async (req, res) => {
+    //console.log("Recieved Spotify Access Request.");
     const { id } = req.params;
     const { spotify } = req.body;
     try {
@@ -341,24 +342,26 @@ exports.getSpotifyAccess = async (req, res) => {
 
         //console.log(spotify);
 
-        /*
+        
         if (spotify === undefined) {
             return res.status(404).json({ message: 'No Spotify information found' })
         }
-        */
+        
         const authOptions = {
             method: 'POST',
             url: 'https://accounts.spotify.com/api/token',
             headers: {
-                'Authorization': 'Basic ' + (Buffer.from('5a58784e6d234424b485e4add1ea7166' + ':' + '230e160afc41447794cd5598c31c18b6').toString('base64')),
+                'Authorization': 'Basic ' + (Buffer.from(process.env.SPOTIFYCLIENTID + ':' + process.env.SPOTIFYCLIENTSECRET).toString('base64')),
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: new URLSearchParams({
                 grant_type: 'refresh_token',
-                refresh_token: spotify
+                refresh_token: spotify,
+                client_id: '5a58784e6d234424b485e4add1ea7166'
             })
         };
-
+        
+        //var access_token;
         fetch(authOptions.url, {
             method: authOptions.method,
             headers: authOptions.headers,
@@ -372,36 +375,40 @@ exports.getSpotifyAccess = async (req, res) => {
             })
             .then(body => {
                 const access_token = body.access_token;
-                console.log(access_token);
-                res.send({
-                    'access_token': access_token
-                });
+                //console.log(access_token);
+
+                // GET TOP SONG DATA FROM SPOTIFY HERE
+                const spotifyAPIUrl = 'https://api.spotify.com/v1/me/top/tracks?limit=1&offset=0';
+                const options = {
+                    method: 'GET', // GET is the default method, but it's good to be explicit
+                    headers: {
+                        'Authorization': `Bearer ${access_token}`
+                    }
+                };
+
+                fetch(spotifyAPIUrl, options)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json(); // If the response is successful, parse it as JSON
+                        }
+                        //console.log(response)
+                        throw new Error('Request failed: ' + response.statusText); // If response is not successful, throw an error
+                    })
+                    .then(data => {
+                        //console.log(data); // Here you can process the data received from the API
+                        // For example, you might want to send this data back in your server's response or process it further
+                        res.send({
+                            'data': data
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error); // Handle any errors that occurred during the fetch
+                    });
+            
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        /*
-
-        const authOptions = {
-            url: 'https://accounts.spotify.com/api/token',
-            headers: { 'Authorization': 'Basic ' + (Buffer.from('5a58784e6d234424b485e4add1ea7166' + ':' + '230e160afc41447794cd5598c31c18b6').toString('base64')) },
-            form: {
-              grant_type: 'refresh_token',
-              refresh_token: spotify
-            },
-            json: true
-        };
-        
-        request.post(authOptions, function(error, response, body) {
-            if (!error && response.statusCode === 200) {
-                const access_token = body.access_token;
-                console.log(access_token);
-                res.send({
-                    'access_token': access_token
-                });
-            }
-          });
-          */
 
     } catch (error) {
         console.error(error);

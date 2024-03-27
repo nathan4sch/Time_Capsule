@@ -22,7 +22,7 @@ export const spotifyLogin = async ({ navigation, page, setSpotify }) => {
     const client_id = '5a58784e6d234424b485e4add1ea7166';
     const client_secret = SPOTIFY_SECRET; //TODO: need to probably store in Mongo and the request?s
     const redirect_uri = 'exp://localhost:19000/--/oauth2callback';
-    const scope = 'user-read-private user-read-email';
+    const scope = 'user-read-private user-read-email user-top-read';
     const state = generateRandomString(16);
 
     let authUrl =
