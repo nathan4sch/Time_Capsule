@@ -17,28 +17,6 @@ const Photos = ({ navigation }) => {
   const [loading, setLoading] = useState(true); // State variable to track loading
   const viewShotRef = useRef(null); // Reference for ViewShot
 
-  //let capsulePhotosUri = []
-  //const canvasRef = useRef(null);
-
-  //function to combine all photos
-  /*const combineImages = async (capsulePhotos) => {
-    // Define dimensions for the combined image
-    const width = 600; // You can adjust these dimensions as per your requirements
-    const height = 600;
-  
-    // Create an array to hold processed images
-    const processedImages = [];
-  
-    // Process each image
-    for (const photo of capsulePhotos) {
-      const processedImage = await ImageManipulator.manipulateAsync(photo.uri, [
-        { resize: { width, height } }, // Resize each image to fit the desired dimensions
-      ]);
-      processedImages.push(processedImage.uri);
-    }
-
-  };*/
-
   const combineImages = async () => {
     const uri = await viewShotRef.current.capture(); // Capture the layout as an image
     const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -64,9 +42,6 @@ const Photos = ({ navigation }) => {
 
         const shuffledAssets = media.assets.sort(() => Math.random() - 0.5);
         const selectedAssets = shuffledAssets.slice(0, 6);
-        //for (index in selectedAssets) {
-        //  capsulePhotosUri.push(selectedAssets[index].uri)
-        //}
         setCapsulePhotos(selectedAssets);
       } else {
         alert('Permission to access camera roll denied!');
@@ -140,7 +115,11 @@ const Photos = ({ navigation }) => {
         }} />
         <ViewShot ref={viewShotRef} options={{ format: 'jpg', quality: 0.9 }} style={styles.viewShotContainer}>
           <Text style={styles.monthText}>January</Text>
-          <Text style={styles.spotifyText}>Spotify Song</Text>
+          <Image source={require('../icons/capsule-.png')} style={styles.appIcon} />
+          <View style={styles.spotifySection}>
+            <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
+            <Text style={styles.spotifyText}>Top Song: Country by Post Malone</Text>
+          </View>
           <View style={styles.photosContainer}>
             {photos.slice(0, 6).map((photo, index) => (
               <View key={index} style={styles.photoWrapper}>
@@ -160,7 +139,7 @@ const containerWidth = screenWidth - 40; // Subtracting some margin
 const containerHeight = containerWidth / aspectRatio;
 
 const photoWidth = containerWidth / 3 - 6;
-const photoHeight = photoWidth * (4/3)
+const photoHeight = photoWidth * (4 / 3)
 
 const styles = StyleSheet.create({
   container: {
@@ -169,33 +148,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  /*photo: {
-    width: 300,
-    height: 300,
-    marginBottom: 10,
-  },*/
   viewShotContainer: {
     width: containerWidth,
     height: containerHeight,
-    backgroundColor: 'black', // Added for visibility, adjust as needed
+    backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden', // Ensure content does not exceed container bounds
+    overflow: 'hidden',
   },
   monthText: {
-    fontSize: 20, // Adjust font size as needed
+    fontSize: 20,
     color: '#fff',
     fontWeight: 'bold',
   },
   spotifyText: {
-    fontSize: 20, // Adjust font size as needed
+    fontSize: 20,
     color: '#fff',
   },
   photosContainer: {
@@ -206,9 +180,8 @@ const styles = StyleSheet.create({
   },
   photoWrapper: {
     margin: 2, // Adjust spacing between photos
-    borderWidth: 2, // Block border around each photo
+    borderWidth: 2,
     borderColor: '#fff',
-    //width: '30%', // Adjust as needed to fit within the container
     width: photoWidth,
     height: photoHeight,
     alignItems: 'center',
@@ -218,6 +191,22 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover'
+  },
+  appIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 50,
+    height: 50,
+  },
+  spotifySection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  spotifyIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 5,
   },
 });
 
