@@ -40,10 +40,6 @@ const {
     deleteNotification
 } = require('../controllers/notification')
 
-const  {
-    selectPhotos,
-} = require('../controllers/googlevision')
-
 const router = require('express').Router()
 
 //API endpoints for user operations
@@ -84,7 +80,6 @@ router
     .delete('/remove-photo/:capsuleId', removePhotoFromCapsule)
     .post('/set-publish/:capsuleId', setPublish)
     .post('/set-quote/:capsuleId', setQuote)
-    .delete('/select-photos/:id', selectPhotos)
 
 //API endpoints for notification operations
 router

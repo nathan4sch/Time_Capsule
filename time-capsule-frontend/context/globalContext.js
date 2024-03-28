@@ -5,7 +5,7 @@ import axios from 'axios'
 
 //CHANGE TO YOUR OWN IP ADDRESS
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-const BASE_URL = "http://10.186.91.72:3000/api/v1/"
+const BASE_URL = "http://100.67.13.152:3000/api/v1/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -311,9 +311,18 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
-    const selectPhotos = async (id) => {
-        try {
-            let response = await axios.delete(`${BASE_URL}select-photos/${id}`);
+    const selectPhotos = async (id, uris) => {
+        const formData = new FormData();
+        uris.forEach((uri, index) => {
+            formData.append('media', {
+                uri: uri,
+                type: 'image/jpeg',
+                name: `photo${index}.jpg`,
+            });
+        });
+        console.log(formData)
+        try {  
+            await axios.post(`${BASE_URL}select-photos/${id}`, formData);
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message);

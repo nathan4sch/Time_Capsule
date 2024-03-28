@@ -30,7 +30,15 @@ const s3 = new S3Client({
     }
 })
 
+module.exports = { s3 };
+
 const upload = multer({ storage: multer.memoryStorage() });
+
+const  {
+    selectPhotos,
+} = require('./controllers/googlevision')
+
+app.post('/api/v1/select-photos/:id', upload.array('media'), selectPhotos)
 
 //handle photo upload to the aws s3 bucket
 app.post('/api/posts', upload.single('image'), async (req, res) => {

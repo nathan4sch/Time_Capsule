@@ -1,7 +1,12 @@
 const axios = require('axios');
 const vision = require('@google-cloud/vision');
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { s3 } = require('../app');
+const convert = require('heic-convert');
 
 const client = new vision.ImageAnnotatorClient();
+
+const bucketName = process.env.BUCKET_NAME
 
 const landscape_keywords = [
     'landscape',
@@ -114,12 +119,12 @@ const landscape_keywords = [
   ];
   
 
-async function analyzeImage(imageUri) {
+async function analyzeImage(image) {
     const [result] = await client.annotateImage({
-        image: { source: { imageUri: imageUri } }, 
+        image: { content: image }, 
         features: [{ type: 'LABEL_DETECTION', maxResults: 100 }, { type: 'FACE_DETECTION' }, { "type": "IMAGE_PROPERTIES" }],
       });      
-      
+    //console.log(result)
     const labels = result.labelAnnotations;
     const faces = result.faceAnnotations;
     let dominantColors = null;
@@ -160,10 +165,9 @@ async function analyzeImage(imageUri) {
             else if (landscape_keywords.includes(labelData.description.toLowerCase())) {
                 landscape += 1;
             }
-
         });
     }
-    console.log("joy ", joy, "landscape", landscape)
+    console.log('joy: ', joy, 'landscape: ', landscape)
     return [joy, landscape, dominantColors];
   }
 
@@ -185,43 +189,65 @@ function addDefaults(image_data) {
 }
 
 exports.selectPhotos = async (req, res) => {
+    const imageType = (await import('image-type')).default;
     const { id } = req.params;
+    console.log(id)
     const image_data = []
-    for (let i = 103; i <= 143; i++) {
-        const imageName = "kevin-temp-" + i + ".jpg";
-        const urlRes = await axios.get(`https://time-capsule-server.onrender.com/api/get/${imageName}`);
-        const [joy, landscape, dominantColors] = await analyzeImage(urlRes.data.url)
+    for (let image of req.files) {
+        if ((await imageType(image.buffer)).mime === 'image/heic') {
+            image.buffer = await convert({
+                buffer: image.buffer, // the HEIC file buffer
+                format: 'JPEG', // output format
+                quality: 0,
+            });
+            image.mimetype = 'image/jpeg'
+        }
+        const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
         if ((joy == 0 && landscape == 0) || dominantColors == null) {
             continue;
         }
         let add = true;
-        for (const [name, url, j, l, dC] of image_data) {
+        for (const [i, j, l, dC] of image_data) {
             if (j == joy && l == landscape && similarPicture(dC, dominantColors)) {
                 add = false;
                 break;
             }            
         }
         if (add)
-            image_data.push([imageName, urlRes.data.url, joy, landscape, dominantColors])
-        console.log("Finished ", i)
+            image_data.push([image, joy, landscape, dominantColors])
     }
     let new_image_data = []
     if (image_data.length < 6) {
-        new_image_data = image_data.map(pair => pair[1])
+        new_image_data = image_data.map(pair => pair[0])
         addDefaults(new_image_data);
     }
     else if (image_data.length > 6) {
         let sort_data = []
-        for (const [name, url, j, l, dC] of image_data) {
-            sort_data.push([url, j+l])          
+        for (const [image, j, l, dC] of image_data) {
+            sort_data.push([image, j+l])          
         }
         sort_data.sort((a, b) => a[1] - b[1])
         sort_data = sort_data.slice(-6)
         new_image_data = sort_data.map(pair => pair[0])
     }
     else {
-        new_image_data = image_data.map(pair => pair[1])
+        new_image_data = image_data.map(pair => pair[0])
     }
-    //CREATE CAPSULE FROM new_image_data
-    console.log(new_image_data)
+    for (const image of new_image_data) {
+        imageName = id + image.originalname
+        const params = {
+            Bucket: bucketName,
+            Body: image.buffer,
+            Key: imageName,  //key is the image name, unique or else rewrite image
+            ContentType: image.mimetype,
+        };
+
+        try {
+            await s3.send(new PutObjectCommand(params));
+            console.log("File uploaded successfully to S3");
+        } catch (error) {
+            console.error('Error uploading image to S3:', error);
+        }
+    }
+    console.log("done")
 };
