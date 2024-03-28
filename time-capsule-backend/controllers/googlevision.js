@@ -124,7 +124,6 @@ async function analyzeImage(image) {
         image: { content: image }, 
         features: [{ type: 'LABEL_DETECTION', maxResults: 100 }, { type: 'FACE_DETECTION' }, { "type": "IMAGE_PROPERTIES" }],
       });      
-    //console.log(result)
     const labels = result.labelAnnotations;
     const faces = result.faceAnnotations;
     let dominantColors = null;
@@ -171,23 +170,28 @@ async function analyzeImage(image) {
     return [joy, landscape, dominantColors];
   }
 
-function similarPicture(color1, color2) {
-    // TODO: Better Identical Check
-    let sum = 0
-    for (let i = 0; i < color1.length; i++) {
-        d1 = (color1[i].color.red - color2[i].color.red) ** 2
-        d2 = (color1[i].color.green - color2[i].color.green) ** 2
-        d3 = (color1[i].color.blue - color2[i].color.blue) ** 2
-        dist = (d1 + d2 + d3) ** .5
-        sum += dist
-    }
-    //console.log(sum / color1.length)
-    return (sum / color1.length) < 70;
-}
+  
+async function similarPicture(dominantColors1, dominantColors2) {
+    function compareColors(color1, color2) {
+        color1 = color1.color;
+        color2 = color2.color;
+        const distance = Math.sqrt(
+            Math.pow(color1.red - color2.red, 2) +
+            Math.pow(color1.green - color2.green, 2) +
+            Math.pow(color1.blue - color2.blue, 2)
+        );
+        const threshold = 8;
 
-function addDefaults(image_data) {
-    // TODO: ADD DEFAULTS
-    return image_data;
+        return distance < threshold;
+    }
+
+    const similarColors = dominantColors1.filter(color1 =>
+        dominantColors2.some(color2 => compareColors(color1, color2))
+    );
+
+    const similarityScore = similarColors.length / Math.min(dominantColors1.length, dominantColors2.length);
+
+    return similarityScore > .5;
 }
 
 function isEqual(row1, row2) {
@@ -206,6 +210,7 @@ exports.selectPhotos = async (req, res) => {
     const imageType = (await import('image-type')).default;
     const { id } = req.params;
     console.log(id)
+
     let image_data = []
     for (let image of req.files) {
         if ((await imageType(image.buffer)).mime === 'image/heic') {
@@ -225,8 +230,7 @@ exports.selectPhotos = async (req, res) => {
         let add = true;
         for (const [i, j, l, dC] of image_data) {
             if (j == joy && l == landscape) {
-                //console.log("Picture 1:", image.originalname, "  Picture 2:", i.originalname)
-                if( similarPicture(dC, dominantColors)) {
+                if(await similarPicture(dC, dominantColors)) {
                     add = false;
                     break;
                 }
@@ -236,11 +240,7 @@ exports.selectPhotos = async (req, res) => {
             image_data.push([image, joy, landscape, dominantColors])
     }
     let new_image_data = []
-    if (image_data.length < 6) {
-        new_image_data = image_data.map(pair => pair[0])
-        addDefaults(new_image_data);
-    }
-    else if (image_data.length > 6) {
+    if (image_data.length > 6) {
         let toggle = true;
         while (new_image_data.length < 6) {
             if (toggle) {
@@ -263,8 +263,10 @@ exports.selectPhotos = async (req, res) => {
     else {
         new_image_data = image_data.map(pair => pair[0])
     }
+    let key_array = []
     for (const image of new_image_data) {
         imageName = id + image.originalname
+        key_array.push(imageName)
         const params = {
             Bucket: bucketName,
             Body: image.buffer,
@@ -279,5 +281,8 @@ exports.selectPhotos = async (req, res) => {
             console.error('Error uploading image to S3:', error);
         }
     }
-    console.log("done")
+    for (let i = 0; i < 6 - new_image_data.length; i++) {
+        key_array.push("default1.png")
+    }
+    console.log(key_array)
 };

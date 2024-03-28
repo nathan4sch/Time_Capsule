@@ -14,7 +14,6 @@ const Main = ({ navigation }) => {
         if (status === 'granted') {
             const month = new Date();
             month.setDate(1);
-            //EDIT HOW MANY PHOTOS HERE WITH FIRST
             const media = await MediaLibrary.getAssetsAsync({first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
             const assetInfoResults = await Promise.all(assetInfoPromises);
