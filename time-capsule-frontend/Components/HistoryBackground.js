@@ -5,19 +5,20 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default ({ children }) => {
   return (
-    /*
+    
     <LinearGradient
-      colors={['#FFFFFF', '#FFFFFF', '#FFFFFF']}
-      //colors={['#000000', '#FFFFFF', '#000000']}
+      //colors={['#FFFFFF', '#FFFFFF', '#FFFFFF']}
+      colors={['#000000', '#FFFFFF', '#000000']}
       start={[0, 0]}
       end={[0, 1]}
       style={styles.background}
     >
       {children}
     </LinearGradient>
-    */
+    
 
     // SVG brick background
+    /*
     <View style={styles.background}>
       <Svg height="100%" width="100%" viewBox="0 0 168 264" style={styles.background}>
         <G id="Page-1" fill="none" fillRule="evenodd">
@@ -117,6 +118,7 @@ export default ({ children }) => {
       </Svg>
       {children}
     </View>
+    */
   );
 };
 
