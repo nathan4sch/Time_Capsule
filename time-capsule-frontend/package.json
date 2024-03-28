@@ -43,6 +43,7 @@
     "react-native-screens": "~3.29.0",
     "react-native-sha256": "^1.4.9",
     "react-native-svg": "^15.1.0",
+    "react-native-view-shot": "^3.8.0",
     "react-native-web": "~0.19.6",
     "react-native-webview": "^13.8.1"
   },
