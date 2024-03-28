@@ -89,4 +89,4 @@ router
     .get('/get-notification/:notificationId', getNotification)
     .delete('/delete-notification/:notificationId', deleteNotification)
 
-module.exports = routermodule.exports = router
+module.exports = router
