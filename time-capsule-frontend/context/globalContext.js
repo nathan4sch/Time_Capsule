@@ -338,6 +338,27 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
+    const selectPhotos = async (id, uris) => {
+        const formData = new FormData();
+        uris.forEach((uri, index) => {
+            formData.append('media', {
+                uri: uri,
+                type: 'image/jpeg',
+                name: `photo${index}.jpg`,
+            });
+        });
+        console.log(formData)
+        try {  
+            await axios.post(`${BASE_URL}select-photos/${id}`, formData);
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
+    };
+  
     const createCapsule = async (snapshotKey, usedPhotos, quote, spotifySongs,) => {
         const response = await axios.post(`${BASE_URL}create-capsule/${curUser._id}`, {
             snapshotKey,
@@ -384,6 +405,7 @@ export const GlobalProvider = ({ children }) => {
             deleteNotification,
             setProfilePictureUrl,
             setProfilePictureKey,
+            selectPhotos
             BASE_S3_URL,
             BASE_URL,
             createCapsule,

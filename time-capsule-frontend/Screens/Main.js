@@ -1,14 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard } from "react-native";
-import PageNavBar from "../Components/PageNavBar";
 import BlackBackground from "../Components/BlackBackground";
-import { commonStyles } from "../Components/FriendsPageStylings";
 import { useGlobalContext } from "../context/globalContext";
+import * as MediaLibrary from 'expo-media-library';
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
+
+    async function getPhotosFromMonth() {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status === 'granted') {
+            const month = new Date();
+            month.setDate(1);
+            const media = await MediaLibrary.getAssetsAsync({first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
+            const assetInfoResults = await Promise.all(assetInfoPromises);
+            const uris = assetInfoResults.map(item => item.localUri);
+            selectPhotos(curUser._id, uris);
+        } else {
+            alert('Permission to access camera roll denied!');
+        }
+    }
 
     useEffect(() => {
         const getCapsuleFunc = async () => {
@@ -92,6 +106,7 @@ const Main = ({ navigation }) => {
                         )}
                     </TouchableOpacity>
                 </View>
+                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}/>
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
@@ -104,6 +119,15 @@ const Main = ({ navigation }) => {
 export default Main;
 
 const styles = StyleSheet.create({
+    tempImageSelect: {
+        position: 'absolute',
+        left: '10%',
+        top: '81%',
+        width: '80%',
+        height: 45,
+        backgroundColor: 'rgba(255, 50, 90, 0.67)',
+        borderRadius: 10,
+    },
     profileContainer: {
         position: 'absolute',
         top: 115,
