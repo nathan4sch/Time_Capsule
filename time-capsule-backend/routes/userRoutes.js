@@ -75,7 +75,7 @@ router
 router
     .post('/create-capsule/:id', createCapsule)
     .get('/get-capsule/:id', getCapsule)
-    .post('/delete-capsule/:id', deleteCapsule)
+    .delete('/delete-capsule/:id', deleteCapsule)
     .delete('/remove-song/:capsuleId', removeSongFromCapsule)
     .post('/add-song/:capsuleId', addSongToCapsule)
     .post('/add-photo/:capsuleId', addPhotoToCapsule)

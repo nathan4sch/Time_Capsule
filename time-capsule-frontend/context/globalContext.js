@@ -4,9 +4,10 @@ import axios from 'axios'
 // Defines the base URL for API calls
 
 //CHANGE TO YOUR OWN IP ADDRESS
-const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
-//const BASE_URL = "http://100.67.14.25:3000/api/v1/"
+//const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+//const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
+const BASE_URL = "http://100.67.14.19:3000/api/v1/"
+const BASE_S3_URL = "http://100.67.14.19:3000/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -107,6 +108,7 @@ export const GlobalProvider = ({ children }) => {
 
 
     const setSpotify = async (spotify) => {
+        curUser.profileSettings.spotifyAccount = spotify
         const response = await axios.post(`${BASE_URL}set-spotify-account/${curUser._id}`, {
             spotify: spotify,
         })
@@ -121,7 +123,8 @@ export const GlobalProvider = ({ children }) => {
         })
         // The return value contains TONS of information about the top song, which we can use for graphics or other stuff.
         //console.log(response.data.data);
-        console.log(response.data.data.items[0].name)
+        //console.log(response.data.data.items[0].name)
+        return(response.data.data.items[0].name)
     }
 
     const setInstragram = async (instagramKey) => {
@@ -288,24 +291,31 @@ export const GlobalProvider = ({ children }) => {
     };
 
     const deleteCapsule = async (capsuleId) => {
-        //delete the photos from s3
         try {
             const response = await axios.delete(`${BASE_URL}delete-capsule/${capsuleId}`);        
         } catch (error) {
             if (error.response) {
+                console.log(error.response.data.message)
+                console.log(error.response)
                 setError(error.response.data.message);
             } else {
+                console.log(error)
                 console.error('Error:', error.message);
             }
         }
     };
 
     const deleteAccount = async (id) => {
+        //console.log(curUser)
         try {
             for (const friendId of curUser.friends) {
                 const response = await removeFriend(friendId)
             }
             for (const capsuleId of curUser.capsules) {
+                capsule = await getCapsule(capsuleId)
+                for (const image of capsule.usedPhotos) {
+                    await axios.delete(`${BASE_S3_URL}api/del/${image.photoKey}`);
+                }
                 const response = await deleteCapsule(capsuleId);
             }
             for (const momentId of curUser.moments) {
@@ -326,6 +336,20 @@ export const GlobalProvider = ({ children }) => {
                 console.error('Error:', error.message);
             }
         }
+    };
+
+    const createCapsule = async (snapshotKey, usedPhotos, quote, spotifySongs,) => {
+        const response = await axios.post(`${BASE_URL}create-capsule/${curUser._id}`, {
+            snapshotKey,
+            usedPhotos,
+            quote,
+            spotifySongs
+        })
+            .catch((err) => {
+                console.log(err)
+                console.log(err.response.data.message)
+                setError(err.response.data.message)
+            })
     };
 
 
@@ -362,6 +386,7 @@ export const GlobalProvider = ({ children }) => {
             setProfilePictureKey,
             BASE_S3_URL,
             BASE_URL,
+            createCapsule,
         }}>
             {children}
         </GlobalContext.Provider>
