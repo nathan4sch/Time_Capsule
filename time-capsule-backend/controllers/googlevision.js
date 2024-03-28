@@ -172,6 +172,7 @@ async function analyzeImage(image) {
   }
 
 function similarPicture(color1, color2) {
+    // TODO: Better Identical Check
     let sum = 0
     for (let i = 0; i < color1.length; i++) {
         d1 = (color1[i].color.red - color2[i].color.red) ** 2
@@ -180,27 +181,42 @@ function similarPicture(color1, color2) {
         dist = (d1 + d2 + d3) ** .5
         sum += dist
     }
-    return (sum / color1.length) < 45;
+    //console.log(sum / color1.length)
+    return (sum / color1.length) < 70;
 }
 
 function addDefaults(image_data) {
-    // ADD DEFAULTS
+    // TODO: ADD DEFAULTS
     return image_data;
+}
+
+function isEqual(row1, row2) {
+    if (row1.length !== row2.length) {
+        return false;
+    }
+    for (let i = 0; i < row1.length; i++) {
+        if (row1[i] !== row2[i]) {
+            return false; 
+        }
+    }
+    return true;
 }
 
 exports.selectPhotos = async (req, res) => {
     const imageType = (await import('image-type')).default;
     const { id } = req.params;
     console.log(id)
-    const image_data = []
+    let image_data = []
     for (let image of req.files) {
         if ((await imageType(image.buffer)).mime === 'image/heic') {
             image.buffer = await convert({
                 buffer: image.buffer, // the HEIC file buffer
                 format: 'JPEG', // output format
-                quality: 0,
             });
             image.mimetype = 'image/jpeg'
+        }
+        if (image.buffer.length === 0) {
+            continue;
         }
         const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
         if ((joy == 0 && landscape == 0) || dominantColors == null) {
@@ -208,9 +224,12 @@ exports.selectPhotos = async (req, res) => {
         }
         let add = true;
         for (const [i, j, l, dC] of image_data) {
-            if (j == joy && l == landscape && similarPicture(dC, dominantColors)) {
-                add = false;
-                break;
+            if (j == joy && l == landscape) {
+                //console.log("Picture 1:", image.originalname, "  Picture 2:", i.originalname)
+                if( similarPicture(dC, dominantColors)) {
+                    add = false;
+                    break;
+                }
             }            
         }
         if (add)
@@ -222,13 +241,24 @@ exports.selectPhotos = async (req, res) => {
         addDefaults(new_image_data);
     }
     else if (image_data.length > 6) {
-        let sort_data = []
-        for (const [image, j, l, dC] of image_data) {
-            sort_data.push([image, j+l])          
+        let toggle = true;
+        while (new_image_data.length < 6) {
+            if (toggle) {
+                const maxSmile = image_data.reduce((max, curr) => curr[1] > max[1] ? curr : max);
+                image_data = image_data.filter(row => !isEqual(row, maxSmile));
+                if (maxSmile[1] != 0) {
+                    new_image_data.push(maxSmile[0])
+                }
+                toggle = !toggle;
+            } else {
+                const maxLandscape = image_data.reduce((max, curr) => curr[2] > max[2] ? curr : max);
+                image_data = image_data.filter(row => !isEqual(row, maxLandscape));
+                if (maxLandscape[2] != 0) {
+                    new_image_data.push(maxLandscape[0])
+                }
+                toggle = !toggle;
+            }
         }
-        sort_data.sort((a, b) => a[1] - b[1])
-        sort_data = sort_data.slice(-6)
-        new_image_data = sort_data.map(pair => pair[0])
     }
     else {
         new_image_data = image_data.map(pair => pair[0])
