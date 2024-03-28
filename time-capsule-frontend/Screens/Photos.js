@@ -1,15 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, Alert, ActivityIndicator, Button } from 'react-native'; // Import ActivityIndicator
 import BackButton from "../Components/lightBackButton";
 import BlackBackground from "../Components/BlackBackground";
 import * as MediaLibrary from 'expo-media-library';
 import { useGlobalContext } from "../context/globalContext";
-import axios from 'axios'
+import * as ImageManipulator from 'expo-image-manipulator';
+import * as FileSystem from 'expo-file-system';
+import axios from 'axios';
 
 const Photos = ({ navigation }) => {
   const { BASE_S3_URL, getSpotifyTopSong, createCapsule, curUser } = useGlobalContext();
   const [photos, setPhotos] = useState([]);
   const [capsulePhotos, setCapsulePhotos] = useState([]);
+  const [loading, setLoading] = useState(true); // State variable to track loading
+
+  //let capsulePhotosUri = []
+  //const canvasRef = useRef(null);
+
+  //function to combine all photos
+  const combineImages = async (capsulePhotos) => {
+    // Define dimensions for the combined image
+    const width = 600; // You can adjust these dimensions as per your requirements
+    const height = 600;
+  
+    // Create an array to hold processed images
+    const processedImages = [];
+  
+    // Process each image
+    for (const photo of capsulePhotos) {
+      const processedImage = await ImageManipulator.manipulateAsync(photo.uri, [
+        { resize: { width, height } }, // Resize each image to fit the desired dimensions
+      ]);
+      processedImages.push(processedImage.uri);
+    }
+  
+    // Combine images horizontally
+    const combinedImage = await ImageManipulator.manipulateAsync(
+      processedImages,
+      [{ concatenate: { axis: 'horizontal', spacing: 10 } }],
+      { format: 'jpg' } // Output format
+    );
+    console.log("combine: ", combinedImage)
+  
+    // Save the combined image to the filesystem
+    const combinedImageUri = `${FileSystem.documentDirectory}combinedImage.jpg`;
+    await FileSystem.copyAsync({ from: combinedImage.uri, to: combinedImageUri });
+  
+    console.log("test: ", combinedImageUri)
+    return combinedImageUri;
+  };
+
+
+  const saveToCameraRoll = async (combinedImageUri) => {
+
+  };
 
   useEffect(() => {
     (async () => {
@@ -17,13 +61,14 @@ const Photos = ({ navigation }) => {
       if (status === 'granted') {
         const month = new Date();
         month.setDate(1);
-        //EDIT HOW MANY PHOTOS HERE WITH FIRST
         const media = await MediaLibrary.getAssetsAsync({ first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
         setPhotos(media.assets);
 
         const shuffledAssets = media.assets.sort(() => Math.random() - 0.5);
         const selectedAssets = shuffledAssets.slice(0, 6);
-        //console.log("selected Assets: ", selectedAssets)
+        //for (index in selectedAssets) {
+        //  capsulePhotosUri.push(selectedAssets[index].uri)
+        //}
         setCapsulePhotos(selectedAssets);
       } else {
         alert('Permission to access camera roll denied!');
@@ -33,13 +78,11 @@ const Photos = ({ navigation }) => {
 
   useEffect(() => {
     (async () => {
-      if (capsulePhotos.length != 0) {
+      if (capsulePhotos.length !== 0) {
         let imageArray = [];
         let spotifySongsArray = [];
-        //need capsule photos, spotify, month (look at timestamp), quote?, moment?
-        //get capsule photos, publish each, get the key
+
         for (let index in capsulePhotos) {
-          //console.log("sending photo: ", index)
           const photo = capsulePhotos[index];
           try {
             const assetInfo = await MediaLibrary.getAssetInfoAsync(photo);
@@ -62,50 +105,59 @@ const Photos = ({ navigation }) => {
             console.error("Error processing photo:", error);
           }
         }
-        //images in imageKeysArray
-        //console.log(imageKeysArray)
-        if (curUser.profileSettings.spotifyAccount != "") {
-          spotifySongs = await getSpotifyTopSong()
-          spotifySongsArray.push(spotifySongs)
-        } else {
-          spotifySongsArray.push("test")
-        }
-        
 
-        snapshotKey = "temp"
-        quote = "temp"
+        if (curUser.profileSettings.spotifyAccount !== "") {
+          spotifySongs = await getSpotifyTopSong();
+          spotifySongsArray.push(spotifySongs);
+        } else {
+          spotifySongsArray.push("test");
+        }
+
+        snapshotKey = "temp";
+        quote = "temp";
 
         await createCapsule(snapshotKey, imageArray, quote, spotifySongsArray);
+        setLoading(false); // Set loading to false when capsule creation is complete
         Alert.alert("Success", "Capsule Created");
-        //console.log("capsule created")
-
       }
     })();
   }, [capsulePhotos]);
 
-  /*
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="white" />
+      </View>
+    );
+  }
+
   return (
     <>
       <BlackBackground>
         <BackButton onPress={() => navigation.goBack()} />
         <Text style={styles.title}>Last Months Photos</Text>
+        <Button title="Save Combined Image" onPress={async () => {
+          const combinedImageUri = await combineImages(capsulePhotos);
+          //-await saveToCameraRoll(combinedImageUri);
+        }} />
         <ScrollView>
-          {photos.map((photo, index) => (
+          {capsulePhotos.map((photo, index) => (
             <Image key={index} source={{ uri: photo.uri }} style={styles.photo} />
           ))}
         </ScrollView>
       </BlackBackground>
     </>
   );
-  */
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
   },
   title: {
     fontSize: 20,
