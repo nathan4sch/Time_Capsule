@@ -4,8 +4,10 @@ import axios from 'axios'
 // Defines the base URL for API calls
 
 //CHANGE TO YOUR OWN IP ADDRESS
-//const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
-const BASE_URL = "http://100.67.13.152:3000/api/v1/"
+const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
+//const BASE_URL = "http://100.67.14.19:3000/api/v1/"
+//const BASE_S3_URL = "http://100.67.14.19:3000/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -106,6 +108,7 @@ export const GlobalProvider = ({ children }) => {
 
 
     const setSpotify = async (spotify) => {
+        curUser.profileSettings.spotifyAccount = spotify
         const response = await axios.post(`${BASE_URL}set-spotify-account/${curUser._id}`, {
             spotify: spotify,
         })
@@ -114,9 +117,19 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
+    const getSpotifyTopSong = async () => {
+        const response = await axios.post(`${BASE_URL}get-spotify-top-song/${curUser._id}`, {
+            spotify: curUser.profileSettings.spotifyAccount
+        })
+        // The return value contains TONS of information about the top song, which we can use for graphics or other stuff.
+        //console.log(response.data.data);
+        //console.log(response.data.data.items[0].name)
+        return(response.data.data.items[0].name)
+    }
+
     const setInstragram = async (instagramKey) => {
         const response = await axios.post(`${BASE_URL}set-instagram-account/${curUser._id}`, {
-            spotify: instagramKey
+            instagram: instagramKey
         })
             .catch((err) => {
                 setError(err.response.data.message)
@@ -206,11 +219,13 @@ export const GlobalProvider = ({ children }) => {
 
     const setProfilePictureUrl = async (profilePictureUrl) => {
         try {
+            //console.log("settingProfileURL")
             const response = await axios.post(`${BASE_URL}set-profile-picture-url/${curUser._id}`, {
                 profilePictureUrl
             });
-        
         } catch (error) {
+            console.log(error)
+            console.log(error.response.data.message)
             if (error.response) {
                 setError(error.response.data.message);
             } else {
@@ -226,6 +241,9 @@ export const GlobalProvider = ({ children }) => {
             });
         
         } catch (error) {
+            console.log(error)
+            console.log(error.response.data.message)
+
             if (error.response) {
                 setError(error.response.data.message);
             } else {
@@ -277,33 +295,42 @@ export const GlobalProvider = ({ children }) => {
             const response = await axios.delete(`${BASE_URL}delete-capsule/${capsuleId}`);        
         } catch (error) {
             if (error.response) {
+                console.log(error.response.data.message)
+                console.log(error.response)
                 setError(error.response.data.message);
             } else {
+                console.log(error)
                 console.error('Error:', error.message);
             }
         }
     };
 
     const deleteAccount = async (id) => {
+        //console.log(curUser)
         try {
-            let response = await axios.delete(`${BASE_URL}delete-user/${id}`);
-            for (friendId in curUser.friends) {
-                response = await axios.delete(`${BASE_URL}remove-friend/${friendId}`, {
-                    data: { id }  // Pass the data in the 'data' property
-                });
+            for (const friendId of curUser.friends) {
+                const response = await removeFriend(friendId)
             }
-            
-            for (capsuleId in curUser.capsules) {
-                response = await deleteCapsule(capsuleId);
+            for (const capsuleId of curUser.capsules) {
+                capsule = await getCapsule(capsuleId)
+                for (const image of capsule.usedPhotos) {
+                    await axios.delete(`${BASE_S3_URL}api/del/${image.photoKey}`);
+                }
+                const response = await deleteCapsule(capsuleId);
             }
-            for (momentId in curUser.moments) {
-                response = await deleteMoment(momentId);
+            for (const momentId of curUser.moments) {
+                const response = await deleteMoment(momentId);
             }
-            for (notificationId in curUser.notifications) {
-                response = await deleteNotification(notificationId);
+            for (const notificationId of curUser.notifications) {
+                const response = await deleteNotification(notificationId);
             }
+            if (curUser.profileSettings.profilePictureKey != "default") {
+                await axios.delete(`${BASE_S3_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
+            }
+            const response = await axios.delete(`${BASE_URL}delete-user/${id}`);
         } catch (error) {
             if (error.response) {
+                console.log(error.response.data.message)
                 setError(error.response.data.message);
             } else {
                 console.error('Error:', error.message);
@@ -331,6 +358,21 @@ export const GlobalProvider = ({ children }) => {
             }
         }
     };
+  
+    const createCapsule = async (snapshotKey, usedPhotos, quote, spotifySongs,) => {
+        const response = await axios.post(`${BASE_URL}create-capsule/${curUser._id}`, {
+            snapshotKey,
+            usedPhotos,
+            quote,
+            spotifySongs
+        })
+            .catch((err) => {
+                console.log(err)
+                console.log(err.response.data.message)
+                setError(err.response.data.message)
+            })
+    };
+
 
     // Provide the context value to child components
     return (
@@ -349,6 +391,7 @@ export const GlobalProvider = ({ children }) => {
             setUserEmail,
             getUserbyID,
             setSpotify,
+            getSpotifyTopSong,
             setInstragram,
             removeFriendRequest,
             sendFriendRequest,
@@ -363,6 +406,9 @@ export const GlobalProvider = ({ children }) => {
             setProfilePictureUrl,
             setProfilePictureKey,
             selectPhotos
+            BASE_S3_URL,
+            BASE_URL,
+            createCapsule,
         }}>
             {children}
         </GlobalContext.Provider>

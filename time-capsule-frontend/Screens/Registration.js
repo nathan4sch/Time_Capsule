@@ -1,34 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, TextInput, Text, Platform, TouchableOpacity, Image, Keyboard, Alert } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios'
 
 const Registration = ({ navigation }) => {
-    const { userEmail, getUser, addUser, setCurUser } = useGlobalContext();
+    const { userEmail, getUser, addUser, setCurUser, setProfilePictureKey, setProfilePictureUrl, curUser, BASE_S3_URL } = useGlobalContext();
     const [username, setUsername] = useState('');
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [profileImage, setProfileImage] = useState(null);
     //const BASE_URL = "http://100.67.14.25:3000/api/v1/";
-    const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+    //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
+
+    const [profileUrl, setProfileUrl] = useState('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png');
+    const [profileKey, setProfileKey] = useState('');
+
+    const curUserChangedReg = useRef(false);
+
+    useEffect(() => {
+        // This effect will run whenever curUser changes
+        if (curUserChangedReg.current) {
+            if (profileUrl != "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png") {
+                //console.log("RegIst: ", profileKey, profileUrl)
+                setProfilePictureKey(profileKey);
+                setProfilePictureUrl(profileUrl);
+                curUserChangedReg.current = false
+            }
+            curUserChangedReg.current = false
+        }
+    }, [curUser]);
 
     const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0,
         });
-    
-        console.log(result);
-        console.log(result.assets[0].uri)
-    
+
         if (!result.canceled) {
-          setProfileImage(result.assets[0].uri);
+            //from react client, to express server, to s3 bucket
+            const formData = new FormData();
+            formData.append("image", {
+                uri: result.assets[0].uri,
+                type: 'image/jpeg',
+                name: 'photo.jpg',
+            });
+
+            try {
+                //const response = await axios.post(`https://time-capsule-server.onrender.com/api/posts`, formData, {
+                const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                setProfileKey(response.data.imageName)
+                //await setProfilePictureKey(imageName)
+                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${response.data.imageName}`);
+                setProfileUrl(urlRes.data.url)
+
+                //let urlResponse = await setProfilePictureUrl(url);
+                //curUser.profileSettings.profilePictureUrl = url
+                //setCurUser(curUser)
+
+                //setProfileImage(uri); // Update the state with the new image URI
+            } catch (error) {
+                console.error('Upload error', error);
+                console.log(error)
+            }
         }
-      };
+    };
 
     const handleSubmission = async () => {
         // Perform actions with the username, such as storing it
@@ -47,36 +90,16 @@ const Registration = ({ navigation }) => {
                 Alert.alert("Error", "Username already exists. Please choose another username.");
             } else {
                 // Check if a profile image is selected
-                if (profileImage) {
-                    const formData = new FormData();
-                    formData.append('image', {
-                        uri: profileImage.uri,
-                        type: profileImage.type,
-                        name: 'profile_image.jpg',
-                    });
 
-                    // Call the server's post image function
-                    fetch(`${BASE_URL}posts`, {
-                        method: 'POST',
-                        body: formData,
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(text => { throw new Error(text) });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Image uploaded successfully:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error uploading image:', error);
-                    });
-                }
                 await addUser(curUsername, userEmail)
                 Alert.alert("Success", "Account Created");
                 const findUser = await getUser(curUsername)
-                setCurUser(findUser)
+                if (profileUrl != "") {
+                    findUser.profileSettings.profilePictureUrl = profileUrl
+                    findUser.profileSettings.profilePictureKey = profileKey
+                }
+                curUserChangedReg.current = true
+                await setCurUser(findUser)
                 navigation.navigate('Spotify');
             }
         }
@@ -89,7 +112,13 @@ const Registration = ({ navigation }) => {
             onPress={() => Keyboard.dismiss()} // Dismiss the keyboard on press
         >
             <GreenBackground>
-                <Image style={styles.image} source={require('../icons/profile-.png')} />
+                <Image
+                    style={styles.image}
+                    source={{
+                        uri: profileUrl,
+                    }}
+                    onError={(error) => console.error("Image load error:", error)}
+                />
                 <TouchableOpacity style={styles.press} onPress={pickImage}>
                     <Text style={styles.text2}>Set Profile Picture</Text>
                 </TouchableOpacity>
@@ -221,10 +250,11 @@ const styles = StyleSheet.create({
     },
     image: {
         position: 'absolute',
-        width: 212,
-        height: 212,
-        left: 82,
-        top: 35,
+        height: '20%',
+        left: 105,
+        top: 65,
+        aspectRatio: 1,
+        borderRadius: 100,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',

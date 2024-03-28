@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require('multer');
 
 const express = require('express') // Express framework for building web applications
@@ -42,7 +42,7 @@ app.post('/api/v1/select-photos/:id', upload.array('media'), selectPhotos)
 
 //handle photo upload to the aws s3 bucket
 app.post('/api/posts', upload.single('image'), async (req, res) => {
-    console.log("Server received a request to /api/posts");
+    //console.log("Server received a request to /api/posts");
     if (!req.file) {
         console.error("No file was uploaded.");
         return res.status(400).json({ error: "File not provided" });
@@ -60,7 +60,7 @@ app.post('/api/posts', upload.single('image'), async (req, res) => {
 
     try {
         await s3.send(new PutObjectCommand(params));
-        console.log("File uploaded successfully to S3");
+        //console.log("File uploaded successfully to S3");
         res.json({ message: "Image uploaded successfully", imageName: imageName });
     } catch (error) {
         console.error('Error uploading image to S3:', error);
@@ -75,9 +75,26 @@ app.get("/api/get/:imageName", async (req, res) => {
         Key: imageName,
     }
     const command = new GetObjectCommand(getObjectParams)
-    const url = await getSignedUrl(s3,command, {expiresIn:3600})
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
     res.send({ url });
 });
+
+app.delete("/api/del/:imageName", async (req, res) => {
+    const { imageName } = req.params;
+    const deleteParams = {
+        Bucket: bucketName,
+        Key: imageName,
+    }
+
+    try {
+        await s3.send(new DeleteObjectCommand(deleteParams))
+        console.log("File deleted successfully");
+        res.json({ message: "Image deleted successfully", imageName: imageName });
+    } catch (error) {
+        console.error('Error deleting image to S3:', error);
+        res.status(500).json({ error: "Error deleting image to S3" });
+    }
+})
 
 //end new
 

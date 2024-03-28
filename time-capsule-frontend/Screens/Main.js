@@ -28,7 +28,8 @@ const Main = ({ navigation }) => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
                 const capsule = await getCapsule(curUser.capsules[0]);
-                setShownCapsule(capsule.snapshot);
+                //get url from key
+                setShownCapsule(capsule.snapshotUrl);
             }
         };
         getCapsuleFunc();
@@ -65,6 +66,10 @@ const Main = ({ navigation }) => {
         navigation.navigate('StoryBoard');
     };
 
+    const handleCreateCapsule = () => {
+
+    }
+
     return (
         <TouchableOpacity
             style={{ flex: 1 }}
@@ -77,23 +82,28 @@ const Main = ({ navigation }) => {
                         source={{
                             uri: curUser.profileSettings.profilePictureUrl,
                         }}
+                        cachePolicy='memory-disk'
                     />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.photoButton}
+                    onPress={() => navigation.navigate('Photos')}>
+                    <Text style={styles.buttonText}>Temp Photo Button</Text>
                 </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
                     <Text style={styles.timerText}>{timer}</Text>
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
                 </View>
                 <View style={styles.imageContainer}>
-                <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
-                    {shownCapsule ? (
-                        <Image
-                            style={styles.capsuleImage}
-                            source={{ uri: shownCapsule }}
-                        />
-                    ) : (
-                        // Render something else when shownCapsule is empty
-                        <Text style={styles.overlayText}>No Capsule Available</Text>
-                    )}
+                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
+                        {shownCapsule ? (
+                            <Image
+                                style={styles.capsuleImage}
+                                source={{ uri: shownCapsule }}
+                            />
+                        ) : (
+                            <Text style={styles.overlayText}>No Capsule Available</Text>
+                        )}
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}/>
@@ -185,7 +195,7 @@ const styles = StyleSheet.create({
         height: '50%',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1,  
+        zIndex: 1,
     },
     capsuleImage: {
         height: '65%',
@@ -203,5 +213,15 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         alignSelf: 'center',
         top: '50%'
+    },
+    photoButton: {
+        position: 'absolute',
+        top: '5%',
+        left: '83%',
+        aspectRatio: 1,
+        height: '6%',
+        borderRadius: 10,
+        backgroundColor: 'aquamarine',
+        alignItems: 'center',
     },
 });

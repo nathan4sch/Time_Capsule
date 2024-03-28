@@ -10,14 +10,15 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 //const BASE_URL = "http://100.67.14.25:3000/"
-const BASE_URL = "https://time-capsule-server.onrender.com/";
+//const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl} = useGlobalContext();
+    const { curUser, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl, BASE_S3_URL} = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");
-    const [profileImage, setProfileImage] = useState(null);
+
+    const [reload, setReload] = useState(true);
 
     const pickImage = async () => {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -25,7 +26,7 @@ const Profile = ({ navigation }) => {
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
+            quality: 0,
         });
 
         if (!result.canceled) {
@@ -38,7 +39,10 @@ const Profile = ({ navigation }) => {
             });
 
             try {
-                const response = await axios.post(`${BASE_URL}api/posts`, formData, {
+                if (curUser.profileSettings.profilePictureKey != "default") {
+                    await axios.delete(`${BASE_S3_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
+                }
+                const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -46,11 +50,14 @@ const Profile = ({ navigation }) => {
                 //console.log('Upload successful, Image Name:', response.data.imageName);
                 imageName = response.data.imageName
                 await setProfilePictureKey(imageName)
-                const urlRes = await axios.get(`${BASE_URL}api/get/${imageName}`);
+                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
                 const url = urlRes.data.url
                 //console.log('URL: ', url)
-                await setProfilePictureUrl(url);
-                setProfileImage(url);
+                let urlResponse = await setProfilePictureUrl(url);
+                curUser.profileSettings.profilePictureUrl = url
+                setCurUser(curUser)
+                setReload(!reload)
+                //console.log(urlResponse)
 
                 //setProfileImage(uri); // Update the state with the new image URI
             } catch (error) {
@@ -68,7 +75,7 @@ const Profile = ({ navigation }) => {
         };
 
         fetchData(curUser.username);
-    }, []);
+    }, [reload]);
 
 
     const toggleDarkMode = () => {
@@ -151,6 +158,12 @@ const Profile = ({ navigation }) => {
                         <Text style={styles.buttonText}>History</Text>
                     </View>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonContainer} onPress={getSpotifyTopSong}>
+                    <View style={buttonStyle.button}>
+                        <Image style={styles.icon} source={require('../icons/spotify-.png')} />
+                        <Text style={styles.buttonText}>Get Top Spotify Song</Text>
+                    </View>
+                </TouchableOpacity>
                 {/*<TouchableOpacity style={styles.buttonContainer} onPress={toggleDarkMode}>
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/history-.png')} />
@@ -196,7 +209,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         width: '80%',
         height: '6.5%',
-        marginBottom: '7%',
+        marginBottom: '4%',
     },
     buttonText: {
         top: '30%',
