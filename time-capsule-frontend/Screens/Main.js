@@ -14,7 +14,8 @@ const Main = ({ navigation }) => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
                 const capsule = await getCapsule(curUser.capsules[0]);
-                setShownCapsule(capsule.snapshot);
+                //get url from key
+                setShownCapsule(capsule.snapshotUrl);
             }
         };
         getCapsuleFunc();
@@ -41,7 +42,7 @@ const Main = ({ navigation }) => {
         const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
- 
+
         const padWithZero = (value) => (value < 10 ? `0${value}` : value);
 
         return `${padWithZero(days)}:${padWithZero(hours)}:${padWithZero(minutes)}:${padWithZero(seconds)}`;
@@ -50,6 +51,10 @@ const Main = ({ navigation }) => {
     const handleOverlayButtonPress = () => {
         navigation.navigate('StoryBoard');
     };
+
+    const handleCreateCapsule = () => {
+
+    }
 
     return (
         <TouchableOpacity
@@ -66,7 +71,9 @@ const Main = ({ navigation }) => {
                         cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.photoButton} onPress={() => navigation.navigate('Photos')}>
+                <TouchableOpacity
+                    style={styles.photoButton}
+                    onPress={() => navigation.navigate('Photos')}>
                     <Text style={styles.buttonText}>Temp Photo Button</Text>
                 </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
@@ -74,15 +81,15 @@ const Main = ({ navigation }) => {
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
                 </View>
                 <View style={styles.imageContainer}>
-                <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
-                    {shownCapsule ? (
-                        <Image
-                            style={styles.capsuleImage}
-                            source={{ uri: shownCapsule }}
-                        />
-                    ) : (
-                        <Text style={styles.overlayText}>No Capsule Available</Text>
-                    )}
+                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
+                        {shownCapsule ? (
+                            <Image
+                                style={styles.capsuleImage}
+                                source={{ uri: shownCapsule }}
+                            />
+                        ) : (
+                            <Text style={styles.overlayText}>No Capsule Available</Text>
+                        )}
                     </TouchableOpacity>
                 </View>
                 <TextInput style={styles.momentButton}
@@ -164,7 +171,7 @@ const styles = StyleSheet.create({
         height: '50%',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1,  
+        zIndex: 1,
     },
     capsuleImage: {
         height: '65%',
@@ -184,7 +191,7 @@ const styles = StyleSheet.create({
         top: '50%'
     },
     photoButton: {
-        position:'absolute',
+        position: 'absolute',
         top: '5%',
         left: '83%',
         aspectRatio: 1,
@@ -192,5 +199,5 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: 'aquamarine',
         alignItems: 'center',
-    }
+    },
 });

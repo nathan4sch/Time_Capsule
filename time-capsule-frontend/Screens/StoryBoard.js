@@ -31,7 +31,9 @@ const StoryBoard = ({ navigation }) => {
                 if (friend.capsules.length > 0) {
                     const capsuleID = friend.capsules[0];
                     const capsule = await getCapsule(capsuleID);
-                    const { snapshot } = capsule;
+                    //get url from key
+                    //only get newUrl if needed? Will break if everyone keeps getting new
+                    const { snapshotUrl } = capsule;
 
                     friendInfoList.push({
                         username: friend.username,
@@ -59,7 +61,7 @@ const StoryBoard = ({ navigation }) => {
                     />
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
-                <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
+                <Image style={styles.capsuleListItem} source={{ uri: item.snapshotUrl }} />
             </TouchableOpacity>
         );
     };

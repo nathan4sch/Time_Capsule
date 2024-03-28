@@ -34,7 +34,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 //handle photo upload to the aws s3 bucket
 app.post('/api/posts', upload.single('image'), async (req, res) => {
-    console.log("Server received a request to /api/posts");
+    //console.log("Server received a request to /api/posts");
     if (!req.file) {
         console.error("No file was uploaded.");
         return res.status(400).json({ error: "File not provided" });
@@ -52,7 +52,7 @@ app.post('/api/posts', upload.single('image'), async (req, res) => {
 
     try {
         await s3.send(new PutObjectCommand(params));
-        console.log("File uploaded successfully to S3");
+        //console.log("File uploaded successfully to S3");
         res.json({ message: "Image uploaded successfully", imageName: imageName });
     } catch (error) {
         console.error('Error uploading image to S3:', error);
