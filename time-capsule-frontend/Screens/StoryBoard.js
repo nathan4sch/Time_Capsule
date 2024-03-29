@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         color: "black",
         fontWeight: "bold",
-        top: "35%",
+        top: "50%",
     },modalOverlay: {
         flex: 1,
         justifyContent: 'center',

@@ -14,7 +14,7 @@ const Main = ({ navigation }) => {
     const [shownCapsule, setShownCapsule] = useState("");
     const [loading, setLoading] = useState(false);
     const [reload, setReload] = useState(false);
-    const [publishState, setPublishState] = useState("");
+    const [publishState, setPublishState] = useState(false);
     const [intervalId, setIntervalId] = useState(null);
 
     let count = 0;
@@ -166,7 +166,7 @@ const Main = ({ navigation }) => {
         Alert.alert("Success", "Capsule Published", [{ text: "OK" }]);
         setPublish(curUser.capsules[curUser.capsules.length - 1])
         capsule = await getCapsule(curUser.capsules[curUser.capsules.length - 1])
-        setPublishState(capsule.published)
+        setPublishState(true)
     };
 
     if (loading) {
@@ -222,7 +222,7 @@ const Main = ({ navigation }) => {
                     )}
 
                     <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
-                        <Text style={styles.overlayText}>Test: Get Capsule</Text>
+                        <Text style={styles.overlayText}>Test: Generate Capsule</Text>
                     </TouchableOpacity>
 
                     <TextInput style={styles.momentButton}
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     },
     
     publishButton: {
-        marginTop: 10,
+        marginTop: 20,
         width: '80%',
         backgroundColor: '#4CAF50',
         borderRadius: 10,
