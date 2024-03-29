@@ -7,8 +7,8 @@ import axios from 'axios'
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
-const BASE_URL = "http://10.186.64.41:3000/api/v1/"
-const BASE_S3_URL = "http://10.186.64.41:3000/"
+const BASE_URL = "http://100.69.15.14:3000/api/v1/"
+const BASE_S3_URL = "http://100.69.15.14:3000/"
 
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112

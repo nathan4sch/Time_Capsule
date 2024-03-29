@@ -14,7 +14,7 @@ const Main = ({ navigation }) => {
     const [shownCapsule, setShownCapsule] = useState("");
     const [loading, setLoading] = useState(false);
     const [reload, setReload] = useState(false);
-    const [publishState, setPublishState] = useState("");
+    const [publishState, setPublishState] = useState(false);
     const [intervalId, setIntervalId] = useState(null);
 
     let count = 0;
@@ -166,7 +166,7 @@ const Main = ({ navigation }) => {
         Alert.alert("Success", "Capsule Published", [{ text: "OK" }]);
         setPublish(curUser.capsules[curUser.capsules.length - 1])
         capsule = await getCapsule(curUser.capsules[curUser.capsules.length - 1])
-        setPublishState(capsule.published)
+        setPublishState(true)
     };
 
     if (loading) {
