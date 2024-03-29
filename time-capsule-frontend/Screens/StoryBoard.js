@@ -45,22 +45,15 @@ const StoryBoard = ({ navigation }) => {
             // Create a list with required information
             const friendInfoList = [];
             for (const friend of filteredFriends) {
-                console.log("friend")
                 
                 if (friend.capsules.length > 0) {
-                    console.log("capsule")
                     const capsuleID = friend.capsules[friend.capsules.length-1];
                     const capsule = await getCapsuleUrl(capsuleID);
                     const capsuleObj = await getCapsule(capsuleID)
 
                     const capsuleDate = new Date(capsuleObj.timestamp);
-                    console.log(capsuleDate)
                     const capsuleYear = capsuleDate.getFullYear();
                     const capsuleMonth = capsuleDate.getMonth();
-
-                    console.log(capsuleObj.published)
-                    console.log(capsuleYear)
-                    console.log(currentYear)
 
                     if (capsuleObj.published && capsuleYear === currentYear && capsuleMonth === currentMonth) {
                         friendInfoList.push({
@@ -76,7 +69,7 @@ const StoryBoard = ({ navigation }) => {
         };
 
         fetchData();
-        console.log(capsuleList)
+        //console.log(capsuleList)
     }, []);
 
 
