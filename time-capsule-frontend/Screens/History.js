@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     capsuleListItem: {
         alignSelf: 'center',
         width: '75%',
-        aspectRatio: 1,
+        aspectRatio: 3/4,
         marginVertical: 15,
         borderRadius: 10
     },

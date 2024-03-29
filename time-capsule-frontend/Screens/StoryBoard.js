@@ -150,12 +150,13 @@ const styles = StyleSheet.create({
     capsuleListItem: {
         alignSelf: "center",
         width: "75%",
-        aspectRatio: 1,
+        aspectRatio: 3/4,
         marginVertical: 15,
     },
     container: {
         width: "100%",
-        height: 350,
+        aspectRatio: 3/4,
+        //height: 350,
         overflow: "hidden",
     },
     listItemContainer: {
