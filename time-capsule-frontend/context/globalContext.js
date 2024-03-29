@@ -7,8 +7,8 @@ import axios from 'axios'
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
-const BASE_URL = "http://10.186.64.41:3000/api/v1/"
-const BASE_S3_URL = "http://10.186.64.41:3000/"
+const BASE_URL = "http://100.67.14.19:3000/api/v1/"
+const BASE_S3_URL = "http://100.67.14.19:3000/"
 
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
@@ -317,6 +317,7 @@ export const GlobalProvider = ({ children }) => {
             }
             for (const capsuleId of curUser.capsules) {
                 capsule = await getCapsule(capsuleId)
+                await axios.delete(`${BASE_S3_URL}api/del/${capsule.snapshotKey}`);
                 for (const image of capsule.usedPhotos) {
                     if (image.photoKey != "default1.png") {
                         await axios.delete(`${BASE_S3_URL}api/del/${image.photoKey}`);
