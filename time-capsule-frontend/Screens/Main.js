@@ -82,7 +82,6 @@ const Main = ({ navigation }) => {
     useEffect(() => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
-                console.log("first")
                 locCurUser = await getUserbyID(curUser._id)
                 await setCurUser(locCurUser)
                 //capsule = await getCapsule(curUser.capsules[0]);
