@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard } from "react-native";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard, Alert } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as MediaLibrary from 'expo-media-library';
+import axios from 'axios'
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule, selectPhotos, capsuleKeys } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
 
@@ -29,11 +30,39 @@ const Main = ({ navigation }) => {
     }
 
     useEffect(() => {
-        if (capsuleKeyChange.current) {
-            console.log("capsuleKeys: ", capsuleKeys)
-            //here create the capsule
-            capsuleKeyChange.current = false;
-        }
+        (async () => {
+            if (capsuleKeyChange.current) {
+                console.log("capsuleKeys: ", capsuleKeys)
+                //here create the capsule
+                let imageArray = [];
+                let spotifySongsArray = [];
+
+                for (index in capsuleKeys) {
+                    const key = capsuleKeys[index]
+                    //get photoUrl from key
+                    const urlRes = await axios.get(`${BASE_S3_URL}api/get/${key}`);
+                    const photoObject = { photoKey: key, photoUrl: urlRes.data.url };
+                    imageArray.push(photoObject);
+                }
+
+                if (curUser.profileSettings.spotifyAccount !== "") {
+                    spotifySongs = await getSpotifyTopSong();
+                    spotifySongsArray.push(spotifySongs);
+                } else {
+                    spotifySongsArray.push("Post Malone");
+                }
+
+                snapshotKey = "temp";
+                quote = "temp";
+
+                await createCapsule(snapshotKey, imageArray, quote, spotifySongsArray);
+                //setLoading(false); // Set loading to false when capsule creation is complete
+                Alert.alert("Success", "Capsule Created");
+                capsuleKeyChange.current = false;
+
+                navigation.navigate("Photos")
+            }
+        })();
     }, [capsuleKeys]);
 
     //render basic capsule on main page
@@ -49,6 +78,7 @@ const Main = ({ navigation }) => {
     }, []);
 
 
+    //Countdown till end of month
     useEffect(() => {
         const intervalId = setInterval(() => {
             setTimer(calculateTimeUntilNextMonth());
