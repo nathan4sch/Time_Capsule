@@ -40,7 +40,7 @@ const Loading = ({navigation}) => {
         <BackButton onPress={() => navigation.goBack()} />
         <Animated.Image style={[styles.icon, { transform: [{ rotate: spin }] }]} source={require('../icons/loading-.png')} />
         <View style={styles.LoadingStatement}>
-          <Text style={styles.buttonText}>Generating Capsules...</Text>
+          <Text style={styles.buttonText}>Generating Capsule...</Text>
         </View>
     </LinearGradient>
   );
