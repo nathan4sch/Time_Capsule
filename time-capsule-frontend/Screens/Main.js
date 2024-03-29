@@ -1,23 +1,23 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, ActivityIndicator, Keyboard, Alert } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
-
 import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as MediaLibrary from 'expo-media-library';
 import axios from 'axios'
 import Loading from "../Components/Loading";
+import { useIsFocused } from '@react-navigation/native';
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
-    const [imageLoading, setImageLoading] = useState(true);
-    const [loading, setLoading] = useState(false); // State variable to track loading
-
-
+    const [loading, setLoading] = useState(false);
+    const [reload, setReload] = useState(false);
 
     const capsuleKeyChange = useRef(false);
+
+    const isFocused = useIsFocused();
 
     async function getPhotosFromMonth() {
         const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -80,13 +80,25 @@ const Main = ({ navigation }) => {
     useEffect(() => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
-                const capsule = await getCapsule(curUser.capsules[0]);
+                console.log("first")
+                locCurUser = await getUserbyID(curUser._id)
+                await setCurUser(locCurUser)
+                //capsule = await getCapsule(curUser.capsules[0]);
                 //get url from key
-                setShownCapsule(capsule.snapshotUrl);
+                //console.log("shown Capsule: ", capsule.snapshotUrl)
+                const url = await getCapsuleUrl(locCurUser.capsules[locCurUser.capsules.length - 1])
+                setShownCapsule(url);
             }
         };
         getCapsuleFunc();
-    }, []);
+    }, [reload]);
+
+    useEffect(() => {
+        if (isFocused) {
+          // Reset the shown capsule and any other relevant state
+          setReload(!reload)
+        }
+      }, [isFocused]);
 
 
     //Countdown till end of month
@@ -122,9 +134,9 @@ const Main = ({ navigation }) => {
 
     if (loading) {
         return (
-          <View><Loading/></View>
+            <Loading />
         );
-      }
+    }
 
     return (
         <TouchableOpacity
@@ -141,37 +153,29 @@ const Main = ({ navigation }) => {
                         cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.photoButton}
-                    onPress={() => navigation.navigate('Photos')}>
-                    <Text style={styles.buttonText}>Temp Photo Button</Text>
-                </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
                     <Text style={styles.timerText}>{timer}</Text>
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
                 </View>
-                <View style={styles.capsuleContainer}>
-                    <TouchableOpacity style={styles.overlayButton}>
+                <View style={styles.imageContainer}>
+                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
                         {shownCapsule ? (
-                            <TouchableOpacity style={styles.imageContainer} onPress={handleOverlayButtonPress}>
-                                {imageLoading && (
-                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                )}
-                                <Image
-                                    style={styles.capsuleImage}
-                                    source={{ uri: shownCapsule }}
-                                    onLoad={() => setImageLoading(false)}
-                                />
-                            </TouchableOpacity>
+                            <Image
+                                style={styles.capsuleImage}
+                                source={{ uri: shownCapsule }}
+                            />
                         ) : (
                             <Text style={styles.overlayText}>No Capsule Available</Text>
                         )}
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()} />
+                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
+                    <Text style={styles.overlayText}>Test: Get Capsule</Text>
+                </TouchableOpacity>
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
+                <View style={styles.capsuleList} />
             </BlackBackground>
         </TouchableOpacity>
     );
@@ -191,7 +195,7 @@ const styles = StyleSheet.create({
     },
     profileContainer: {
         position: 'absolute',
-        top: 115,
+        top: 85,
         left: 25,
         height: '13%',
         aspectRatio: 1,
@@ -210,7 +214,7 @@ const styles = StyleSheet.create({
         width: 230,
         height: 70,
         left: 150,
-        top: 130,
+        top: 100,
     },
     timerText: {
         fontFamily: 'Arial',
@@ -248,39 +252,23 @@ const styles = StyleSheet.create({
         backgroundColor: '#8E8E8E',
         borderRadius: 20,
     },
-    capsuleContainer: {
-
-    },
     imageContainer: {
-        // working on this right now
-        position: 'center',
-        top: '30%',
-        width: 345,
-        height: 460,
-  
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 0,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,  
-    },
-    activityIndicator: { // loading thing for before image loads
         position: 'absolute',
+        top: '30%',
+        left: 0,
+        width: '100%',
+        height: '50%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1,
     },
     capsuleImage: {
-        height: '100%',
-        width: '100%',
-        borderRadius: 20,
+        height: '90%',
+        width: '75%'
     },
     overlayButton: {
         backgroundColor: 'transparent',
+        padding: 10,
         width: '100%',
         height: '100%',
         zIndex: 2,
@@ -301,4 +289,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'aquamarine',
         alignItems: 'center',
     },
+    overlayText: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 10,
+      },
 });
