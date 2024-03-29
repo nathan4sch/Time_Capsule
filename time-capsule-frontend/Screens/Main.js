@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, ActivityIndicator, Keyboard, Alert } from "react-native";
-import PageNavBar from "../Components/PageNavBar";
-
+import Loading from "../Components/Loading";
 import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as MediaLibrary from 'expo-media-library';
@@ -111,6 +110,7 @@ const Main = ({ navigation }) => {
 
     const handleOverlayButtonPress = () => {
         navigation.navigate('StoryBoard');
+        console.log("Going StoryBoard");
     };
 
     const handleCreateCapsule = () => {
@@ -146,7 +146,7 @@ const Main = ({ navigation }) => {
                         {shownCapsule ? (
                             <TouchableOpacity style={styles.imageContainer} onPress={handleOverlayButtonPress}>
                                 {imageLoading && (
-                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                    <Loading/>
                                 )}
                                 <Image
                                     style={styles.capsuleImage}
