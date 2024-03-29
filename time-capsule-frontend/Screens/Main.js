@@ -210,6 +210,9 @@ const Main = ({ navigation }) => {
                             <Text style={styles.overlayText}>No Capsule Available</Text>
                         )}
                     </TouchableOpacity>
+                    
+                </View>
+                <View style={styles.buttonsContainer}>
                     {!publishState && shownCapsule && (
                         <TouchableOpacity
                             style={styles.publishButton}
@@ -218,13 +221,17 @@ const Main = ({ navigation }) => {
                             <Text style={styles.publishButtonText}>Publish</Text>
                         </TouchableOpacity>
                     )}
-                </View>
-                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
-                    <Text style={styles.overlayText}>Test: Get Capsule</Text>
-                </TouchableOpacity>
-                <TextInput style={styles.momentButton}
+
+                    <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
+                        <Text style={styles.overlayText}>Test: Get Capsule</Text>
+                    </TouchableOpacity>
+
+                    <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
+                </View>
+                
+                
                 <View style={styles.capsuleList} />
             </BlackBackground>
         </TouchableOpacity>
@@ -234,15 +241,6 @@ const Main = ({ navigation }) => {
 export default Main;
 
 const styles = StyleSheet.create({
-    tempImageSelect: {
-        position: 'absolute',
-        left: '10%',
-        top: '81%',
-        width: '80%',
-        height: 45,
-        backgroundColor: 'rgba(255, 50, 90, 0.67)',
-        borderRadius: 10,
-    },
     profileContainer: {
         position: 'absolute',
         top: 85,
@@ -284,28 +282,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#FFFFFF',
     },
-    momentButton: {
-        position: 'absolute',
-        paddingLeft: 20,
-        left: '10%',
-        top: '87%',
-        width: '80%',
-        height: 31,
-        backgroundColor: 'rgba(255, 255, 255, 0.67)',
-        borderRadius: 10,
-    },
+    
     capsuleList: {
         position: 'absolute',
-        top: '30%',
+        top: '27%',
         width: '100%',
         height: '50%',
-        backgroundColor: '#8E8E8E',
+        backgroundColor: 'transparent',
         borderRadius: 20,
     },
     imageContainer: {
         position: 'absolute',
-        top: '30%',
-        left: 0,
+        borderRadius: 10,
+        top: '27%',
         width: '100%',
         height: '50%',
         alignItems: 'center',
@@ -313,47 +302,51 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     capsuleImage: {
-        height: '90%',
-        width: '75%'
+        width: 330,
+        height: 430,
+
+        // get rid of that red border and make it black
+        borderRadius: 10,
+        borderWidth: 3,
+        borderColor: 'black',
     },
     overlayButton: {
         backgroundColor: 'transparent',
-        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
         width: '100%',
         height: '100%',
         zIndex: 2,
     },
     overlayText: {
-        color: 'black',
+        color: 'white',
+        //position: 'absolute',
         fontWeight: 'bold',
         alignSelf: 'center',
-        top: '50%'
     },
-    photoButton: {
+
+    buttonsContainer: {
         position: 'absolute',
-        top: '5%',
-        left: '83%',
-        aspectRatio: 1,
-        height: '6%',
-        borderRadius: 10,
-        backgroundColor: 'aquamarine',
+        left: '10%',
+        top: '77%',
+        height: '10%',
+        width: '80%',
         alignItems: 'center',
+        justifyContent: 'space-between',
     },
-    overlayText: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        zIndex: 10,
-    },
+    
     publishButton: {
         marginTop: 10,
+        width: '80%',
         backgroundColor: '#4CAF50',
-        borderRadius: 5,
+        borderRadius: 10,
         padding: 10,
         alignItems: 'center',
     },
+    
     publishButtonText: {
         color: 'white',
+        fontWeight: 'bold',
         fontSize: 16,
     },  
     timerbutton: {
@@ -367,5 +360,29 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
       },
-    
+    photoButton: {
+        left: '83%',
+        aspectRatio: 1,
+        height: '6%',
+        borderRadius: 10,
+        backgroundColor: 'aquamarine',
+        alignItems: 'center',
+    },
+    tempImageSelect: {
+        marginTop: 15,
+        justifyContent: 'center',
+        textAlign: 'center',
+        padding: 10,
+        width: '80%',
+        backgroundColor: 'rgba(255, 50, 90, 0.67)',
+        borderRadius: 10,
+    },
+    momentButton: {
+        marginTop: 15,
+        width: '100%',
+        height: 31,
+        backgroundColor: 'rgba(255, 255, 255, 0.67)',
+        borderRadius: 10,
+        textAlign: 'center',
+    },
 });
