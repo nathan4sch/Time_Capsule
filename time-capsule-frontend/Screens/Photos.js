@@ -77,6 +77,22 @@ const Photos = ({ navigation }) => {
     }
   };
 
+  const getCurrentMonthName = () => {
+    const date = new Date(); // Creates a new date object representing the current date and time
+    const monthNames = [ // An array containing all the month names
+      "January", "February", "March",
+      "April", "May", "June",
+      "July", "August", "September",
+      "October", "November", "December"
+    ];
+    return monthNames[date.getMonth()]; // getMonth() returns the month in the range 0-11, which is used to get the month name from the array
+  };
+  
+  const getCurrentYear = () => {
+    const date = new Date();
+    return date.getFullYear();
+  }
+
   return (
     <>
       <BlackBackground>
@@ -84,11 +100,20 @@ const Photos = ({ navigation }) => {
         <Text style={styles.title}>Monthly Capsule</Text>
         
         <ViewShot ref={viewShotRef} options={{ format: 'jpg', quality: 0.9 }} style={styles.viewShotContainer}>
-          <Text style={styles.monthText}>January</Text>
-          <Image source={require('../icons/capsule-.png')} style={styles.appIcon} />
-          <View style={styles.spotifySection}>
-            <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
-            <Text style={styles.spotifyText}>Top Song: {spotifySong}</Text>
+          <View style={styles.informationContainer}>
+            <View style={styles.topbarContainer}>
+              <View style={styles.yearTextContainer}>
+                <Text style={styles.yearText}>{getCurrentYear()}</Text>
+              </View>
+              <View style={styles.monthTextContainer}>
+                <Text style={styles.monthText}>{getCurrentMonthName()}</Text>
+              </View>
+              <Image source={require('../icons/capsuleWhite-.png')} style={styles.appIcon} />
+            </View>
+            <View style={styles.spotifySection}>
+              <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
+              <Text style={styles.spotifyText}>Top Song: {spotifySong}</Text>
+            </View>
           </View>
           <View style={styles.photosContainer}>
             {capsulePhotos.slice(0, 6).map((photoUrl, index) => (
@@ -121,8 +146,83 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  spacer: {
+    // This view acts as a balance for the year text and ensures the month text is centered
+    width: 75, // Match the width of the appIcon to balance the layout
+    height: 50, // Match the height of the appIcon
+    opacity: 0, // Make the spacer invisible
+  },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  informationContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    //borderWidth: 3,
+    //borderColor: 'red',
+    height: '30%',
+  },
+  topbarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between', // Ensures the logo is pushed to the far right
+    width: '100%',
+    position: 'relative',
+    marginBottom: 10,
+
+    //borderWidth: 2,
+    //borderColor: 'red',
+  },
+  yearTextContainer: {
+    //marginRight: 'auto',
+    marginLeft: 20,
+    //paddingTop: 15,
+  },
+  yearText: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  monthTextContainer: {
+    flex: 1, // Takes up all available space
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    justifyContent: 'center', // Center the month text vertically
+    alignItems: 'center', // Center the month text horizontally
+  },
+  monthText: {
+    fontSize: 40,
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  appIcon: {
+    width: 60,
+    height: 40,
+    right: 20,
+    //backgroundColor: 'white',
+  },
+  spotifySection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: "100%",
+    height: "50%",
+    padding: 10,
+    
+    //borderWidth: 2,
+    //borderColor: 'blue',
+  },
+  spotifyText: {
+    fontSize: 18,
+    color: '#fff',
+  },
+  spotifyIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 5,
   },
   title: {
     fontSize: 20,
@@ -139,24 +239,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
     borderWidth: 2,
-    borderColor: 'red',
-  },
-  monthText: {
-    fontSize: 20,
-    color: '#fff',
-    fontWeight: 'bold',
-    top: -50,
-  },
-  spotifyText: {
-    fontSize: 18,
-    color: '#fff',
+    borderRadius: 10,
+    borderColor: '#fff',
   },
   photosContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     margin: 3,
-    bottom: -50
   },
   photoWrapper: {
     margin: 1, // Adjust spacing between photos
@@ -171,22 +261,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover'
-  },
-  appIcon: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 50,
-    height: 50,
-  },
-  spotifySection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  spotifyIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 5,
   },
 });
 

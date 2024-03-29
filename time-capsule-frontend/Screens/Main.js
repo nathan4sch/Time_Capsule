@@ -306,8 +306,8 @@ const styles = StyleSheet.create({
 
         // get rid of that red border and make it black
         borderRadius: 10,
-        borderWidth: 3,
-        borderColor: 'black',
+        borderWidth: 2,
+        borderColor: 'white',
     },
     overlayButton: {
         backgroundColor: 'transparent',
