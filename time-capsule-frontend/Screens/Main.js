@@ -15,7 +15,9 @@ const Main = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [reload, setReload] = useState(false);
     const [publishState, setPublishState] = useState("");
+    const [intervalId, setIntervalId] = useState(null);
 
+    let count = 0;
 
     const capsuleKeyChange = useRef(false);
 
@@ -106,11 +108,12 @@ const Main = ({ navigation }) => {
 
     //Countdown till end of month
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            setTimer(calculateTimeUntilNextMonth());
-        }, 1000);
-
-        return () => clearInterval(intervalId);
+        clearInterval(intervalId)
+        const id = setInterval(() => {
+                setTimer(calculateTimeUntilNextMonth());
+            }, 1000);
+        setIntervalId(id)
+        return () => clearInterval(id);
     }, []);
 
     function calculateTimeUntilNextMonth() {
@@ -129,6 +132,30 @@ const Main = ({ navigation }) => {
         const padWithZero = (value) => (value < 10 ? `0${value}` : value);
 
         return `${padWithZero(days)}:${padWithZero(hours)}:${padWithZero(minutes)}:${padWithZero(seconds)}`;
+    }
+
+    function calculateFiveSeconds(c) {
+        const padWithZero = (value) => (value < 10 ? `0${value}` : value);
+        return `${padWithZero(0)}:${padWithZero(0)}:${padWithZero(0)}:${padWithZero(c)}`;
+    }
+
+    function changeToTempTimer() {
+        let count = 5;
+        clearInterval(intervalId); // Clear the previous interval if it exists
+        const id = setInterval(() => {
+            if (count < 0) {
+                clearInterval(id); // Clear the current interval
+                getPhotosFromMonth();
+                const newId = setInterval(() => {
+                    setTimer(calculateTimeUntilNextMonth());
+                }, 1000);
+                setIntervalId(newId); // Update the intervalId state with the new interval ID
+            } else {
+                setTimer(calculateFiveSeconds(count));
+                count -= 1;
+            }
+        }, 1000);
+        setIntervalId(id); // Update the intervalId state with the current interval ID
     }
 
     const handleOverlayButtonPress = () => {
@@ -163,6 +190,9 @@ const Main = ({ navigation }) => {
                         cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
+                    <Text style={styles.timerbuttonText}>SetTimer</Text>
+                </TouchableOpacity>
 
                 <View style={styles.tempTimeContainer}>
                     <Text style={styles.timerText}>{timer}</Text>
@@ -179,6 +209,9 @@ const Main = ({ navigation }) => {
                             <Text style={styles.overlayText}>No Capsule Available</Text>
                         )}
                     </TouchableOpacity>
+                    
+                </View>
+                <View style={styles.buttonsContainer}>
                     {!publishState && shownCapsule && (
                         <TouchableOpacity
                             style={styles.publishButton}
@@ -187,13 +220,17 @@ const Main = ({ navigation }) => {
                             <Text style={styles.publishButtonText}>Publish</Text>
                         </TouchableOpacity>
                     )}
-                </View>
-                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
-                    <Text style={styles.overlayText}>Test: Get Capsule</Text>
-                </TouchableOpacity>
-                <TextInput style={styles.momentButton}
+
+                    <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
+                        <Text style={styles.overlayText}>Test: Get Capsule</Text>
+                    </TouchableOpacity>
+
+                    <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
+                </View>
+                
+                
                 <View style={styles.capsuleList} />
             </BlackBackground>
         </TouchableOpacity>
@@ -203,15 +240,6 @@ const Main = ({ navigation }) => {
 export default Main;
 
 const styles = StyleSheet.create({
-    tempImageSelect: {
-        position: 'absolute',
-        left: '10%',
-        top: '81%',
-        width: '80%',
-        height: 45,
-        backgroundColor: 'rgba(255, 50, 90, 0.67)',
-        borderRadius: 10,
-    },
     profileContainer: {
         position: 'absolute',
         top: 85,
@@ -253,28 +281,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#FFFFFF',
     },
-    momentButton: {
-        position: 'absolute',
-        paddingLeft: 20,
-        left: '10%',
-        top: '87%',
-        width: '80%',
-        height: 31,
-        backgroundColor: 'rgba(255, 255, 255, 0.67)',
-        borderRadius: 10,
-    },
+    
     capsuleList: {
         position: 'absolute',
-        top: '30%',
+        top: '27%',
         width: '100%',
         height: '50%',
-        backgroundColor: '#8E8E8E',
+        backgroundColor: 'transparent',
         borderRadius: 20,
     },
     imageContainer: {
         position: 'absolute',
-        top: '30%',
-        left: 0,
+        borderRadius: 10,
+        top: '27%',
         width: '100%',
         height: '50%',
         alignItems: 'center',
@@ -282,25 +301,65 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     capsuleImage: {
-        height: '90%',
-        width: '75%'
+        width: 330,
+        height: 430,
+
+        // get rid of that red border and make it black
+        borderRadius: 10,
+        borderWidth: 3,
+        borderColor: 'black',
     },
     overlayButton: {
         backgroundColor: 'transparent',
-        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
         width: '100%',
         height: '100%',
         zIndex: 2,
     },
     overlayText: {
-        color: 'black',
+        color: 'white',
+        //position: 'absolute',
         fontWeight: 'bold',
         alignSelf: 'center',
-        top: '50%'
     },
-    photoButton: {
+
+    buttonsContainer: {
         position: 'absolute',
-        top: '5%',
+        left: '10%',
+        top: '77%',
+        height: '10%',
+        width: '80%',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    
+    publishButton: {
+        marginTop: 10,
+        width: '80%',
+        backgroundColor: '#4CAF50',
+        borderRadius: 10,
+        padding: 10,
+        alignItems: 'center',
+    },
+    
+    publishButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },  
+    timerbutton: {
+        backgroundColor: 'green',
+        padding: 10,
+        borderRadius: 5,
+        top: 50,
+        right: 20
+      },
+      timerbuttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+      },
+    photoButton: {
         left: '83%',
         aspectRatio: 1,
         height: '6%',
@@ -308,21 +367,21 @@ const styles = StyleSheet.create({
         backgroundColor: 'aquamarine',
         alignItems: 'center',
     },
-    overlayText: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        zIndex: 10,
-    },
-    publishButton: {
-        marginTop: 10,
-        backgroundColor: '#4CAF50',
-        borderRadius: 5,
+    tempImageSelect: {
+        marginTop: 15,
+        justifyContent: 'center',
+        textAlign: 'center',
         padding: 10,
-        alignItems: 'center',
+        width: '80%',
+        backgroundColor: 'rgba(255, 50, 90, 0.67)',
+        borderRadius: 10,
     },
-    publishButtonText: {
-        color: 'white',
-        fontSize: 16,
+    momentButton: {
+        marginTop: 15,
+        width: '100%',
+        height: 31,
+        backgroundColor: 'rgba(255, 255, 255, 0.67)',
+        borderRadius: 10,
+        textAlign: 'center',
     },
 });

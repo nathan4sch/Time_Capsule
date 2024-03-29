@@ -163,12 +163,12 @@ const Profile = ({ navigation }) => {
                         <Text style={styles.buttonText}>History</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonContainer} onPress={getSpotifyTopSong}>
+                {/*<TouchableOpacity style={styles.buttonContainer} onPress={getSpotifyTopSong}>
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/spotify-.png')} />
                         <Text style={styles.buttonText}>Get Top Spotify Song</Text>
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity>*/}
                 {/*<TouchableOpacity style={styles.buttonContainer} onPress={toggleDarkMode}>
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/history-.png')} />
