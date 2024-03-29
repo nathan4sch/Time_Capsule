@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const CapsuleSchema = new mongoose.Schema({
-    snapshot: {
+    snapshotUrl: {
+        type: String,
+        default: ""
+    },
+    snapshotKey: {
         type: String
     },
     timestamp: {
@@ -9,7 +13,13 @@ const CapsuleSchema = new mongoose.Schema({
         default: Date.now
     },
     usedPhotos: [{
-        type: String
+        photoKey: {
+            type: String
+        },
+        photoUrl: {
+            type: String,
+            default: ""
+        }
     }],
     quote: {
         type: String

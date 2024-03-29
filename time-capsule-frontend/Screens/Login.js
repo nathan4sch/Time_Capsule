@@ -7,11 +7,11 @@ import { useGlobalContext } from "../context/globalContext";
 import { ANDROID_CLIENT_ID, IOS_CLIENT_ID, WEB_CLIENT_ID } from '../env.js';
 import axios from 'axios';
 
-const BASE_URL = "https://time-capsule-server.onrender.com/";
+//const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 
 const Login = ({ navigation }) => {
-    const { getUser, setCurUser, curUser, emailExist, setUserEmail, setProfilePictureUrl, getUserbyID } = useGlobalContext();
+    const { getUser, setCurUser, curUser, emailExist, setUserEmail, setProfilePictureUrl, getUserbyID, BASE_S3_URL } = useGlobalContext();
     const [profileUrl, setProfileUrl] = useState('');
     const curUserChanged = useRef(false);
 
@@ -56,7 +56,7 @@ const Login = ({ navigation }) => {
                 } else {
                     user = await getUserbyID(existResponse.user._id)
                     if (existResponse.user.profileSettings.profilePictureKey != "default") {
-                        const urlRes = await axios.get(`${BASE_URL}api/get/${user.profileSettings.profilePictureKey}`);
+                        const urlRes = await axios.get(`${BASE_S3_URL}api/get/${user.profileSettings.profilePictureKey}`);
                         const url = urlRes.data.url
                         //randomly breaks when the url expires
                         user.profileSettings.profilePictureUrl = url

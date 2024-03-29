@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios'
 
 const Registration = ({ navigation }) => {
-    const { userEmail, getUser, addUser, setCurUser, setProfilePictureKey, setProfilePictureUrl, curUser } = useGlobalContext();
+    const { userEmail, getUser, addUser, setCurUser, setProfilePictureKey, setProfilePictureUrl, curUser, BASE_S3_URL } = useGlobalContext();
     const [username, setUsername] = useState('');
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
@@ -21,7 +21,7 @@ const Registration = ({ navigation }) => {
     useEffect(() => {
         // This effect will run whenever curUser changes
         if (curUserChangedReg.current) {
-            if (profileUrl != "") {
+            if (profileUrl != "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png") {
                 //console.log("RegIst: ", profileKey, profileUrl)
                 setProfilePictureKey(profileKey);
                 setProfilePictureUrl(profileUrl);
@@ -50,14 +50,15 @@ const Registration = ({ navigation }) => {
             });
 
             try {
-                const response = await axios.post(`https://time-capsule-server.onrender.com/api/posts`, formData, {
+                //const response = await axios.post(`https://time-capsule-server.onrender.com/api/posts`, formData, {
+                const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
                 setProfileKey(response.data.imageName)
                 //await setProfilePictureKey(imageName)
-                const urlRes = await axios.get(`https://time-capsule-server.onrender.com/api/get/${response.data.imageName}`);
+                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${response.data.imageName}`);
                 setProfileUrl(urlRes.data.url)
 
                 //let urlResponse = await setProfilePictureUrl(url);

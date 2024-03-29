@@ -398,6 +398,7 @@ exports.getSpotifyTopSong = async (req, res) => {
                 if (response.ok) {
                     return response.json();
                 }
+                console.log(response)
                 throw new Error('Request failed: ' + response.statusText);
             })
             .then(body => {

@@ -1,22 +1,39 @@
 import React, { useEffect, useState } from "react";
+
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, ActivityIndicator, Keyboard } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import BlackBackground from "../Components/BlackBackground";
-import { commonStyles } from "../Components/FriendsPageStylings";
 import { useGlobalContext } from "../context/globalContext";
+import * as MediaLibrary from 'expo-media-library';
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
     const [imageLoading, setImageLoading] = useState(true);
 
 
+    async function getPhotosFromMonth() {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status === 'granted') {
+            const month = new Date();
+            month.setDate(1);
+            const media = await MediaLibrary.getAssetsAsync({first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
+            const assetInfoResults = await Promise.all(assetInfoPromises);
+            const uris = assetInfoResults.map(item => item.localUri);
+            selectPhotos(curUser._id, uris);
+        } else {
+            alert('Permission to access camera roll denied!');
+        }
+    }
+
     useEffect(() => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
                 const capsule = await getCapsule(curUser.capsules[0]);
-                setShownCapsule(capsule.snapshot);
+                //get url from key
+                setShownCapsule(capsule.snapshotUrl);
             }
         };
         getCapsuleFunc();
@@ -43,7 +60,7 @@ const Main = ({ navigation }) => {
         const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
- 
+
         const padWithZero = (value) => (value < 10 ? `0${value}` : value);
 
         return `${padWithZero(days)}:${padWithZero(hours)}:${padWithZero(minutes)}:${padWithZero(seconds)}`;
@@ -52,6 +69,10 @@ const Main = ({ navigation }) => {
     const handleOverlayButtonPress = () => {
         navigation.navigate('StoryBoard');
     };
+
+    const handleCreateCapsule = () => {
+
+    }
 
     return (
         <TouchableOpacity
@@ -68,7 +89,9 @@ const Main = ({ navigation }) => {
                         cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.photoButton} onPress={() => navigation.navigate('Photos')}>
+                <TouchableOpacity
+                    style={styles.photoButton}
+                    onPress={() => navigation.navigate('Photos')}>
                     <Text style={styles.buttonText}>Temp Photo Button</Text>
                 </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
@@ -93,6 +116,7 @@ const Main = ({ navigation }) => {
                         )}
                     </TouchableOpacity>
                 </View>
+                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}/>
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
@@ -104,6 +128,15 @@ const Main = ({ navigation }) => {
 export default Main;
 
 const styles = StyleSheet.create({
+    tempImageSelect: {
+        position: 'absolute',
+        left: '10%',
+        top: '81%',
+        width: '80%',
+        height: 45,
+        backgroundColor: 'rgba(255, 50, 90, 0.67)',
+        borderRadius: 10,
+    },
     profileContainer: {
         position: 'absolute',
         top: 115,
@@ -207,7 +240,7 @@ const styles = StyleSheet.create({
         top: '50%'
     },
     photoButton: {
-        position:'absolute',
+        position: 'absolute',
         top: '5%',
         left: '83%',
         aspectRatio: 1,
@@ -215,5 +248,5 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: 'aquamarine',
         alignItems: 'center',
-    }
+    },
 });
