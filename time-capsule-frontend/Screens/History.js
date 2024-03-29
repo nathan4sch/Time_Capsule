@@ -26,7 +26,7 @@ const History = ({ navigation }) => {
             const capsulesArray = await Promise.all(
                 curUser.capsules.map(async (capsuleId) => {
                     const capsule = await getCapsule(capsuleId);
-                    return capsule.snapshot;
+                    return capsule.snapshotURL;
                 })
             );
             setCapsules(capsulesArray);
