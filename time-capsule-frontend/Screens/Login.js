@@ -90,17 +90,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 296,
         height: 50,
-        left: 47,
         top: 695,
-        backgroundColor: 'rgba(255, 255, 255, 0.48)',
-        borderRadius: 10,
-    },
-    container1: {
-        position: 'absolute',
-        width: 296,
-        height: 50,
-        left: 47,
-        top: 495,
         backgroundColor: 'rgba(255, 255, 255, 0.48)',
         borderRadius: 10,
     },
@@ -116,7 +106,7 @@ const styles = StyleSheet.create({
         color: '#000000',
     },
     google: {
-        position: 'absolute',
+        position: 'relative',
         width: 35,
         height: 36,
         left: '3%',
@@ -126,7 +116,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 425,
         height: 183,
-        left: -18,
         top: 56,
         ...Platform.select({
             ios: {
