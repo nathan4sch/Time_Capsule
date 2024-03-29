@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
   StyleSheet, Text, View, Image, ScrollView, Alert, ActivityIndicator, Button, Dimensions
 } from 'react-native'; // Import ActivityIndicator
@@ -16,7 +16,9 @@ const Photos = ({ navigation }) => {
   const [capsulePhotos, setCapsulePhotos] = useState([]);
   const [spotifySong, setSpotifySong] = useState();
   const [loading, setLoading] = useState(true); // State variable to track loading
+  const [capsuleId, setCapsuleId] = useState("")
   const viewShotRef = useRef(null); // Reference for ViewShot
+  const [isContentReady, setIsContentReady] = useState(false);
 
   //let capsule
   //let photos
@@ -24,8 +26,9 @@ const Photos = ({ navigation }) => {
   useEffect(() => {
     const fetchCapsuleData = async () => {
       try {
-        const capsuleId = curUser.capsules[curUser.capsules.length - 1];
-        const capsule = await getCapsule(capsuleId);
+        const localCapsuleId = curUser.capsules[curUser.capsules.length - 1];
+        setCapsuleId(localCapsuleId)
+        const capsule = await getCapsule(localCapsuleId);
         const photos = capsule.usedPhotos.map(photo => photo.photoUrl);
         //let localpotifySong = capsule.spotifySongs[0]
         //if (spotifySong)
@@ -33,11 +36,11 @@ const Photos = ({ navigation }) => {
         setCapsulePhotos(photos);
 
         //set curUser snapshot url and key
-        const uri = await viewShotRef.current.capture();
+        /*const uri = await viewShotRef.current.capture();
         const imageKey = await postPhoto(uri)
-        setSnapshotKey(capsuleId, imageKey)
-        //here
+        setSnapshotKey(capsuleId, imageKey)*/
 
+        setIsContentReady(true);
         setLoading(false); // Data is loaded, set loading to false
       } catch (error) {
         console.error("Failed to fetch capsule data:", error);
@@ -47,6 +50,22 @@ const Photos = ({ navigation }) => {
 
     fetchCapsuleData();
   }, []);
+
+  useLayoutEffect(() => {
+    const saveSnapshot = async () => {
+      if (viewShotRef.current && isContentReady) { // Check if content is ready
+        setTimeout(async () => {
+          const uri = await viewShotRef.current.capture();
+          const imageKey = await postPhoto(uri);
+          setSnapshotKey(capsuleId, imageKey);
+        }, 1000);
+      }
+    };
+
+    if (isContentReady) { // Execute only if content is ready
+      saveSnapshot();
+    }
+  }, [isContentReady, capsuleId]);
 
   const combineImages = async () => {
     const uri = await viewShotRef.current.capture(); // Capture the layout as an image
@@ -58,93 +77,12 @@ const Photos = ({ navigation }) => {
     }
   };
 
-
-  //const saveToCameraRoll = async (combinedImageUri) => {
-  //};
-
-  /*useEffect(() => {
-    (async () => {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status === 'granted') {
-        const month = new Date();
-        month.setDate(1);
-        const media = await MediaLibrary.getAssetsAsync({ first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
-        setPhotos(media.assets);
-
-        const shuffledAssets = media.assets.sort(() => Math.random() - 0.5);
-        const selectedAssets = shuffledAssets.slice(0, 6);
-        setCapsulePhotos(selectedAssets);
-      } else {
-        alert('Permission to access camera roll denied!');
-      }
-    })();
-  }, []);*/
-
-  /*
-  useEffect(() => {
-    (async () => {
-      if (capsulePhotos.length !== 0) {
-        let imageArray = [];
-        let spotifySongsArray = [];
-
-        for (let index in capsulePhotos) {
-          const photo = capsulePhotos[index];
-          try {
-            const assetInfo = await MediaLibrary.getAssetInfoAsync(photo);
-            const localUri = assetInfo.localUri;
-            const formData = new FormData();
-            formData.append("image", {
-              uri: localUri,
-              type: 'image/jpeg',
-              name: 'photo.jpg',
-            });
-            const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            });
-            const imageKey = response.data.imageName;
-            const photoObject = { photoKey: imageKey, photoUrl: "" };
-            imageArray.push(photoObject);
-          } catch (error) {
-            console.error("Error processing photo:", error);
-          }
-        }
-
-        if (curUser.profileSettings.spotifyAccount !== "") {
-          spotifySongs = await getSpotifyTopSong();
-          spotifySongsArray.push(spotifySongs);
-        } else {
-          spotifySongsArray.push("test");
-        }
-
-        snapshotKey = "temp";
-        quote = "temp";
-
-        await createCapsule(snapshotKey, imageArray, quote, spotifySongsArray);
-        setLoading(false); // Set loading to false when capsule creation is complete
-        Alert.alert("Success", "Capsule Created");
-      }
-    })();
-  }, [capsulePhotos]);
-
-  if (loading) {
-    return (
-      <View style={[styles.container, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color="white" />
-      </View>
-    );
-  }*/
-
   return (
     <>
       <BlackBackground>
         <BackButton onPress={() => navigation.goBack()} />
-        <Text style={styles.title}>Last Months Photos</Text>
-        <Button title="Save Combined Image" onPress={async () => {
-          const combinedImageUri = await combineImages(capsulePhotos);
-          //-await saveToCameraRoll(combinedImageUri);
-        }} />
+        <Text style={styles.title}>Monthly Capsule</Text>
+        
         <ViewShot ref={viewShotRef} options={{ format: 'jpg', quality: 0.9 }} style={styles.viewShotContainer}>
           <Text style={styles.monthText}>January</Text>
           <Image source={require('../icons/capsule-.png')} style={styles.appIcon} />
@@ -160,6 +98,10 @@ const Photos = ({ navigation }) => {
             ))}
           </View>
         </ViewShot>
+        <Button title="Save Combined Image" onPress={async () => {
+          const combinedImageUri = await combineImages(capsulePhotos);
+          //-await saveToCameraRoll(combinedImageUri);
+        }} />
       </BlackBackground>
     </>
   );
@@ -185,7 +127,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 130,
+    top: 80,
+    color: "white"
   },
   viewShotContainer: {
     width: containerWidth,
@@ -194,11 +138,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: 'red',
   },
   monthText: {
     fontSize: 20,
     color: '#fff',
     fontWeight: 'bold',
+    top: -50,
   },
   spotifyText: {
     fontSize: 18,
@@ -209,9 +156,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     margin: 3,
+    bottom: -50
   },
   photoWrapper: {
-    margin: 2, // Adjust spacing between photos
+    margin: 1, // Adjust spacing between photos
     borderWidth: 2,
     borderColor: '#fff',
     width: photoWidth,
