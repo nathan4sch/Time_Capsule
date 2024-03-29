@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, Image, FlatList, Modal, ActivityIndicator } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
@@ -11,6 +11,18 @@ const StoryBoard = ({ navigation }) => {
     const { setCurUser, curUser, getUserbyID, getCapsuleUrl } = useGlobalContext();
     const [friendObj, setFriendObj] = React.useState([]);
     const [capsuleList, setCapsuleList] = React.useState([]);
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageLoading, setImageLoading] = useState(true);
+
+
+    // handle image presses for enlarging the capsule
+    const handleImagePress = (imageUrl) => {
+        setSelectedImage(imageUrl);
+        setImageLoading(true);
+        setModalVisible(true);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,7 +42,7 @@ const StoryBoard = ({ navigation }) => {
             const friendInfoList = [];
 
             for (const friend of filteredFriends) {
-                console.log(friend)
+                
                 if (friend.capsules.length > 0) {
                     const capsuleID = friend.capsules[0];
                     const capsule = await getCapsuleUrl(capsuleID);
@@ -47,6 +59,7 @@ const StoryBoard = ({ navigation }) => {
         };
 
         fetchData();
+        console.log(capsuleList)
     }, []);
 
 
@@ -61,7 +74,9 @@ const StoryBoard = ({ navigation }) => {
                     />
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleImagePress(item.snapshot)}>
                 <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
+                </TouchableOpacity>
             </TouchableOpacity>
         );
     };
@@ -71,6 +86,7 @@ const StoryBoard = ({ navigation }) => {
             <BackButton onPress={() => navigation.goBack()} />
             {/* Add the rest of your components here */}
             {capsuleList.length > 0 ? (
+                <>
                 <FlatList
                     style={styles.capsuleList}
                     data={capsuleList}
@@ -78,6 +94,33 @@ const StoryBoard = ({ navigation }) => {
                     renderItem={({ item }) => renderFriendCapsule(item)}
                     ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
                 />
+                <Modal
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+                >
+                    <TouchableOpacity
+                        style={styles.modalOverlay}
+                        activeOpacity={1}
+                        onPressOut={() => setModalVisible(false)}
+                    >
+                        <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+                            <View style={styles.modalContent}>
+                                <View style={styles.imageContainer}>
+                                    {imageLoading && (
+                                        <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                    )}
+                                    <Image
+                                        style={styles.enlargedImage}
+                                        source={{ uri: selectedImage }}
+                                        onLoad={() => setImageLoading(false)}
+                                    />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </Modal>
+                </>
             ) : (
                 <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
             )}
@@ -122,5 +165,40 @@ const styles = StyleSheet.create({
         color: "black",
         fontWeight: "bold",
         top: "35%",
+    },modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    modalContent: {
+        //margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 0,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    activityIndicator: { // loading thing for before image loads
+        position: 'absolute',
+    },
+    enlargedImage: {
+        // need to change width and height for specific capsule dimensions
+        width: "100%",
+        height: '100%',
+        borderRadius: 20,
+        resizeMode: 'contain',
+    },imageContainer: {
+        width: 345,
+        height: 460,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
