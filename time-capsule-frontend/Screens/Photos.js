@@ -11,7 +11,7 @@ import ViewShot from 'react-native-view-shot';
 import axios from 'axios';
 
 const Photos = ({ navigation }) => {
-  const { BASE_S3_URL, getSpotifyTopSong, createCapsule, curUser, getCapsule } = useGlobalContext();
+  const { BASE_S3_URL, getSpotifyTopSong, createCapsule, curUser, getCapsule, postPhoto, setSnapshotKey } = useGlobalContext();
   //const [photos, setPhotos] = useState([]);
   const [capsulePhotos, setCapsulePhotos] = useState([]);
   const [spotifySong, setSpotifySong] = useState();
@@ -29,9 +29,15 @@ const Photos = ({ navigation }) => {
         const photos = capsule.usedPhotos.map(photo => photo.photoUrl);
         //let localpotifySong = capsule.spotifySongs[0]
         //if (spotifySong)
-        //working here
         setSpotifySong(capsule.spotifySongs[0])
         setCapsulePhotos(photos);
+
+        //set curUser snapshot url and key
+        const uri = await viewShotRef.current.capture();
+        const imageKey = await postPhoto(uri)
+        setSnapshotKey(capsuleId, imageKey)
+        //here
+
         setLoading(false); // Data is loaded, set loading to false
       } catch (error) {
         console.error("Failed to fetch capsule data:", error);
@@ -144,7 +150,7 @@ const Photos = ({ navigation }) => {
           <Image source={require('../icons/capsule-.png')} style={styles.appIcon} />
           <View style={styles.spotifySection}>
             <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
-            <Text style={styles.spotifyText}>Top Song: {spotifySong} by Post Malone</Text>
+            <Text style={styles.spotifyText}>Top Song: {spotifySong}</Text>
           </View>
           <View style={styles.photosContainer}>
             {capsulePhotos.slice(0, 6).map((photoUrl, index) => (
@@ -195,7 +201,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   spotifyText: {
-    fontSize: 20,
+    fontSize: 18,
     color: '#fff',
   },
   photosContainer: {

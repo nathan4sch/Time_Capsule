@@ -204,3 +204,26 @@ exports.setQuote = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+exports.setSnapshotKey = async (req, res) => {
+    const { capsuleId } = req.params;
+    const { key } = req.body;
+
+    try {
+        const capsule = await CapsuleSchema.findOne({ _id: capsuleId });
+        if (!capsule) {
+            return res.status(404).json({ message: 'capsule not found' });
+        }
+
+        //Switch boolean value
+        capsule.snapshotKey = key;
+
+        // Save the updated user document
+        await capsule.save();
+
+        res.status(200).json({ message: 'Capsule key changed' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

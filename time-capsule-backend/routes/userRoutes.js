@@ -32,7 +32,8 @@ const {
     addPhotoToCapsule,
     removePhotoFromCapsule,
     setPublish,
-    setQuote
+    setQuote,
+    setSnapshotKey
 } = require('../controllers/capsule')
 
 const { 
@@ -82,6 +83,7 @@ router
     .delete('/remove-photo/:capsuleId', removePhotoFromCapsule)
     .post('/set-publish/:capsuleId', setPublish)
     .post('/set-quote/:capsuleId', setQuote)
+    .post('/set-key/:capsuleId', setSnapshotKey)
 
 //API endpoints for notification operations
 router
