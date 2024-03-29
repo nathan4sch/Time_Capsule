@@ -3,10 +3,11 @@ import { StyleSheet, View, Text, Modal, TouchableOpacity, Image, FlatList, Activ
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
+import BackButton from "../Components/lightBackButton";
 
 
 const History = ({ navigation }) => {
-    const { curUser, getCapsule } = useGlobalContext();
+    const { curUser, getCapsuleUrl } = useGlobalContext();
     const [capsulesArray, setCapsules] = useState([]);
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -25,18 +26,19 @@ const History = ({ navigation }) => {
         const getCapsulesFunc = async () => {
             const capsulesArray = await Promise.all(
                 curUser.capsules.map(async (capsuleId) => {
-                    const capsule = await getCapsule(capsuleId);
-                    return capsule.snapshotURL;
+                    const capsuleUrl = await getCapsuleUrl(capsuleId);
+                    return capsuleUrl;
                 })
             );
             setCapsules(capsulesArray);
         };
         getCapsulesFunc();
+        console.log("capsule array", capsulesArray)
     }, [curUser.capsules]);
 
     return (
         <HistoryBackground>
-            <PageNavBar onBackPress={() => navigation.goBack()} title="History Page" />
+            <BackButton onPress={() => navigation.goBack()} />
             {capsulesArray.length > 0 ? (
                 <View style={{ flex: 1 }}>
                 <FlatList

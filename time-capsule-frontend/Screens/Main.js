@@ -153,6 +153,7 @@ const Main = ({ navigation }) => {
                         cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
+
                 <View style={styles.tempTimeContainer}>
                     <Text style={styles.timerText}>{timer}</Text>
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
