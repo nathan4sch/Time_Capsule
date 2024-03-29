@@ -143,7 +143,7 @@ const Main = ({ navigation }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.photoButton}
-                    onPress={() => navigation.navigate('Photos')}>
+                    onPress={() => navigation.navigate('StoryBoard')}>
                     <Text style={styles.buttonText}>Temp Photo Button</Text>
                 </TouchableOpacity>
                 <View style={styles.tempTimeContainer}>
