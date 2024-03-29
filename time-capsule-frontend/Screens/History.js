@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
     },
-    activityIndicator: {
-        position: 'absolute', // Position over the image area
+    activityIndicator: { // loading thing for before image loads
+        position: 'absolute',
     },
     enlargedImage: {
         // need to change width and height for specific capsule dimensions
@@ -133,10 +133,10 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     imageContainer: {
-        width: 345, // Match your enlargedImage width
-        height: 460, // Match your enlargedImage height
-        justifyContent: 'center', // Center children vertically
-        alignItems: 'center', // Center children horizontally
+        width: 345,
+        height: 460,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     textBox: {
         position: "absolute",

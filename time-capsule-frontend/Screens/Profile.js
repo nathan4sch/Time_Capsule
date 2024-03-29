@@ -114,10 +114,15 @@ const Profile = ({ navigation }) => {
     return (
         <>
             <BlackBackground>
-                <BackButton onPress={() => navigation.goBack()} />
                 <View style={styles.separator} />
-                <View style={styles.profileContainer}>
+                <View style={styles.topbarContainer}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backArrowContainer}>
+                        <Image style={styles.backArrowIconContainer} source={require('../icons/lightbackbutton-.png')} />
+                    </TouchableOpacity>
+                    {/*<BackButton onPress={() => navigation.goBack()} />*/}
                     <Text style={styles.username}>  {curUser.username}</Text>
+                </View>
+                <View style={styles.profileContainer}>
                     <Image
                         style={styles.profileIcon}
                         source={{
@@ -182,10 +187,30 @@ const Profile = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     separator: {
-        marginVertical: 50,
+        marginVertical: 40,
+    },
+    topbarContainer: {
+        flexDirection: 'row', // Align children in a row.
+        //justifyContent: 'center', // Center children horizontally in the container.
+        alignItems: 'center', // Center children vertically in the container.
+        width: '100%',
+    },
+    backArrowContainer: {
+        left: 25,
+        //background: 'white',
+        width: '15%',
+        padding: 10, // Makes it easier to touch
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    backArrowIconContainer: {
+        position: 'absolute',
+        padding: 10,
+        height: "100%",
+        width: "100%",
     },
     profileContainer: {
-        top: '-5%',
+        //top: '-5%',
         position: 'relative',
         alignItems: 'center',
         height: '30%',
@@ -193,9 +218,13 @@ const styles = StyleSheet.create({
         marginBottom: '12%',
     },
     username: {
-        top: '10%',
+        //top: '10%',
+        left: '24%',
         fontSize: 30,
         color: 'white',
+        position: 'absolute', // Position the username absolutely to ensure it stays in the center.
+        textAlign: 'center', // Center the text within the Text component.
+        width: '50%',
     },
     profileIcon: {
         justifyContent: 'center',
