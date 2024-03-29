@@ -8,7 +8,7 @@ import * as MediaLibrary from 'expo-media-library';
 import axios from 'axios'
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
     const [imageLoading, setImageLoading] = useState(true);
@@ -53,13 +53,15 @@ const Main = ({ navigation }) => {
                     spotifySongs = await getSpotifyTopSong();
                     spotifySongsArray.push(spotifySongs);
                 } else {
-                    spotifySongsArray.push("Post Malone");
+                    spotifySongsArray.push("Hey Jude by The Beatles");
                 }
 
                 snapshotKey = "temp";
                 quote = "temp";
 
                 await createCapsule(snapshotKey, imageArray, quote, spotifySongsArray);
+                locCurUser = await getUserbyID(curUser._id)
+                await setCurUser(locCurUser)
                 //setLoading(false); // Set loading to false when capsule creation is complete
                 Alert.alert("Success", "Capsule Created");
                 capsuleKeyChange.current = false;

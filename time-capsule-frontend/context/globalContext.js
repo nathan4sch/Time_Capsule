@@ -7,8 +7,8 @@ import axios from 'axios'
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
-const BASE_URL = "http://100.67.13.152:3000/api/v1/"
-const BASE_S3_URL = "http://100.67.13.152:3000/"
+const BASE_URL = "http://100.67.14.19:3000/api/v1/"
+const BASE_S3_URL = "http://100.67.14.19:3000/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -126,7 +126,7 @@ export const GlobalProvider = ({ children }) => {
         // The return value contains TONS of information about the top song, which we can use for graphics or other stuff.
         //console.log(response.data.data);
         //console.log(response.data.data.items[0].name)
-        return(response.data.data.items[0].name)
+        return (response.data.data.items[0].name)
     }
 
     const setInstragram = async (instagramKey) => {
@@ -152,9 +152,9 @@ export const GlobalProvider = ({ children }) => {
             const response = await axios.post(`${BASE_URL}send-friend-request/${curUser._id}`, {
                 friendUsername
             });
-    
+
             return "Success";
-    
+
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 return "Not Found";
@@ -171,15 +171,15 @@ export const GlobalProvider = ({ children }) => {
             const response1 = await axios.post(`${BASE_URL}add-friend/${curUser._id}`, {
                 friendUsername
             });
-    
+
             const otherUser = await getUser(friendUsername)
             const otherUserID = otherUser._id
-            friendUsername = curUser.username   
+            friendUsername = curUser.username
             // Second request to add current user as a friend to the other user
             const response2 = await axios.post(`${BASE_URL}add-friend/${otherUserID}`, {
                 friendUsername
             });
-    
+
             // Handle success if needed
         } catch (err) {
             // Handle errors for both requests
@@ -209,7 +209,7 @@ export const GlobalProvider = ({ children }) => {
     const setLDMode = async () => {
         try {
             const response = await axios.post(`${BASE_URL}set-LD-mode/${curUser._id}`);
-        
+
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message);
@@ -241,7 +241,7 @@ export const GlobalProvider = ({ children }) => {
             const response = await axios.post(`${BASE_URL}set-profile-picture-key/${curUser._id}`, {
                 profilePictureKey
             });
-        
+
         } catch (error) {
             console.log(error)
             console.log(error.response.data.message)
@@ -258,7 +258,7 @@ export const GlobalProvider = ({ children }) => {
         try {
             const response = await axios.get(`${BASE_URL}get-capsule/${id}`);
             return response.data;
-        
+
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message);
@@ -270,7 +270,7 @@ export const GlobalProvider = ({ children }) => {
 
     const deleteNotification = async (notificationId) => {
         try {
-            const response = await axios.delete(`${BASE_URL}delete-notification/${notificationId}`);        
+            const response = await axios.delete(`${BASE_URL}delete-notification/${notificationId}`);
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message);
@@ -282,7 +282,7 @@ export const GlobalProvider = ({ children }) => {
 
     const deleteMoment = async (momentId) => {
         try {
-            const response = await axios.delete(`${BASE_URL}delete-moment/${momentId}`);        
+            const response = await axios.delete(`${BASE_URL}delete-moment/${momentId}`);
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message);
@@ -294,7 +294,7 @@ export const GlobalProvider = ({ children }) => {
 
     const deleteCapsule = async (capsuleId) => {
         try {
-            const response = await axios.delete(`${BASE_URL}delete-capsule/${capsuleId}`);        
+            const response = await axios.delete(`${BASE_URL}delete-capsule/${capsuleId}`);
         } catch (error) {
             if (error.response) {
                 console.log(error.response.data.message)
@@ -316,7 +316,9 @@ export const GlobalProvider = ({ children }) => {
             for (const capsuleId of curUser.capsules) {
                 capsule = await getCapsule(capsuleId)
                 for (const image of capsule.usedPhotos) {
-                    await axios.delete(`${BASE_S3_URL}api/del/${image.photoKey}`);
+                    if (image.photoKey != "default1.png") {
+                        await axios.delete(`${BASE_S3_URL}api/del/${image.photoKey}`);
+                    }
                 }
                 const response = await deleteCapsule(capsuleId);
             }
@@ -350,7 +352,7 @@ export const GlobalProvider = ({ children }) => {
             });
         });
         //console.log(formData)
-        try {  
+        try {
             const response = await axios.post(`${BASE_URL}select-photos/${id}`, formData);
             //console.log("globalCon: ", response.data)
             //capsuleKeys = response.data
@@ -363,7 +365,7 @@ export const GlobalProvider = ({ children }) => {
             }
         }
     };
-  
+
     const createCapsule = async (snapshotKey, usedPhotos, quote, spotifySongs,) => {
         const response = await axios.post(`${BASE_URL}create-capsule/${curUser._id}`, {
             snapshotKey,
@@ -377,6 +379,39 @@ export const GlobalProvider = ({ children }) => {
                 setError(err.response.data.message)
             })
     };
+
+    const getCapsuleUrl = async (capsuleId) => {
+        capsule = await getCapsule(capsuleId)
+        const urlRes = await axios.get(`${BASE_S3_URL}api/get/${capsule.snapshotKey}`);
+        const url = urlRes.data.url
+        return url
+    };
+
+    const postPhoto = async (uri) => {
+        const formData = new FormData();
+        formData.append("image", {
+          uri: uri,
+          type: 'image/jpeg',
+          name: 'photo.jpg',
+        });
+        const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        return response.data.imageName
+    }
+
+    const setSnapshotKey = async (capsuleId, key) => {
+        const response = await axios.post(`${BASE_URL}set-key/${capsuleId}`, {
+            key
+        })
+            .catch((err) => {
+                console.log(err)
+                console.log(err.response.data.message)
+                setError(err.response.data.message)
+            })
+    }
 
 
     // Provide the context value to child components
@@ -414,7 +449,10 @@ export const GlobalProvider = ({ children }) => {
             BASE_S3_URL,
             BASE_URL,
             createCapsule,
-            capsuleKeys
+            capsuleKeys,
+            getCapsuleUrl,
+            postPhoto,
+            setSnapshotKey
         }}>
             {children}
         </GlobalContext.Provider>
