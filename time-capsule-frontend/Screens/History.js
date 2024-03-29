@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image, FlatList } from "react-native";
+import { StyleSheet, View, Text, Modal, TouchableOpacity, Image, FlatList, ActivityIndicator } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
@@ -9,12 +9,24 @@ const History = ({ navigation }) => {
     const { curUser, getCapsule } = useGlobalContext();
     const [capsulesArray, setCapsules] = useState([]);
 
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageLoading, setImageLoading] = useState(true);
+
+
+    // handle image presses for enlarging the capsule
+    const handleImagePress = (imageUrl) => {
+        setSelectedImage(imageUrl);
+        setImageLoading(true);
+        setModalVisible(true);
+    };
+
     useEffect(() => {
         const getCapsulesFunc = async () => {
             const capsulesArray = await Promise.all(
                 curUser.capsules.map(async (capsuleId) => {
                     const capsule = await getCapsule(capsuleId);
-                    return capsule.snapshot; // Assuming snapshot is the image URI
+                    return capsule.snapshotURL;
                 })
             );
             setCapsules(capsulesArray);
@@ -26,14 +38,44 @@ const History = ({ navigation }) => {
         <HistoryBackground>
             <PageNavBar onBackPress={() => navigation.goBack()} title="History Page" />
             {capsulesArray.length > 0 ? (
+                <View style={{ flex: 1 }}>
                 <FlatList
                     style={styles.capsuleList}
                     data={capsulesArray}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => handleImagePress(item)}>
                         <Image style={styles.capsuleListItem} source={{ uri: item }} />
+                    </TouchableOpacity>
                     )}
                 />
+                <Modal
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+                >
+                    <TouchableOpacity
+                        style={styles.modalOverlay}
+                        activeOpacity={1}
+                        onPressOut={() => setModalVisible(false)}
+                    >
+                        <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+                            <View style={styles.modalContent}>
+                                <View style={styles.imageContainer}>
+                                    {imageLoading && (
+                                        <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                    )}
+                                    <Image
+                                        style={styles.enlargedImage}
+                                        source={{ uri: selectedImage }}
+                                        onLoad={() => setImageLoading(false)}
+                                    />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </Modal>
+                </View>
             ) : (
                 <View style={styles.noPastCapsulesContainer}>
                         <Text style={styles.overlayText}>No Past Capsules</Text>
@@ -57,6 +99,44 @@ const styles = StyleSheet.create({
         width: '75%',
         aspectRatio: 1,
         marginVertical: 15,
+        borderRadius: 10
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    modalContent: {
+        //margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 0,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    activityIndicator: { // loading thing for before image loads
+        position: 'absolute',
+    },
+    enlargedImage: {
+        // need to change width and height for specific capsule dimensions
+        width: "100%",
+        height: '100%',
+        borderRadius: 20,
+        resizeMode: 'contain',
+    },
+    imageContainer: {
+        width: 345,
+        height: 460,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     textBox: {
         position: "absolute",

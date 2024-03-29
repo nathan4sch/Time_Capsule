@@ -24,7 +24,8 @@ const styles = StyleSheet.create({
     height: 130, // Adjust the height as needed
     width: '100%',
     paddingHorizontal: 16, // Side padding
-    backgroundColor: '#33b898', // Change the background color as needed
+    //backgroundColor: '#33b898', // Change the background color as needed
+    backgroundColor: 'black',
     elevation: 4, // Adds shadow for Android
     shadowOpacity: 0.1, // Adds shadow for iOS
     shadowRadius: 10,
