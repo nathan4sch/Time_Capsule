@@ -406,7 +406,7 @@ exports.getSpotifyTopSong = async (req, res) => {
                 //console.log(access_token);
 
                 // GET TOP SONG DATA FROM SPOTIFY HERE
-                const spotifyAPIUrl = 'https://api.spotify.com/v1/me/top/tracks?limit=1&offset=0';
+                const spotifyAPIUrl = 'https://api.spotify.com/v1/me/top/tracks?limit=1&time_range=short_term';
                 const options = {
                     method: 'GET', // GET is the default method, but it's good to be explicit
                     headers: {
