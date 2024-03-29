@@ -137,7 +137,7 @@ const aspectRatio = 4284 / 5712;
 const containerWidth = screenWidth - 40; // Subtracting some margin
 const containerHeight = containerWidth / aspectRatio;
 
-const photoWidth = containerWidth / 3 - 6;
+const photoWidth = containerWidth / 3 - 1.4;
 const photoHeight = photoWidth * (4 / 3)
 
 const styles = StyleSheet.create({
@@ -246,11 +246,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    margin: 3,
+    top: 10,
+    marginHorizontal: 0,
+    //margin: 3,
   },
   photoWrapper: {
-    margin: 1, // Adjust spacing between photos
+    //margin: 1, // Adjust spacing between photos
     borderWidth: 2,
+    borderTopWidth: 3,
     borderColor: '#fff',
     width: photoWidth,
     height: photoHeight,
