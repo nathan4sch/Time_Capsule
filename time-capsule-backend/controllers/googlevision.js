@@ -3,6 +3,7 @@ const vision = require('@google-cloud/vision');
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { s3 } = require('../app');
 const convert = require('heic-convert');
+const sharp = require('sharp');
 
 const client = new vision.ImageAnnotatorClient();
 
@@ -210,19 +211,23 @@ exports.selectPhotos = async (req, res) => {
     const imageType = (await import('image-type')).default;
     const { id } = req.params;
     console.log(id)
-
-    let image_data = []
-    for (let image of req.files) {
+    console.log("Before conversion")
+    const conversionPromises = req.files.map(async (image) => {
+        let processedImage = { ...image }; // Create a new object for the processed image
         if ((await imageType(image.buffer)).mime === 'image/heic') {
-            image.buffer = await convert({
+            processedImage.buffer = await convert({
                 buffer: image.buffer, // the HEIC file buffer
                 format: 'JPEG', // output format
             });
-            image.mimetype = 'image/jpeg'
+            processedImage.mimetype = 'image/jpeg';
         }
-        if (image.buffer.length === 0) {
-            continue;
-        }
+    
+        return processedImage;
+    });
+    const convertedImages = await Promise.all(conversionPromises);
+    console.log("after conversion")
+    let image_data = []
+    for (let image of convertedImages) {
         const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
         if ((joy == 0 && landscape == 0) || dominantColors == null) {
             continue;
