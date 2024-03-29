@@ -8,7 +8,7 @@ import BackButton from "../Components/lightBackButton";
 
 
 const StoryBoard = ({ navigation }) => {
-    const { setCurUser, curUser, getUserbyID, getCapsuleUrl } = useGlobalContext();
+    const { setCurUser, curUser, getUserbyID, getCapsuleUrl, getCapsule } = useGlobalContext();
     const [friendObj, setFriendObj] = React.useState([]);
     const [capsuleList, setCapsuleList] = React.useState([]);
 
@@ -38,15 +38,24 @@ const StoryBoard = ({ navigation }) => {
             // Filter friends based on the condition
             const filteredFriends = friendData.filter((friend) => friend.capsules.length !== 0);
 
+
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth();
             // Create a list with required information
             const friendInfoList = [];
-
             for (const friend of filteredFriends) {
                 
                 if (friend.capsules.length > 0) {
-                    const capsuleID = friend.capsules[0];
+                    const capsuleID = friend.capsules[friend.capsules.length-1];
                     const capsule = await getCapsuleUrl(capsuleID);
-                    if (capsule.published) {
+                    const capsuleObj = await getCapsule(capsuleID)
+
+                    const capsuleDate = new Date(capsuleObj.timestamp);
+                    const capsuleYear = capsuleDate.getFullYear();
+                    const capsuleMonth = capsuleDate.getMonth();
+
+                    if (capsuleObj.published && capsuleYear === currentYear && capsuleMonth === currentMonth) {
                         friendInfoList.push({
                             username: friend.username,
                             profilePicture: friend.profileSettings.profilePictureUrl,
@@ -60,7 +69,7 @@ const StoryBoard = ({ navigation }) => {
         };
 
         fetchData();
-        console.log(capsuleList)
+        //console.log(capsuleList)
     }, []);
 
 

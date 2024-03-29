@@ -7,8 +7,9 @@ import axios from 'axios'
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
-const BASE_URL = "http://100.69.15.14:3000/api/v1/"
-const BASE_S3_URL = "http://100.69.15.14:3000/"
+const BASE_URL = "http://10.186.64.41:3000/api/v1/"
+const BASE_S3_URL = "http://10.186.64.41:3000/"
+
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -126,7 +127,8 @@ export const GlobalProvider = ({ children }) => {
         // The return value contains TONS of information about the top song, which we can use for graphics or other stuff.
         //console.log(response.data.data);
         //console.log(response.data.data.items[0].name)
-        return (response.data.data.items[0].name)
+        let returnStr = response.data.data.items[0].name + " by " + response.data.data.items[0].artists[0].name
+        return (returnStr)
     }
 
     const setInstragram = async (instagramKey) => {
