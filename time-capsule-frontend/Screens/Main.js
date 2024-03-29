@@ -1,29 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard } from "react-native";
 import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as MediaLibrary from 'expo-media-library';
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule, selectPhotos } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos, capsuleKeys } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
+
+    const capsuleKeyChange = useRef(false);
 
     async function getPhotosFromMonth() {
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status === 'granted') {
             const month = new Date();
             month.setDate(1);
-            const media = await MediaLibrary.getAssetsAsync({first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
             const assetInfoResults = await Promise.all(assetInfoPromises);
             const uris = assetInfoResults.map(item => item.localUri);
-            selectPhotos(curUser._id, uris);
+            capsuleKeyChange.current = true;
+            await selectPhotos(curUser._id, uris); //calls function in global context
+            //waits till change in capsuleKeys then creates capsule with those keys
         } else {
             alert('Permission to access camera roll denied!');
         }
     }
 
+    useEffect(() => {
+        if (capsuleKeyChange.current) {
+            console.log("capsuleKeys: ", capsuleKeys)
+            //here create the capsule
+            capsuleKeyChange.current = false;
+        }
+    }, [capsuleKeys]);
+
+    //render basic capsule on main page
     useEffect(() => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
@@ -106,7 +119,7 @@ const Main = ({ navigation }) => {
                         )}
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}/>
+                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()} />
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
