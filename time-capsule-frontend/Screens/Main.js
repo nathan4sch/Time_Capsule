@@ -1,33 +1,75 @@
-import React, { useEffect, useState } from "react";
-
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, ActivityIndicator, Keyboard } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, ActivityIndicator, Keyboard, Alert } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
+
 import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as MediaLibrary from 'expo-media-library';
+import axios from 'axios'
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule, selectPhotos } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
     const [imageLoading, setImageLoading] = useState(true);
 
+
+    const capsuleKeyChange = useRef(false);
 
     async function getPhotosFromMonth() {
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status === 'granted') {
             const month = new Date();
             month.setDate(1);
-            const media = await MediaLibrary.getAssetsAsync({first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
             const assetInfoResults = await Promise.all(assetInfoPromises);
             const uris = assetInfoResults.map(item => item.localUri);
-            selectPhotos(curUser._id, uris);
+            capsuleKeyChange.current = true;
+            await selectPhotos(curUser._id, uris); //calls function in global context
+            //waits till change in capsuleKeys then creates capsule with those keys
         } else {
             alert('Permission to access camera roll denied!');
         }
     }
 
+    useEffect(() => {
+        (async () => {
+            if (capsuleKeyChange.current) {
+                console.log("capsuleKeys: ", capsuleKeys)
+                //here create the capsule
+                let imageArray = [];
+                let spotifySongsArray = [];
+
+                for (index in capsuleKeys) {
+                    const key = capsuleKeys[index]
+                    //get photoUrl from key
+                    const urlRes = await axios.get(`${BASE_S3_URL}api/get/${key}`);
+                    const photoObject = { photoKey: key, photoUrl: urlRes.data.url };
+                    imageArray.push(photoObject);
+                }
+
+                if (curUser.profileSettings.spotifyAccount !== "") {
+                    spotifySongs = await getSpotifyTopSong();
+                    spotifySongsArray.push(spotifySongs);
+                } else {
+                    spotifySongsArray.push("Post Malone");
+                }
+
+                snapshotKey = "temp";
+                quote = "temp";
+
+                await createCapsule(snapshotKey, imageArray, quote, spotifySongsArray);
+                //setLoading(false); // Set loading to false when capsule creation is complete
+                Alert.alert("Success", "Capsule Created");
+                capsuleKeyChange.current = false;
+
+                navigation.navigate("Photos")
+            }
+        })();
+    }, [capsuleKeys]);
+
+    //render basic capsule on main page
     useEffect(() => {
         const getCapsuleFunc = async () => {
             if (curUser.capsules.length !== 0) {
@@ -40,6 +82,7 @@ const Main = ({ navigation }) => {
     }, []);
 
 
+    //Countdown till end of month
     useEffect(() => {
         const intervalId = setInterval(() => {
             setTimer(calculateTimeUntilNextMonth());
@@ -116,7 +159,7 @@ const Main = ({ navigation }) => {
                         )}
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}/>
+                <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()} />
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />

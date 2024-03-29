@@ -6,6 +6,7 @@ import axios from 'axios'
 //CHANGE TO YOUR OWN IP ADDRESS
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
+
 const BASE_URL = "http://100.67.13.152:3000/api/v1/"
 const BASE_S3_URL = "http://100.67.13.152:3000/"
 //https://time-capsule-server.onrender.com/api/v1/
@@ -20,6 +21,7 @@ export const GlobalProvider = ({ children }) => {
     const [users, setUsers] = useState([])
     const [error, setError] = useState(null)
     const [userEmail, setUserEmail] = useState("")
+    const [capsuleKeys, setCapsuleKeys] = useState([])
 
     // User Functions
     //Function to add user data
@@ -347,9 +349,12 @@ export const GlobalProvider = ({ children }) => {
                 name: `photo${index}.jpg`,
             });
         });
-        console.log(formData)
+        //console.log(formData)
         try {  
-            await axios.post(`${BASE_URL}select-photos/${id}`, formData);
+            const response = await axios.post(`${BASE_URL}select-photos/${id}`, formData);
+            //console.log("globalCon: ", response.data)
+            //capsuleKeys = response.data
+            setCapsuleKeys(response.data)
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message);
@@ -409,6 +414,7 @@ export const GlobalProvider = ({ children }) => {
             BASE_S3_URL,
             BASE_URL,
             createCapsule,
+            capsuleKeys
         }}>
             {children}
         </GlobalContext.Provider>

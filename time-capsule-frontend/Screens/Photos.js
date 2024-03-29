@@ -11,11 +11,36 @@ import ViewShot from 'react-native-view-shot';
 import axios from 'axios';
 
 const Photos = ({ navigation }) => {
-  const { BASE_S3_URL, getSpotifyTopSong, createCapsule, curUser } = useGlobalContext();
-  const [photos, setPhotos] = useState([]);
+  const { BASE_S3_URL, getSpotifyTopSong, createCapsule, curUser, getCapsule } = useGlobalContext();
+  //const [photos, setPhotos] = useState([]);
   const [capsulePhotos, setCapsulePhotos] = useState([]);
+  const [spotifySong, setSpotifySong] = useState();
   const [loading, setLoading] = useState(true); // State variable to track loading
   const viewShotRef = useRef(null); // Reference for ViewShot
+
+  //let capsule
+  //let photos
+
+  useEffect(() => {
+    const fetchCapsuleData = async () => {
+      try {
+        const capsuleId = curUser.capsules[curUser.capsules.length - 1];
+        const capsule = await getCapsule(capsuleId);
+        const photos = capsule.usedPhotos.map(photo => photo.photoUrl);
+        //let localpotifySong = capsule.spotifySongs[0]
+        //if (spotifySong)
+        //working here
+        setSpotifySong(capsule.spotifySongs[0])
+        setCapsulePhotos(photos);
+        setLoading(false); // Data is loaded, set loading to false
+      } catch (error) {
+        console.error("Failed to fetch capsule data:", error);
+        setLoading(false); // Ensure loading is set to false even if there's an error
+      }
+    };
+
+    fetchCapsuleData();
+  }, []);
 
   const combineImages = async () => {
     const uri = await viewShotRef.current.capture(); // Capture the layout as an image
@@ -31,7 +56,7 @@ const Photos = ({ navigation }) => {
   //const saveToCameraRoll = async (combinedImageUri) => {
   //};
 
-  useEffect(() => {
+  /*useEffect(() => {
     (async () => {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status === 'granted') {
@@ -47,8 +72,9 @@ const Photos = ({ navigation }) => {
         alert('Permission to access camera roll denied!');
       }
     })();
-  }, []);
+  }, []);*/
 
+  /*
   useEffect(() => {
     (async () => {
       if (capsulePhotos.length !== 0) {
@@ -102,7 +128,7 @@ const Photos = ({ navigation }) => {
         <ActivityIndicator size="large" color="white" />
       </View>
     );
-  }
+  }*/
 
   return (
     <>
@@ -118,12 +144,12 @@ const Photos = ({ navigation }) => {
           <Image source={require('../icons/capsule-.png')} style={styles.appIcon} />
           <View style={styles.spotifySection}>
             <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
-            <Text style={styles.spotifyText}>Top Song: Country by Post Malone</Text>
+            <Text style={styles.spotifyText}>Top Song: {spotifySong} by Post Malone</Text>
           </View>
           <View style={styles.photosContainer}>
-            {photos.slice(0, 6).map((photo, index) => (
+            {capsulePhotos.slice(0, 6).map((photoUrl, index) => (
               <View key={index} style={styles.photoWrapper}>
-                <Image source={{ uri: photo.uri }} style={styles.photo} />
+                <Image source={{ uri: photoUrl }} style={styles.photo} />
               </View>
             ))}
           </View>

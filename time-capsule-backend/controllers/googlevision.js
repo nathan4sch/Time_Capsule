@@ -4,6 +4,7 @@ const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { s3 } = require('../app');
 const convert = require('heic-convert');
 const sharp = require('sharp');
+const crypto = require('crypto')
 
 const client = new vision.ImageAnnotatorClient();
 
@@ -117,14 +118,15 @@ const landscape_keywords = [
     'amazing',
     'beautiful',
     'gorgeous',
-  ];
-  
+];
+
+const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
 
 async function analyzeImage(image) {
     const [result] = await client.annotateImage({
-        image: { content: image }, 
+        image: { content: image },
         features: [{ type: 'LABEL_DETECTION', maxResults: 100 }, { type: 'FACE_DETECTION' }, { "type": "IMAGE_PROPERTIES" }],
-      });      
+    });
     const labels = result.labelAnnotations;
     const faces = result.faceAnnotations;
     let dominantColors = null;
@@ -169,9 +171,9 @@ async function analyzeImage(image) {
     }
     console.log('joy: ', joy, 'landscape: ', landscape)
     return [joy, landscape, dominantColors];
-  }
+}
 
-  
+
 async function similarPicture(dominantColors1, dominantColors2) {
     function compareColors(color1, color2) {
         color1 = color1.color;
@@ -201,7 +203,7 @@ function isEqual(row1, row2) {
     }
     for (let i = 0; i < row1.length; i++) {
         if (row1[i] !== row2[i]) {
-            return false; 
+            return false;
         }
     }
     return true;
@@ -221,7 +223,6 @@ exports.selectPhotos = async (req, res) => {
             });
             processedImage.mimetype = 'image/jpeg';
         }
-    
         return processedImage;
     });
     const convertedImages = await Promise.all(conversionPromises);
@@ -229,17 +230,18 @@ exports.selectPhotos = async (req, res) => {
     let image_data = []
     for (let image of convertedImages) {
         const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
+        console.log("done with google vision")
         if ((joy == 0 && landscape == 0) || dominantColors == null) {
             continue;
         }
         let add = true;
         for (const [i, j, l, dC] of image_data) {
             if (j == joy && l == landscape) {
-                if(await similarPicture(dC, dominantColors)) {
+                if (await similarPicture(dC, dominantColors)) {
                     add = false;
                     break;
                 }
-            }            
+            }
         }
         if (add)
             image_data.push([image, joy, landscape, dominantColors])
@@ -270,7 +272,8 @@ exports.selectPhotos = async (req, res) => {
     }
     let key_array = []
     for (const image of new_image_data) {
-        imageName = id + image.originalname
+        //imageName = id + image.originalname
+        imageName = randomImageName()
         key_array.push(imageName)
         const params = {
             Bucket: bucketName,
@@ -289,5 +292,7 @@ exports.selectPhotos = async (req, res) => {
     for (let i = 0; i < 6 - new_image_data.length; i++) {
         key_array.push("default1.png")
     }
-    console.log(key_array)
+    //console.log("vision: ", key_array)
+    //console.log(key_array)
+    res.status(200).json(key_array);
 };
