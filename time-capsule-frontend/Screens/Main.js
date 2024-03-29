@@ -9,11 +9,13 @@ import Loading from "../Components/Loading";
 import { useIsFocused } from '@react-navigation/native';
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl } = useGlobalContext();
+    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl, setPublish } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
     const [loading, setLoading] = useState(false);
     const [reload, setReload] = useState(false);
+    const [publishState, setPublishState] = useState("");
+
 
     const capsuleKeyChange = useRef(false);
 
@@ -88,6 +90,8 @@ const Main = ({ navigation }) => {
                 //console.log("shown Capsule: ", capsule.snapshotUrl)
                 const url = await getCapsuleUrl(locCurUser.capsules[locCurUser.capsules.length - 1])
                 setShownCapsule(url);
+                capsule = await getCapsule(locCurUser.capsules[locCurUser.capsules.length - 1])
+                setPublishState(capsule.published)
             }
         };
         getCapsuleFunc();
@@ -95,10 +99,10 @@ const Main = ({ navigation }) => {
 
     useEffect(() => {
         if (isFocused) {
-          // Reset the shown capsule and any other relevant state
-          setReload(!reload)
+            // Reset the shown capsule and any other relevant state
+            setReload(!reload)
         }
-      }, [isFocused]);
+    }, [isFocused]);
 
 
     //Countdown till end of month
@@ -130,6 +134,13 @@ const Main = ({ navigation }) => {
 
     const handleOverlayButtonPress = () => {
         navigation.navigate('StoryBoard');
+    };
+
+    const handlePublish = async () => {
+        Alert.alert("Success", "Capsule Published", [{ text: "OK" }]);
+        setPublish(curUser.capsules[curUser.capsules.length - 1])
+        capsule = await getCapsule(curUser.capsules[curUser.capsules.length - 1])
+        setPublishState(capsule.published)
     };
 
     if (loading) {
@@ -169,6 +180,14 @@ const Main = ({ navigation }) => {
                             <Text style={styles.overlayText}>No Capsule Available</Text>
                         )}
                     </TouchableOpacity>
+                    {!publishState && shownCapsule && (
+                        <TouchableOpacity
+                            style={styles.publishButton}
+                            onPress={handlePublish}
+                        >
+                            <Text style={styles.publishButtonText}>Publish</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
                     <Text style={styles.overlayText}>Test: Get Capsule</Text>
@@ -295,5 +314,16 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         zIndex: 10,
-      },
+    },
+    publishButton: {
+        marginTop: 10,
+        backgroundColor: '#4CAF50',
+        borderRadius: 5,
+        padding: 10,
+        alignItems: 'center',
+    },
+    publishButtonText: {
+        color: 'white',
+        fontSize: 16,
+    },
 });

@@ -413,6 +413,15 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
+    const setPublish = async (capsuleId) => {
+        const response = await axios.post(`${BASE_URL}set-publish/${capsuleId}`)
+            .catch((err) => {
+                console.log(err)
+                console.log(err.response.data.message)
+                setError(err.response.data.message)
+            })
+    }
+
 
     // Provide the context value to child components
     return (
@@ -452,7 +461,8 @@ export const GlobalProvider = ({ children }) => {
             capsuleKeys,
             getCapsuleUrl,
             postPhoto,
-            setSnapshotKey
+            setSnapshotKey,
+            setPublish
         }}>
             {children}
         </GlobalContext.Provider>
