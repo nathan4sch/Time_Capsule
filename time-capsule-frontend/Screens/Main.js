@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, Keyboard, Alert } from "react-native";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, FlatList, ActivityIndicator, Keyboard, Alert } from "react-native";
+import PageNavBar from "../Components/PageNavBar";
+
 import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as MediaLibrary from 'expo-media-library';
@@ -9,6 +11,8 @@ const Main = ({ navigation }) => {
     const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
+    const [imageLoading, setImageLoading] = useState(true);
+
 
     const capsuleKeyChange = useRef(false);
 
@@ -137,13 +141,19 @@ const Main = ({ navigation }) => {
                     <Text style={styles.timerText}>{timer}</Text>
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
                 </View>
-                <View style={styles.imageContainer}>
-                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
+                <View style={styles.capsuleContainer}>
+                    <TouchableOpacity style={styles.overlayButton}>
                         {shownCapsule ? (
-                            <Image
-                                style={styles.capsuleImage}
-                                source={{ uri: shownCapsule }}
-                            />
+                            <TouchableOpacity style={styles.imageContainer} onPress={handleOverlayButtonPress}>
+                                {imageLoading && (
+                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                )}
+                                <Image
+                                    style={styles.capsuleImage}
+                                    source={{ uri: shownCapsule }}
+                                    onLoad={() => setImageLoading(false)}
+                                />
+                            </TouchableOpacity>
                         ) : (
                             <Text style={styles.overlayText}>No Capsule Available</Text>
                         )}
@@ -153,7 +163,6 @@ const Main = ({ navigation }) => {
                 <TextInput style={styles.momentButton}
                     placeholder="Enter Moment"
                     returnKeyType="done" />
-                <View style={styles.capsuleList} />
             </BlackBackground>
         </TouchableOpacity>
     );
@@ -230,23 +239,39 @@ const styles = StyleSheet.create({
         backgroundColor: '#8E8E8E',
         borderRadius: 20,
     },
+    capsuleContainer: {
+
+    },
     imageContainer: {
-        position: 'absolute',
+        // working on this right now
+        position: 'center',
         top: '30%',
-        left: 0,
-        width: '100%',
-        height: '50%',
+        width: 345,
+        height: 460,
+  
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 0,
         alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,  
+    },
+    activityIndicator: { // loading thing for before image loads
+        position: 'absolute',
     },
     capsuleImage: {
-        height: '65%',
-        width: '80%'
+        height: '100%',
+        width: '100%',
+        borderRadius: 20,
     },
     overlayButton: {
         backgroundColor: 'transparent',
-        padding: 10,
         width: '100%',
         height: '100%',
         zIndex: 2,

@@ -213,36 +213,22 @@ exports.selectPhotos = async (req, res) => {
     const imageType = (await import('image-type')).default;
     const { id } = req.params;
     console.log(id)
-
-    let image_data = []
-    for (let image of req.files) {
-        console.log("start of conversion")
+    console.log("Before conversion")
+    const conversionPromises = req.files.map(async (image) => {
+        let processedImage = { ...image }; // Create a new object for the processed image
         if ((await imageType(image.buffer)).mime === 'image/heic') {
-            image.buffer = await convert({
+            processedImage.buffer = await convert({
                 buffer: image.buffer, // the HEIC file buffer
                 format: 'JPEG', // output format
             });
-            image.mimetype = 'image/jpeg'
+            processedImage.mimetype = 'image/jpeg';
         }
-        if (image.buffer.length === 0) {
-            continue;
-        }
-        /*if ((await imageType(image.buffer)).mime === 'image/heic') {
-            sharp(image.buffer)
-                .jpeg({ quality: 80 }) // Convert to JPEG with 80% quality
-                .toBuffer()
-                .then(outputBuffer => {
-                    image.buffer = outputBuffer;
-                    image.mimetype = 'image/jpeg';
-                })
-                .catch(err => {
-                    console.error('Error during conversion:', err);
-                });
-        }
-        if (image.buffer.length === 0) {
-            continue;
-        }*/
-        console.log("after conversion, starting google vision")
+        return processedImage;
+    });
+    const convertedImages = await Promise.all(conversionPromises);
+    console.log("after conversion")
+    let image_data = []
+    for (let image of convertedImages) {
         const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
         console.log("done with google vision")
         if ((joy == 0 && landscape == 0) || dominantColors == null) {
