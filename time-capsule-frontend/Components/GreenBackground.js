@@ -18,5 +18,6 @@ const styles = StyleSheet.create({
         left: 0,
         top: 0,
         backgroundColor: 'rgba(0, 245, 186, 0.3)',
+        alignItems: 'center',
     },
 });
