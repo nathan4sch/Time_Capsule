@@ -6,12 +6,15 @@ import BlackBackground from "../Components/BlackBackground";
 import { useGlobalContext } from "../context/globalContext";
 import * as MediaLibrary from 'expo-media-library';
 import axios from 'axios'
+import Loading from "../Components/Loading";
 
 const Main = ({ navigation }) => {
     const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
     const [imageLoading, setImageLoading] = useState(true);
+    const [loading, setLoading] = useState(false); // State variable to track loading
+
 
 
     const capsuleKeyChange = useRef(false);
@@ -19,6 +22,7 @@ const Main = ({ navigation }) => {
     async function getPhotosFromMonth() {
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status === 'granted') {
+            setLoading(true);
             const month = new Date();
             month.setDate(1);
             const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
@@ -66,6 +70,7 @@ const Main = ({ navigation }) => {
                 Alert.alert("Success", "Capsule Created");
                 capsuleKeyChange.current = false;
 
+                setLoading(false)
                 navigation.navigate("Photos")
             }
         })();
@@ -115,9 +120,11 @@ const Main = ({ navigation }) => {
         navigation.navigate('StoryBoard');
     };
 
-    const handleCreateCapsule = () => {
-
-    }
+    if (loading) {
+        return (
+          <View><Loading/></View>
+        );
+      }
 
     return (
         <TouchableOpacity
