@@ -222,7 +222,7 @@ const Main = ({ navigation }) => {
                     )}
 
                     <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
-                        <Text style={styles.overlayText}>Test: Get Capsule</Text>
+                        <Text style={styles.overlayText}>Test: Generate Capsule</Text>
                     </TouchableOpacity>
 
                     <TextInput style={styles.momentButton}
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     },
     
     publishButton: {
-        marginTop: 10,
+        marginTop: 20,
         width: '80%',
         backgroundColor: '#4CAF50',
         borderRadius: 10,
