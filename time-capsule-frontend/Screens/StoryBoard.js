@@ -4,9 +4,11 @@ import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
+import BackButton from "../Components/lightBackButton";
+
 
 const StoryBoard = ({ navigation }) => {
-    const { setCurUser, curUser, getUserbyID, getCapsule } = useGlobalContext();
+    const { setCurUser, curUser, getUserbyID, getCapsuleUrl } = useGlobalContext();
     const [friendObj, setFriendObj] = React.useState([]);
     const [capsuleList, setCapsuleList] = React.useState([]);
 
@@ -28,17 +30,15 @@ const StoryBoard = ({ navigation }) => {
             const friendInfoList = [];
 
             for (const friend of filteredFriends) {
+                console.log(friend)
                 if (friend.capsules.length > 0) {
                     const capsuleID = friend.capsules[0];
-                    const capsule = await getCapsule(capsuleID);
-                    //get url from key
-                    //only get newUrl if needed? Will break if everyone keeps getting new
-                    const { snapshotUrl } = capsule;
+                    const capsule = await getCapsuleUrl(capsuleID);
 
                     friendInfoList.push({
                         username: friend.username,
-                        profilePicture: friend.profileSettings.profilePicture,
-                        snapshot: snapshot,
+                        profilePicture: friend.profileSettings.profilePictureUrl,
+                        snapshot: capsule,
                     });
                 }
             }
@@ -61,14 +61,14 @@ const StoryBoard = ({ navigation }) => {
                     />
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
-                <Image style={styles.capsuleListItem} source={{ uri: item.snapshotUrl }} />
+                <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
             </TouchableOpacity>
         );
     };
 
     return (
         <HistoryBackground>
-            <PageNavBar onBackPress={() => navigation.goBack()} title="StoryBoard" />
+            <BackButton onPress={() => navigation.goBack()} />
             {/* Add the rest of your components here */}
             {capsuleList.length > 0 ? (
                 <FlatList

@@ -7,8 +7,8 @@ import axios from 'axios'
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
-const BASE_URL = "http://100.67.14.19:3000/api/v1/"
-const BASE_S3_URL = "http://100.67.14.19:3000/"
+const BASE_URL = "http://100.67.13.152:3000/api/v1/"
+const BASE_S3_URL = "http://100.67.13.152:3000/"
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
 //100.67.14.58
@@ -381,7 +381,7 @@ export const GlobalProvider = ({ children }) => {
     };
 
     const getCapsuleUrl = async (capsuleId) => {
-        capsule = await getCapsule(capsuleId)
+        let capsule = await getCapsule(capsuleId)
         const urlRes = await axios.get(`${BASE_S3_URL}api/get/${capsule.snapshotKey}`);
         const url = urlRes.data.url
         return url
