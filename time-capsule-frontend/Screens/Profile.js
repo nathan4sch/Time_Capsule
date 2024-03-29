@@ -13,7 +13,7 @@ import axios from 'axios';
 //const BASE_URL = "https://time-capsule-server.onrender.com/";
 
 const Profile = ({ navigation }) => {
-    const { curUser, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl, BASE_S3_URL} = useGlobalContext();
+    const { curUser, setInstagram, setLDMode, setSpotify, getSpotifyTopSong, setCurUser, getUser, deleteAccount, setProfilePictureKey, setProfilePictureUrl, BASE_S3_URL} = useGlobalContext();
     const [isDarkMode, setIsDarkMode] = useState(curUser.profileSettings.darkMode);
     const [showSpotifyButton, setShowSpotifyButton] = useState(curUser.profileSettings.spotifyAccount === "");
     const [showInstagramButton, setShowInstagramButton] = useState(curUser.profileSettings.instagramAccount === "");

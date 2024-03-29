@@ -14,7 +14,7 @@ const {
     setProfilePictureKey,
     setSpotify,
     getSpotifyTopSong,
-    setInstragram,
+    setInstagram,
 } = require('../controllers/user')
 
 const {
@@ -63,7 +63,7 @@ router
     .post('/set-profile-picture-key/:id', setProfilePictureKey)
     .post('/set-spotify-account/:id', setSpotify)
     .post('/get-spotify-top-song/:id', getSpotifyTopSong)
-    .post('/set-instagram-account/:id', setInstragram)
+    .post('/set-instagram-account/:id', setInstagram)
 
 //API endpoints for moment operations
 //:id is the id of the moment to modify 

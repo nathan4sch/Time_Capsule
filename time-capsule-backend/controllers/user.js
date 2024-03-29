@@ -444,7 +444,7 @@ exports.getSpotifyTopSong = async (req, res) => {
     }
 }
 
-exports.setInstragram = async (req, res) => {
+exports.setInstagram = async (req, res) => {
     const { id } = req.params;
     const { instagram } = req.body;
 

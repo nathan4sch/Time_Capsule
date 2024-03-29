@@ -1,5 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import { INSTAGRAM_SECRET } from '../env.js';
+import { useGlobalContext } from "../context/globalContext";
 
 export const instagramLogin = async ({navigation, page}) => {
 
@@ -62,8 +63,14 @@ export const instagramLogin = async ({navigation, page}) => {
         `&redirect_uri=${encodeURIComponent(redirectUrl)}` +
         `&scope=user_profile,user_media` +
         `&response_type=code`;
+    let result = WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
 
-    let result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
+    setTimeout(() => {
+        WebBrowser.dismissAuthSession();
+        console.log("AFter")
+    }, 2000);  
+    
+    return;
 
     if (result.type === 'success') {
         // Handle the authentication response here
