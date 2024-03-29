@@ -29,7 +29,7 @@ const Main = ({ navigation }) => {
             setLoading(true);
             const month = new Date();
             month.setDate(1);
-            const media = await MediaLibrary.getAssetsAsync({ first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
             const assetInfoResults = await Promise.all(assetInfoPromises);
             const uris = assetInfoResults.map(item => item.localUri);
