@@ -34,12 +34,13 @@ const StoryBoard = ({ navigation }) => {
                 if (friend.capsules.length > 0) {
                     const capsuleID = friend.capsules[0];
                     const capsule = await getCapsuleUrl(capsuleID);
-
-                    friendInfoList.push({
-                        username: friend.username,
-                        profilePicture: friend.profileSettings.profilePictureUrl,
-                        snapshot: capsule,
-                    });
+                    if (capsule.published) {
+                        friendInfoList.push({
+                            username: friend.username,
+                            profilePicture: friend.profileSettings.profilePictureUrl,
+                            snapshot: capsule,
+                        });
+                    }
                 }
             }
 
