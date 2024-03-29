@@ -38,15 +38,18 @@ const StoryBoard = ({ navigation }) => {
             // Filter friends based on the condition
             const filteredFriends = friendData.filter((friend) => friend.capsules.length !== 0);
 
+
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth();
             // Create a list with required information
             const friendInfoList = [];
-
             for (const friend of filteredFriends) {
                 
                 if (friend.capsules.length > 0) {
-                    const capsuleID = friend.capsules[0];
+                    const capsuleID = friend.capsules[friend.capsules.length-1];
                     const capsule = await getCapsuleUrl(capsuleID);
-                    if (capsule.published) {
+                    if (capsule.published && capsuleYear === currentYear && capsuleMonth === currentMonth) {
                         friendInfoList.push({
                             username: friend.username,
                             profilePicture: friend.profileSettings.profilePictureUrl,
