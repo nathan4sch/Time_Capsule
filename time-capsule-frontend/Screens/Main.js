@@ -15,7 +15,9 @@ const Main = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [reload, setReload] = useState(false);
     const [publishState, setPublishState] = useState("");
+    const [intervalId, setIntervalId] = useState(null);
 
+    let count = 0;
 
     const capsuleKeyChange = useRef(false);
 
@@ -107,11 +109,12 @@ const Main = ({ navigation }) => {
 
     //Countdown till end of month
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            setTimer(calculateTimeUntilNextMonth());
-        }, 1000);
-
-        return () => clearInterval(intervalId);
+        clearInterval(intervalId)
+        const id = setInterval(() => {
+                setTimer(calculateTimeUntilNextMonth());
+            }, 1000);
+        setIntervalId(id)
+        return () => clearInterval(id);
     }, []);
 
     function calculateTimeUntilNextMonth() {
@@ -130,6 +133,30 @@ const Main = ({ navigation }) => {
         const padWithZero = (value) => (value < 10 ? `0${value}` : value);
 
         return `${padWithZero(days)}:${padWithZero(hours)}:${padWithZero(minutes)}:${padWithZero(seconds)}`;
+    }
+
+    function calculateFiveSeconds(c) {
+        const padWithZero = (value) => (value < 10 ? `0${value}` : value);
+        return `${padWithZero(0)}:${padWithZero(0)}:${padWithZero(0)}:${padWithZero(c)}`;
+    }
+
+    function changeToTempTimer() {
+        let count = 5;
+        clearInterval(intervalId); // Clear the previous interval if it exists
+        const id = setInterval(() => {
+            if (count < 0) {
+                clearInterval(id); // Clear the current interval
+                getPhotosFromMonth();
+                const newId = setInterval(() => {
+                    setTimer(calculateTimeUntilNextMonth());
+                }, 1000);
+                setIntervalId(newId); // Update the intervalId state with the new interval ID
+            } else {
+                setTimer(calculateFiveSeconds(count));
+                count -= 1;
+            }
+        }, 1000);
+        setIntervalId(id); // Update the intervalId state with the current interval ID
     }
 
     const handleOverlayButtonPress = () => {
@@ -163,6 +190,9 @@ const Main = ({ navigation }) => {
                         }}
                         cachePolicy='memory-disk'
                     />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
+                    <Text style={styles.timerbuttonText}>SetTimer</Text>
                 </TouchableOpacity>
 
                 <View style={styles.tempTimeContainer}>
@@ -318,7 +348,18 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
-    },
+    },  
+    timerbutton: {
+        backgroundColor: 'green',
+        padding: 10,
+        borderRadius: 5,
+        top: 50,
+        right: 20
+      },
+      timerbuttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+      },
     photoButton: {
         left: '83%',
         aspectRatio: 1,

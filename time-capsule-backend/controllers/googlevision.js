@@ -229,6 +229,7 @@ exports.selectPhotos = async (req, res) => {
     console.log("after conversion")
     let image_data = []
     for (let image of convertedImages) {
+        console.log("before GV")
         const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
         console.log("done with google vision")
         if ((joy == 0 && landscape == 0) || dominantColors == null) {

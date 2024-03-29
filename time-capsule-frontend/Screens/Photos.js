@@ -58,7 +58,7 @@ const Photos = ({ navigation }) => {
           const uri = await viewShotRef.current.capture();
           const imageKey = await postPhoto(uri);
           setSnapshotKey(capsuleId, imageKey);
-        }, 1000);
+        }, 5000);
       }
     };
 
