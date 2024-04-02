@@ -163,6 +163,12 @@ const Profile = ({ navigation }) => {
                         <Text style={styles.buttonText}>My Capsules</Text>
                     </View>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Moment')}>
+                    <View style={buttonStyle.button}>
+                        <Image style={styles.icon} source={require('../icons/moment-.png')} />
+                        <Text style={styles.buttonText}>Moments</Text>
+                    </View>
+                </TouchableOpacity>
                 {/*<TouchableOpacity style={styles.buttonContainer} onPress={getSpotifyTopSong}>
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/spotify-.png')} />

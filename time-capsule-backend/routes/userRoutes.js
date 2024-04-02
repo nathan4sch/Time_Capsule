@@ -15,6 +15,7 @@ const {
     setSpotify,
     getSpotifyTopSong,
     setInstagram,
+    getMomentCount,
 } = require('../controllers/user')
 
 const {
@@ -65,6 +66,8 @@ router
     .post('/set-spotify-account/:id', setSpotify)
     .post('/get-spotify-top-song/:id', getSpotifyTopSong)
     .post('/set-instagram-account/:id', setInstagram)
+    .get('/get-moment-count/:id', getMomentCount)
+
 
 //API endpoints for moment operations
 //:id is the id of the moment to modify 

@@ -53,7 +53,7 @@ const Photos = ({ navigation }) => {
 
   useLayoutEffect(() => {
     const saveSnapshot = async () => {
-      if (viewShotRef.current && isContentReady) { // Check if content is ready
+      if (viewShotRef.current && isContentReady) { 
         setTimeout(async () => {
           const uri = await viewShotRef.current.capture();
           const imageKey = await postPhoto(uri);
@@ -62,30 +62,30 @@ const Photos = ({ navigation }) => {
       }
     };
 
-    if (isContentReady) { // Execute only if content is ready
+    if (isContentReady) { 
       saveSnapshot();
     }
   }, [isContentReady, capsuleId]);
 
   const combineImages = async () => {
-    const uri = await viewShotRef.current.capture(); // Capture the layout as an image
+    const uri = await viewShotRef.current.capture(); 
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status === 'granted') {
-      const asset = await MediaLibrary.createAssetAsync(uri); // Save the captured image to the camera roll
+      const asset = await MediaLibrary.createAssetAsync(uri); 
       await MediaLibrary.createAlbumAsync('YourAlbumName', asset, false);
       Alert.alert("Image Saved", "Your combined image has been saved to the camera roll.");
     }
   };
 
   const getCurrentMonthName = () => {
-    const date = new Date(); // Creates a new date object representing the current date and time
-    const monthNames = [ // An array containing all the month names
+    const date = new Date(); 
+    const monthNames = [ 
       "January", "February", "March",
       "April", "May", "June",
       "July", "August", "September",
       "October", "November", "December"
     ];
-    return monthNames[date.getMonth()]; // getMonth() returns the month in the range 0-11, which is used to get the month name from the array
+    return monthNames[date.getMonth()]; 
   };
   
   const getCurrentYear = () => {
@@ -184,13 +184,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   monthTextContainer: {
-    flex: 1, // Takes up all available space
+    flex: 1, 
     position: 'absolute',
     left: 0,
     right: 0,
     textAlign: 'center',
-    justifyContent: 'center', // Center the month text vertically
-    alignItems: 'center', // Center the month text horizontally
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   monthText: {
     fontSize: 40,
