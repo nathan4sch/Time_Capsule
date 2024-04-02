@@ -210,9 +210,6 @@ const Main = ({ navigation }) => {
                     <Text style={styles.buttonText}>Capsule</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, styles.momentButton]} onPress={() => 1}>
-                    <Text style={styles.buttonText}>Moment</Text>
-                </TouchableOpacity>
             </View>
                 <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
                     <Image style={styles.profileIcon}
@@ -424,13 +421,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 245, 186, 0.5)',
         marginRight: 5,
         borderRadius: 10,
-    },
-    momentButton: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 245, 186, 0.5)',
-        borderRadius: 10,
-        textAlign: 'left',
-        paddingLeft: 15,
     },
     topButtonsContainer: {
         flexDirection: 'row',

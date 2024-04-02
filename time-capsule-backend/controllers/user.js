@@ -479,9 +479,6 @@ exports.getMomentCount = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'id not found' });
         }
-
-        console.log(user.moments.length)
-
         res.status(200).json(user.moments.length);
     } catch (error) {
         console.error(error);
