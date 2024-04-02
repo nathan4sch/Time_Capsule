@@ -68,7 +68,7 @@ exports.deleteCapsule = async (req, res) => {
         })
 }
 
-exports.removeSongFromCapsule = async (req, res) => {
+exports.replaceSongFromCapsule = async (req, res) => {
     const { capsuleId } = req.params;
     const { songName } = req.body;
 
@@ -79,8 +79,8 @@ exports.removeSongFromCapsule = async (req, res) => {
             return res.status(404).json({ message: "Capsule not found" });
         }
 
-        const updatedSongs = capsule.spotifySongs.filter((song) => song !== songName);
-        capsule.spotifySongs = updatedSongs;
+        //const updatedSongs = capsule.spotifySongs.filter((song) => song !== songName);
+        capsule.spotifySongs[0] = songName;
 
         await capsule.save();
 

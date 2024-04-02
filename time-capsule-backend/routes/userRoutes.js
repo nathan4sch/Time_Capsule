@@ -27,14 +27,14 @@ const {
     createCapsule, 
     getCapsule, 
     deleteCapsule,
-    removeSongFromCapsule,
     addSongToCapsule,
     addPhotoToCapsule,
     removePhotoFromCapsule,
     setPublish,
     setQuote,
     setSnapshotKey,
-    replacePhoto
+    replacePhoto,
+    replaceSongFromCapsule
 } = require('../controllers/capsule')
 
 const { 
@@ -78,7 +78,7 @@ router
     .post('/create-capsule/:id', createCapsule)
     .get('/get-capsule/:id', getCapsule)
     .delete('/delete-capsule/:id', deleteCapsule)
-    .delete('/remove-song/:capsuleId', removeSongFromCapsule)
+    .delete('/replace-song/:capsuleId', replaceSongFromCapsule)
     .post('/add-song/:capsuleId', addSongToCapsule)
     .post('/add-photo/:capsuleId', addPhotoToCapsule)
     .post('/replace-photo/:capsuleId', replacePhoto)

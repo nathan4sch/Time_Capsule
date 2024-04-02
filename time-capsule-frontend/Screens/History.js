@@ -12,10 +12,11 @@ import ViewShot from "react-native-view-shot";
 
 
 const History = ({ navigation }) => {
-    const { curUser, getCapsuleUrl, BASE_S3_URL, getCapsule, replacePhoto, setSnapshotKey } = useGlobalContext();
+    const { curUser, getCapsuleUrl, BASE_S3_URL, getCapsule, replacePhoto, setSnapshotKey, replaceSong } = useGlobalContext();
     const [capsulesArray, setCapsules] = useState([]);
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [spotifyVisible, setSpotifyVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedCapsule, setSelectedCapsule] = useState();
     const [imageLoading, setImageLoading] = useState(true);
@@ -39,7 +40,7 @@ const History = ({ navigation }) => {
 
     // handle image presses for enlarging the capsule
     const handleImagePress = async (imageUrl, index) => {
-        console.log("Selected image index: ", index); // Example usage of index
+        console.log("Selected image index: ", index);
         capsuleId = curUser.capsules[index]
         capsule = await getCapsule(capsuleId)
         setEditOverlayVisible(false)
@@ -48,13 +49,14 @@ const History = ({ navigation }) => {
         setAddedImages(Array(6).fill(null))
         setImageLoading(true);
         setModalVisible(true);
+        setSpotifyVisible(false)
     };
 
     const handleEditPress = () => {
         setEditOverlayVisible(!isEditOverlayVisible);
     };
 
-    const handleEditSpotify = () => {
+    const handleEditSpotify = async () => {
         Alert.prompt(
             "Enter Song Name",
             null,
@@ -81,11 +83,12 @@ const History = ({ navigation }) => {
                                         text: "OK",
                                         onPress: (alertArtist) => {
                                             if (alertArtist.trim() !== '') {
-                                                // Both songName and artist are provided
                                                 setSongName(alertSongName)
                                                 setArtist(alertArtist)
+                                                newSongName = alertSongName + " by " + alertArtist
+                                                //replaceSong(selectedCapsule._id, newSongName)
+                                                setSpotifyVisible(true);
                                             } else {
-                                                // Artist name is empty
                                                 Alert.alert("Error", "Please enter an artist name.");
                                             }
                                         }
@@ -96,7 +99,6 @@ const History = ({ navigation }) => {
                                 "default"
                             );
                         } else {
-                            // Song name is empty
                             Alert.alert("Error", "Please enter a song name.");
                         }
                     }
@@ -106,14 +108,14 @@ const History = ({ navigation }) => {
             "",
             "default"
         );
-
     };
 
 
     const handleSavePress = async () => {
-        console.log("save")
+        
         setEditOverlayVisible(false)
-        const uri = await viewShotRef.current.capture(); // Capture the layout as an image
+        const uri = await viewShotRef.current.capture();
+        Alert.alert("Success", "Changes Saved");
 
         const formData = new FormData();
         formData.append("image", {
@@ -255,7 +257,7 @@ const History = ({ navigation }) => {
                                     </View>
                                     {isEditOverlayVisible && (
                                         <View style={styles.editOverlay}>
-                                            <TouchableOpacity style={styles.editSpotifyButton} onPress={() => { handleEditSpotify() }}><Text>spotify</Text></TouchableOpacity>
+                                            <TouchableOpacity style={styles.editSpotifyButton} onPress={() => { handleEditSpotify() }}></TouchableOpacity>
                                             <View style={styles.editButtonContainer}>
                                                 {editButtons.map((button, index) => (
                                                     <TouchableOpacity
@@ -267,6 +269,12 @@ const History = ({ navigation }) => {
                                                     </TouchableOpacity>
                                                 ))}
                                             </View>
+                                        </View>
+                                    )}
+                                    {spotifyVisible && (
+                                        <View style={styles.spotifyTextContainer}>
+                                            <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
+                                            <Text style={styles.spotifyText}>Top Song: {songName} by {artist}</Text>
                                         </View>
                                     )}
                                     {modalVisible && (
@@ -434,13 +442,34 @@ const styles = StyleSheet.create({
     editSpotifyButton: {
         width: '100%',
         height: 80,
-        borderWidth: 4,
-        borderColor: "red",
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         top: 30
     },
     transparentImage: {
         width: '100%',
         height: '100%',
         opacity: 0.5
+    },
+    spotifyTextContainer: {
+        flexDirection: 'row',
+        backgroundColor: 'black',
+        //borderWidth: 2,
+        //borderColor: "red",
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 70,
+        width: '86%',
+        height: '18%',
+        alignSelf: 'center'
+    },
+    spotifyText: {
+        fontSize: 18,
+        color: '#fff',
+    },
+    spotifyIcon: {
+        width: 20,
+        height: 20,
+        marginRight: 5,
     },
 });
