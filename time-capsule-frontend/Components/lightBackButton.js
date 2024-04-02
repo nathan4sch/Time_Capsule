@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
       left: 10,
       width: 45,
       height: 45,
+      zIndex: 5,
     },
     arrowIconContainer: {
       position: 'absolute',

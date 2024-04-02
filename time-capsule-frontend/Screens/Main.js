@@ -32,7 +32,9 @@ const Main = ({ navigation }) => {
             setLoading(true);
             const month = new Date();
             month.setDate(1);
+
             month.setHours(0, 0, 0, 0);
+
             const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
             console.log(media.assets)

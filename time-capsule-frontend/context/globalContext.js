@@ -427,6 +427,30 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
+    const replacePhoto = async (capsuleId, photoKey, photoUrl, index) => {
+        const response = await axios.post(`${BASE_URL}replace-photo/${capsuleId}`, {
+            photoKey,
+            photoUrl,
+            index,
+        })
+            .catch((err) => {
+                console.log(err)
+                console.log(err.response.data.message)
+                setError(err.response.data.message)
+            })
+    }
+
+    const replaceSong = async(capsuleId, songName) => {
+        const response = await axios.post(`${BASE_URL}replace-song/${capsuleId}`, {
+            songName
+        })
+            .catch((err) => {
+                console.log(err)
+                console.log(err.response.data.message)
+                setError(err.response.data.message)
+            })
+    }
+    
     const addMoment = async (id, description) => {
         try {
             const response = await axios.post(`${BASE_URL}add-moment/${id}`, {
@@ -500,6 +524,8 @@ export const GlobalProvider = ({ children }) => {
             postPhoto,
             setSnapshotKey,
             setPublish,
+            replacePhoto,
+            replaceSong,
             addMoment,
             getMomentCount,
             getAllMoments

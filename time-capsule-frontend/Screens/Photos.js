@@ -147,9 +147,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   spacer: {
-    width: 75,
+    width: 75, 
     height: 50, 
-    opacity: 0,
+    opacity: 0, 
   },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   topbarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Ensures the logo is pushed to the far right
+    justifyContent: 'space-between',
     width: '100%',
     position: 'relative',
     marginBottom: 10,

@@ -68,7 +68,7 @@ exports.deleteCapsule = async (req, res) => {
         })
 }
 
-exports.removeSongFromCapsule = async (req, res) => {
+exports.replaceSongFromCapsule = async (req, res) => {
     const { capsuleId } = req.params;
     const { songName } = req.body;
 
@@ -79,8 +79,8 @@ exports.removeSongFromCapsule = async (req, res) => {
             return res.status(404).json({ message: "Capsule not found" });
         }
 
-        const updatedSongs = capsule.spotifySongs.filter((song) => song !== songName);
-        capsule.spotifySongs = updatedSongs;
+        //const updatedSongs = capsule.spotifySongs.filter((song) => song !== songName);
+        capsule.spotifySongs[0] = songName;
 
         await capsule.save();
 
@@ -109,6 +109,28 @@ exports.addSongToCapsule = async (req, res) => {
         res.status(200).json({ message: "Song added to capsule" });
     } catch (error) {
         console.error("Error adding song from capsule:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+exports.replacePhoto = async(req, res) => {
+    const { capsuleId } = req.params;
+    const { photoKey, photoUrl, index } = req.body;
+
+    try {
+        const capsule = await CapsuleSchema.findOne({ _id: capsuleId });
+
+        if (!capsule) {
+            return res.status(404).json({ message: "Capsule not found" });
+        }
+
+        capsule.usedPhotos[index] = { photoKey, photoUrl };
+
+        await capsule.save();
+
+        res.status(200).json({ message: "Photo replaced" });
+    } catch (error) {
+        console.log("Error replacing photo to capsule:", error);
         res.status(500).json({ message: "Server Error" });
     }
 };
