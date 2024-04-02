@@ -9,13 +9,15 @@ import Loading from "../Components/Loading";
 import { useIsFocused } from '@react-navigation/native';
 
 const Main = ({ navigation }) => {
-    const { curUser, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl, setPublish } = useGlobalContext();
+    const { curUser, addMoment, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl, setPublish } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
     const [loading, setLoading] = useState(false);
     const [reload, setReload] = useState(false);
     const [publishState, setPublishState] = useState(false);
     const [intervalId, setIntervalId] = useState(null);
+    const [moment, setMoment] = useState('');
+    const [margin, setMargin] = useState(15);
 
     let count = 0;
 
@@ -29,8 +31,10 @@ const Main = ({ navigation }) => {
             setLoading(true);
             const month = new Date();
             month.setDate(1);
+            month.setHours(0, 0, 0, 0);
             const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
+            console.log(media.assets)
             const assetInfoResults = await Promise.all(assetInfoPromises);
             const uris = assetInfoResults.map(item => item.localUri);
             capsuleKeyChange.current = true;
@@ -169,6 +173,15 @@ const Main = ({ navigation }) => {
         setPublishState(true)
     };
 
+    const submitMoment = () => {
+        addMoment(curUser._id, moment)
+        setMoment('')
+    }
+
+    const handleTextChange = (text) => {
+        setMoment(text); 
+      };
+
     if (loading) {
         return (
             <Loading />
@@ -182,6 +195,19 @@ const Main = ({ navigation }) => {
             onPress={() => Keyboard.dismiss()}
         >
             <BlackBackground>
+            <View style={styles.topButtonsContainer}>
+                <TouchableOpacity style={[styles.button, styles.timerButton]} onPress={() => changeToTempTimer()}>
+                    <Text style={styles.buttonText}>Set Timer</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.button, styles.generateCapsuleButton]} onPress={() => getPhotosFromMonth()}>
+                    <Text style={styles.buttonText}>Capsule</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.button, styles.momentButton]} onPress={() => 1}>
+                    <Text style={styles.buttonText}>Moment</Text>
+                </TouchableOpacity>
+            </View>
                 <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
                     <Image style={styles.profileIcon}
                         source={{
@@ -190,9 +216,9 @@ const Main = ({ navigation }) => {
                         cachePolicy='memory-disk'
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
+                {/* <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
                     <Text style={styles.timerbuttonText}>SetTimer</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <View style={styles.tempTimeContainer}>
                     <Text style={styles.timerText}>{timer}</Text>
@@ -221,13 +247,25 @@ const Main = ({ navigation }) => {
                         </TouchableOpacity>
                     )}
 
-                    <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
+                    {/* <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
                         <Text style={styles.overlayText}>Test: Generate Capsule</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
-                    <TextInput style={styles.momentButton}
-                    placeholder="Enter Moment"
-                    returnKeyType="done" />
+                    <View style={styles.inputContainer}>
+                        <TextInput 
+                            style={styles.momentEnter}
+                            placeholder="Enter Moment"
+                            returnKeyType="done" 
+                            onSubmitEditing={submitMoment}
+                            onChangeText={handleTextChange}
+                            onFocus={() => setMargin(-183)}
+                            onBlur={() => setMargin(15)}
+                            value={moment}
+                        />
+                        <View style={styles.numberSquare}>
+                            <Text style={styles.number}>2</Text>
+                        </View>
+                    </View>
                 </View>
                 
                 
@@ -348,13 +386,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
     },  
-    timerbutton: {
-        backgroundColor: 'green',
-        padding: 10,
-        borderRadius: 5,
-        top: 50,
-        right: 20
-      },
+    timerButton: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 245, 186, 0.5)',
+        marginRight: 5,
+        borderRadius: 10,
+    },
       timerbuttonText: {
         color: 'white',
         fontWeight: 'bold',
@@ -376,12 +413,56 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 50, 90, 0.67)',
         borderRadius: 10,
     },
+    generateCapsuleButton: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 245, 186, 0.5)',
+        marginRight: 5,
+        borderRadius: 10,
+    },
     momentButton: {
-        marginTop: 15,
-        width: '100%',
-        height: 31,
+        flex: 1,
+        backgroundColor: 'rgba(0, 245, 186, 0.5)',
+        borderRadius: 10,
+        textAlign: 'left',
+        paddingLeft: 15,
+    },
+    topButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 40,
+        paddingHorizontal: 10,
+    },button: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 10,
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },momentEnter: {
+        width: '80%',
+        height: 40,
         backgroundColor: 'rgba(255, 255, 255, 0.67)',
         borderRadius: 10,
-        textAlign: 'center',
+        textAlign: 'left',
+        paddingLeft: 15,
+    },inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
+    numberSquare: {
+        width: 40,
+        height: 40,
+        backgroundColor: 'rgba(255, 255, 255, 0.67)',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 10,
+    },
+    number: {
+        color: 'black',
+        fontWeight: 'bold',
+        fontSize: 20
+    }
+    
 });

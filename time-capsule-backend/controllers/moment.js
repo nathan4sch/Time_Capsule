@@ -4,7 +4,7 @@ const UserSchema = require("../models/UserModel");
 exports.addMoment = async (req, res) => {
     const { description } = req.body;
     const { id } = req.params;
-
+    console.log(description)
     try {
         if (!description) {
             return res.status(400).json({ message: 'Description Required' });
