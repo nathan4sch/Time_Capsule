@@ -11,6 +11,7 @@ import History from './Screens/History';
 import Spotify from './Screens/Spotify';
 import Instagram from './Screens/Instagram';
 import Photos from './Screens/Photos';
+import Moment from './Screens/Moment';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react'
 import { GlobalProvider, useGlobalContext } from './context/globalContext';
@@ -35,6 +36,7 @@ export default function App() {
           <Stack.Screen name="StoryBoard" component={StoryBoard} options={{ headerLeft: null, gestureEnabled: true }} />
           <Stack.Screen name="History" component={History} options={{ headerLeft: null, gestureEnabled: true }} />
           <Stack.Screen name="Photos" component={Photos} options={{ headerLeft: null, gestureEnabled: true }} />
+          <Stack.Screen name="Moment" component={Moment} options={{ headerLeft: null, gestureEnabled: true }} />
         </Stack.Navigator>
       </NavigationContainer>
     </GlobalProvider>

@@ -8,8 +8,8 @@ import axios from 'axios'
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
 
-const BASE_URL = "http://100.67.14.19:3000/api/v1/"
-const BASE_S3_URL = "http://100.67.14.19:3000/"
+const BASE_URL = "http://10.186.91.192:3000/api/v1/"
+const BASE_S3_URL = "http://10.186.91.192:3000/"
 
 
 //https://time-capsule-server.onrender.com/api/v1/
@@ -427,6 +427,38 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
+    const addMoment = async (id, description) => {
+        try {
+            const response = await axios.post(`${BASE_URL}add-moment/${id}`, {
+                description: description
+            });
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }  
+    }
+
+    const getMomentCount = async (id) => {
+        try {
+          const response = await axios.get(`${BASE_URL}get-moment-count/${id}`);
+          return response.data;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+
+    const getAllMoments = async (id) => {
+        const momentArr = []
+        for (let i = 0; i < curUser.moments.length; i++) {
+            const moment = await axios.get(`${BASE_URL}get-moment/${curUser.moments[i]}`);
+            momentArr.push([moment.data.description, moment.data.timestamp])
+        }
+        return momentArr;
+    }
+
 
     // Provide the context value to child components
     return (
@@ -467,7 +499,10 @@ export const GlobalProvider = ({ children }) => {
             getCapsuleUrl,
             postPhoto,
             setSnapshotKey,
-            setPublish
+            setPublish,
+            addMoment,
+            getMomentCount,
+            getAllMoments
         }}>
             {children}
         </GlobalContext.Provider>

@@ -213,39 +213,41 @@ exports.selectPhotos = async (req, res) => {
     const imageType = (await import('image-type')).default;
     const { id } = req.params;
     console.log(id)
-    console.log("Before conversion")
-    const conversionPromises = req.files.map(async (image) => {
-        let processedImage = { ...image }; // Create a new object for the processed image
-        if ((await imageType(image.buffer)).mime === 'image/heic') {
-            processedImage.buffer = await convert({
-                buffer: image.buffer, // the HEIC file buffer
-                format: 'JPEG', // output format
-            });
-            processedImage.mimetype = 'image/jpeg';
-        }
-        return processedImage;
-    });
-    const convertedImages = await Promise.all(conversionPromises);
-    console.log("after conversion")
     let image_data = []
-    for (let image of convertedImages) {
-        console.log("before GV")
-        const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
-        console.log("done with google vision")
-        if ((joy == 0 && landscape == 0) || dominantColors == null) {
-            continue;
-        }
-        let add = true;
-        for (const [i, j, l, dC] of image_data) {
-            if (j == joy && l == landscape) {
-                if (await similarPicture(dC, dominantColors)) {
-                    add = false;
-                    break;
+    console.log("Before conversion")
+    if (req.files) {
+        const conversionPromises = req.files.map(async (image) => {
+            let processedImage = { ...image }; // Create a new object for the processed image
+            if ((await imageType(image.buffer)).mime === 'image/heic') {
+                processedImage.buffer = await convert({
+                    buffer: image.buffer, // the HEIC file buffer
+                    format: 'JPEG', // output format
+                });
+                processedImage.mimetype = 'image/jpeg';
+            }
+            return processedImage;
+        });
+        const convertedImages = await Promise.all(conversionPromises);
+        console.log("after conversion")
+        for (let image of convertedImages) {
+            console.log("before GV")
+            const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
+            console.log("done with google vision")
+            if ((joy == 0 && landscape == 0) || dominantColors == null) {
+                continue;
+            }
+            let add = true;
+            for (const [i, j, l, dC] of image_data) {
+                if (j == joy && l == landscape) {
+                    if (await similarPicture(dC, dominantColors)) {
+                        add = false;
+                        break;
+                    }
                 }
             }
+            if (add)
+                image_data.push([image, joy, landscape, dominantColors])
         }
-        if (add)
-            image_data.push([image, joy, landscape, dominantColors])
     }
     let new_image_data = []
     if (image_data.length > 6) {
