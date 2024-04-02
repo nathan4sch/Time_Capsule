@@ -441,6 +441,15 @@ export const GlobalProvider = ({ children }) => {
         }  
     }
 
+    const getMomentCount = async (id) => {
+        try {
+          const response = await axios.get(`${BASE_URL}get-moment-count/${id}`);
+          return response.data;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+
 
     // Provide the context value to child components
     return (
@@ -482,7 +491,8 @@ export const GlobalProvider = ({ children }) => {
             postPhoto,
             setSnapshotKey,
             setPublish,
-            addMoment
+            addMoment,
+            getMomentCount
         }}>
             {children}
         </GlobalContext.Provider>

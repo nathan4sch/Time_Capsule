@@ -9,7 +9,7 @@ import Loading from "../Components/Loading";
 import { useIsFocused } from '@react-navigation/native';
 
 const Main = ({ navigation }) => {
-    const { curUser, addMoment, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl, setPublish } = useGlobalContext();
+    const { curUser, getMomentCount, addMoment, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl, setPublish } = useGlobalContext();
     const [timer, setTimer] = useState(calculateTimeUntilNextMonth());
     const [shownCapsule, setShownCapsule] = useState("");
     const [loading, setLoading] = useState(false);
@@ -17,7 +17,8 @@ const Main = ({ navigation }) => {
     const [publishState, setPublishState] = useState(false);
     const [intervalId, setIntervalId] = useState(null);
     const [moment, setMoment] = useState('');
-    const [margin, setMargin] = useState(15);
+    const [margin, setMargin] = useState(0);
+    const [momentCount, setMomentCount] = useState(0);
 
     let count = 0;
 
@@ -99,7 +100,11 @@ const Main = ({ navigation }) => {
                 setPublishState(capsule.published)
             }
         };
+        const getUserMomentCount = async () => {
+            setMomentCount(await getMomentCount(curUser._id))
+        }
         getCapsuleFunc();
+        getUserMomentCount();
     }, [reload]);
 
     useEffect(() => {
@@ -175,6 +180,7 @@ const Main = ({ navigation }) => {
 
     const submitMoment = () => {
         addMoment(curUser._id, moment)
+        setMomentCount(momentCount+1)
         setMoment('')
     }
 
@@ -253,17 +259,17 @@ const Main = ({ navigation }) => {
 
                     <View style={styles.inputContainer}>
                         <TextInput 
-                            style={styles.momentEnter}
+                            style={[styles.momentEnter, { marginTop: margin }]}
                             placeholder="Enter Moment"
                             returnKeyType="done" 
                             onSubmitEditing={submitMoment}
                             onChangeText={handleTextChange}
-                            onFocus={() => setMargin(-183)}
-                            onBlur={() => setMargin(15)}
+                            onFocus={() => setMargin(-330)}
+                            onBlur={() => setMargin(0)}
                             value={moment}
                         />
-                        <View style={styles.numberSquare}>
-                            <Text style={styles.number}>2</Text>
+                        <View style={[styles.numberSquare, { marginTop: margin }]}>
+                            <Text style={styles.number}>{momentCount}</Text>
                         </View>
                     </View>
                 </View>
