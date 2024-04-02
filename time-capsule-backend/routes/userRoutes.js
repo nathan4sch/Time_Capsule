@@ -33,7 +33,8 @@ const {
     removePhotoFromCapsule,
     setPublish,
     setQuote,
-    setSnapshotKey
+    setSnapshotKey,
+    replacePhoto
 } = require('../controllers/capsule')
 
 const { 
@@ -80,6 +81,7 @@ router
     .delete('/remove-song/:capsuleId', removeSongFromCapsule)
     .post('/add-song/:capsuleId', addSongToCapsule)
     .post('/add-photo/:capsuleId', addPhotoToCapsule)
+    .post('/replace-photo/:capsuleId', replacePhoto)
     .delete('/remove-photo/:capsuleId', removePhotoFromCapsule)
     .post('/set-publish/:capsuleId', setPublish)
     .post('/set-quote/:capsuleId', setQuote)

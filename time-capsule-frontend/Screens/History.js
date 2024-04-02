@@ -4,18 +4,22 @@ import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
 import BackButton from "../Components/lightBackButton";
+import ImageGrid from "../Components/ImageGrid"
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import { captureScreen } from "react-native-view-shot";
 
 
 const History = ({ navigation }) => {
-    const { curUser, getCapsuleUrl, BASE_S3_URL } = useGlobalContext();
+    const { curUser, getCapsuleUrl, BASE_S3_URL, getCapsule, replacePhoto } = useGlobalContext();
     const [capsulesArray, setCapsules] = useState([]);
 
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedCapsule, setSelectedCapsule] = useState();
     const [imageLoading, setImageLoading] = useState(true);
     const [isEditOverlayVisible, setEditOverlayVisible] = useState(false);
+    const [addedImages, setAddedImages] = useState(Array(6).fill(null));
 
     const editButtons = [
         { id: 'btn1', label: 'Btn 1' },
@@ -28,8 +32,12 @@ const History = ({ navigation }) => {
 
 
     // handle image presses for enlarging the capsule
-    const handleImagePress = (imageUrl, index) => {
+    const handleImagePress = async (imageUrl, index) => {
         console.log("Selected image index: ", index); // Example usage of index
+        capsuleId = curUser.capsules[index]
+        capsule = await getCapsule(capsuleId)
+        setEditOverlayVisible(false)
+        setSelectedCapsule(capsule);
         setSelectedImage(imageUrl);
         setImageLoading(true);
         setModalVisible(true);
@@ -63,14 +71,29 @@ const History = ({ navigation }) => {
             });
 
             try {
-                //if (curUser.profileSettings.profilePictureKey != "default") {
-                //    await axios.delete(`${BASE_S3_URL}api/del/${curUser.profileSettings.profilePictureKey}`);
-                //}
+                //delete old photo from s3
+                if (selectedCapsule.usedPhotos[index].photoKey != "default1.png") {
+                    await axios.delete(`${BASE_S3_URL}api/del/${selectedCapsule.usedPhotos[index].photoKey}`);
+                }
+                //add new photo to s3
                 const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                //get new photo name and url
+                imageName = response.data.imageName
+                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
+                const url = urlRes.data.url
+                //add new photo to mongo and remove old
+                await replacePhoto(selectedCapsule._id, imageName, url, index)
+                newImages = [...addedImages]
+                newImages[index] = url
+                setAddedImages(newImages)
+                //captureView();
+                //setSelectedImage()
+
+
                 //console.log('Upload successful, Image Name:', response.data.imageName);
                 /*imageName = response.data.imageName
                 await setProfilePictureKey(imageName)
@@ -142,7 +165,6 @@ const History = ({ navigation }) => {
                                 </View>
                                 {isEditOverlayVisible && (
                                     <View style={styles.editOverlay}>
-                                        {/* Row 1 */}
                                         <TouchableOpacity style={styles.editSpotifyButton}><Text>spotify</Text></TouchableOpacity>
                                         <View style={styles.editButtonContainer}>
                                             {editButtons.map((button, index) => (
@@ -325,5 +347,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         opacity: 0.5
-    }
+    },
+    imageGridOverlay: {
+        position: 'absolute',
+        top: '10%', // Adjust based on your layout
+        left: 0,
+        right: 0,
+        height: '30%', // Adjust based on your layout
+        // Additional styling such as background color, padding, etc., if needed
+    },
 });

@@ -427,6 +427,19 @@ export const GlobalProvider = ({ children }) => {
             })
     }
 
+    const replacePhoto = async (capsuleId, photoKey, photoUrl, index) => {
+        const response = await axios.post(`${BASE_URL}replace-photo/${capsuleId}`, {
+            photoKey,
+            photoUrl,
+            index,
+        })
+            .catch((err) => {
+                console.log(err)
+                console.log(err.response.data.message)
+                setError(err.response.data.message)
+            })
+    }
+
 
     // Provide the context value to child components
     return (
@@ -467,7 +480,8 @@ export const GlobalProvider = ({ children }) => {
             getCapsuleUrl,
             postPhoto,
             setSnapshotKey,
-            setPublish
+            setPublish,
+            replacePhoto,
         }}>
             {children}
         </GlobalContext.Provider>
