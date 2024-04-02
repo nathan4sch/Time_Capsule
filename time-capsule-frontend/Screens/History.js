@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, Modal, TouchableOpacity, Image, FlatList, ActivityIndicator } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, View, Text, Modal, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
@@ -7,11 +7,13 @@ import BackButton from "../Components/lightBackButton";
 import ImageGrid from "../Components/ImageGrid"
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-import { captureScreen } from "react-native-view-shot";
+import ViewShot from "react-native-view-shot";
+import * as MediaLibrary from 'expo-media-library';
+
 
 
 const History = ({ navigation }) => {
-    const { curUser, getCapsuleUrl, BASE_S3_URL, getCapsule, replacePhoto } = useGlobalContext();
+    const { curUser, getCapsuleUrl, BASE_S3_URL, getCapsule, replacePhoto, setSnapshotKey } = useGlobalContext();
     const [capsulesArray, setCapsules] = useState([]);
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -20,6 +22,8 @@ const History = ({ navigation }) => {
     const [imageLoading, setImageLoading] = useState(true);
     const [isEditOverlayVisible, setEditOverlayVisible] = useState(false);
     const [addedImages, setAddedImages] = useState(Array(6).fill(null));
+
+    const viewShotRef = useRef(null);
 
     const editButtons = [
         { id: 'btn1', label: 'Btn 1' },
@@ -39,6 +43,7 @@ const History = ({ navigation }) => {
         setEditOverlayVisible(false)
         setSelectedCapsule(capsule);
         setSelectedImage(imageUrl);
+        setAddedImages(Array(6).fill(null))
         setImageLoading(true);
         setModalVisible(true);
     };
@@ -47,8 +52,50 @@ const History = ({ navigation }) => {
         setEditOverlayVisible(!isEditOverlayVisible);
     };
 
-    const handleSavePress = () => {
+    const handleSavePress = async () => {
+        console.log("save")
+        setEditOverlayVisible(false)
+        const uri = await viewShotRef.current.capture(); // Capture the layout as an image
 
+        const formData = new FormData();
+            formData.append("image", {
+                uri: uri,
+                type: 'image/jpeg',
+                name: 'photo.jpg',
+            });
+
+            try {
+                //delete old photo from s3
+                await axios.delete(`${BASE_S3_URL}api/del/${selectedCapsule.snapshotKey}`);
+                //add new photo to s3
+                const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                //get new photo name and url
+                imageName = response.data.imageName
+
+                //replace mongo data
+                selectedCapsuleId = selectedCapsule._id
+                await setSnapshotKey(selectedCapsuleId, imageName)
+
+                //get url
+                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
+                const url = urlRes.data.url
+                //update selectedCaspsule
+                curCapsule = selectedCapsule
+                curCapsule.snapshotKey = imageName
+                curCapsule.snapshotUrl = url
+                setSelectedCapsule(curCapsule)
+
+                setSelectedImage(url)
+                setAddedImages(Array(6).fill(null))
+
+                getCapsulesFunc();
+            } catch (error) {
+                console.error('Upload error', error);
+            }
     };
 
     const handleEditImagePress = async (index) => {
@@ -90,41 +137,24 @@ const History = ({ navigation }) => {
                 newImages = [...addedImages]
                 newImages[index] = url
                 setAddedImages(newImages)
-                //captureView();
-                //setSelectedImage()
-
-
-                //console.log('Upload successful, Image Name:', response.data.imageName);
-                /*imageName = response.data.imageName
-                await setProfilePictureKey(imageName)
-                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
-                const url = urlRes.data.url
-                //console.log('URL: ', url)
-                let urlResponse = await setProfilePictureUrl(url);
-                curUser.profileSettings.profilePictureUrl = url
-                setCurUser(curUser)
-                setReload(!reload)*/
-                //console.log(urlResponse)
-
-                //setProfileImage(uri); // Update the state with the new image URI
             } catch (error) {
                 console.error('Upload error', error);
             }
         }
     }
 
+    const getCapsulesFunc = async () => {
+        const capsulesArray = await Promise.all(
+            curUser.capsules.map(async (capsuleId) => {
+                const capsuleUrl = await getCapsuleUrl(capsuleId);
+                return capsuleUrl;
+            })
+        );
+        setCapsules(capsulesArray);
+    };
+
     useEffect(() => {
-        const getCapsulesFunc = async () => {
-            const capsulesArray = await Promise.all(
-                curUser.capsules.map(async (capsuleId) => {
-                    const capsuleUrl = await getCapsuleUrl(capsuleId);
-                    return capsuleUrl;
-                })
-            );
-            setCapsules(capsulesArray);
-        };
         getCapsulesFunc();
-        //console.log("capsule array", capsulesArray)
     }, [curUser.capsules]);
 
     return (
@@ -153,32 +183,38 @@ const History = ({ navigation }) => {
                             onPressOut={() => setModalVisible(false)}
                         >
                             <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
-                                <View style={styles.imageContainer}>
-                                    {imageLoading && (
-                                        <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                    )}
-                                    <Image
-                                        style={styles.enlargedImage}
-                                        source={{ uri: selectedImage }}
-                                        onLoad={() => setImageLoading(false)}
-                                    />
-                                </View>
-                                {isEditOverlayVisible && (
-                                    <View style={styles.editOverlay}>
-                                        <TouchableOpacity style={styles.editSpotifyButton}><Text>spotify</Text></TouchableOpacity>
-                                        <View style={styles.editButtonContainer}>
-                                            {editButtons.map((button, index) => (
-                                                <TouchableOpacity
-                                                    key={button.id}
-                                                    style={styles.editButtonWrapper}
-                                                    onPress={() => handleEditImagePress(index)}
-                                                >
-                                                    <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
-                                                </TouchableOpacity>
-                                            ))}
-                                        </View>
+                                <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
+                                    <View style={styles.imageContainer}>
+                                        {imageLoading && (
+                                            <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                        )}
+                                        <Image
+                                            style={styles.enlargedImage}
+                                            source={{ uri: selectedImage }}
+                                            onLoad={() => setImageLoading(false)}
+                                        />
                                     </View>
-                                )}
+                                    {isEditOverlayVisible && (
+                                        <View style={styles.editOverlay}>
+                                            <TouchableOpacity style={styles.editSpotifyButton}><Text>spotify</Text></TouchableOpacity>
+                                            <View style={styles.editButtonContainer}>
+                                                {editButtons.map((button, index) => (
+                                                    <TouchableOpacity
+                                                        key={button.id}
+                                                        style={styles.editButtonWrapper}
+                                                        onPress={() => handleEditImagePress(index)}
+                                                    >
+                                                        <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </View>
+                                        </View>
+                                    )}
+                                    {modalVisible && (
+                                        <ImageGrid images={addedImages} />
+                                    )}
+                                </ViewShot>
+
                             </TouchableOpacity>
                             {/* Buttons Container */}
                             {modalVisible && (
@@ -306,6 +342,7 @@ const styles = StyleSheet.create({
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        zIndex: 2,
     },
     buttonRow: {
         flexDirection: 'row',
@@ -321,11 +358,13 @@ const styles = StyleSheet.create({
         backgroundColor: "white"
     },
     editButtonContainer: {
+        position: 'relative',
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         top: 38,
         marginHorizontal: 0,
+        zIndex: 1
     },
     editButtonWrapper: {
         borderWidth: 2,
@@ -347,13 +386,5 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         opacity: 0.5
-    },
-    imageGridOverlay: {
-        position: 'absolute',
-        top: '10%', // Adjust based on your layout
-        left: 0,
-        right: 0,
-        height: '30%', // Adjust based on your layout
-        // Additional styling such as background color, padding, etc., if needed
     },
 });

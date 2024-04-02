@@ -147,10 +147,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   spacer: {
-    // This view acts as a balance for the year text and ensures the month text is centered
-    width: 75, // Match the width of the appIcon to balance the layout
-    height: 50, // Match the height of the appIcon
-    opacity: 0, // Make the spacer invisible
+    width: 75, 
+    height: 50, 
+    opacity: 0, 
   },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
   topbarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Ensures the logo is pushed to the far right
+    justifyContent: 'space-between',
     width: '100%',
     position: 'relative',
     marginBottom: 10,
