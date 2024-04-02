@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Text, Modal, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert } from "react-native";
+import { StyleSheet, View, Text, Modal, TouchableOpacity, Image, FlatList, ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
@@ -8,7 +8,6 @@ import ImageGrid from "../Components/ImageGrid"
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import ViewShot from "react-native-view-shot";
-import * as MediaLibrary from 'expo-media-library';
 
 
 
@@ -22,6 +21,9 @@ const History = ({ navigation }) => {
     const [imageLoading, setImageLoading] = useState(true);
     const [isEditOverlayVisible, setEditOverlayVisible] = useState(false);
     const [addedImages, setAddedImages] = useState(Array(6).fill(null));
+
+    const [songName, setSongName] = useState('');
+    const [artist, setArtist] = useState('');
 
     const viewShotRef = useRef(null);
 
@@ -52,50 +54,106 @@ const History = ({ navigation }) => {
         setEditOverlayVisible(!isEditOverlayVisible);
     };
 
+    const handleEditSpotify = () => {
+        Alert.prompt(
+            "Enter Song Name",
+            null,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: (alertSongName) => {
+                        if (alertSongName.trim() !== '') {
+                            Alert.prompt(
+                                "Enter Artist Name",
+                                null,
+                                [
+                                    {
+                                        text: "Cancel",
+                                        onPress: () => console.log("Cancel Pressed"),
+                                        style: "cancel"
+                                    },
+                                    {
+                                        text: "OK",
+                                        onPress: (alertArtist) => {
+                                            if (alertArtist.trim() !== '') {
+                                                // Both songName and artist are provided
+                                                setSongName(alertSongName)
+                                                setArtist(alertArtist)
+                                            } else {
+                                                // Artist name is empty
+                                                Alert.alert("Error", "Please enter an artist name.");
+                                            }
+                                        }
+                                    }
+                                ],
+                                "plain-text",
+                                "",
+                                "default"
+                            );
+                        } else {
+                            // Song name is empty
+                            Alert.alert("Error", "Please enter a song name.");
+                        }
+                    }
+                }
+            ],
+            "plain-text",
+            "",
+            "default"
+        );
+
+    };
+
+
     const handleSavePress = async () => {
         console.log("save")
         setEditOverlayVisible(false)
         const uri = await viewShotRef.current.capture(); // Capture the layout as an image
 
         const formData = new FormData();
-            formData.append("image", {
-                uri: uri,
-                type: 'image/jpeg',
-                name: 'photo.jpg',
+        formData.append("image", {
+            uri: uri,
+            type: 'image/jpeg',
+            name: 'photo.jpg',
+        });
+
+        try {
+            //delete old photo from s3
+            await axios.delete(`${BASE_S3_URL}api/del/${selectedCapsule.snapshotKey}`);
+            //add new photo to s3
+            const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
+            //get new photo name and url
+            imageName = response.data.imageName
 
-            try {
-                //delete old photo from s3
-                await axios.delete(`${BASE_S3_URL}api/del/${selectedCapsule.snapshotKey}`);
-                //add new photo to s3
-                const response = await axios.post(`${BASE_S3_URL}api/posts`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                //get new photo name and url
-                imageName = response.data.imageName
+            //replace mongo data
+            selectedCapsuleId = selectedCapsule._id
+            await setSnapshotKey(selectedCapsuleId, imageName)
 
-                //replace mongo data
-                selectedCapsuleId = selectedCapsule._id
-                await setSnapshotKey(selectedCapsuleId, imageName)
+            //get url
+            const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
+            const url = urlRes.data.url
+            //update selectedCaspsule
+            curCapsule = selectedCapsule
+            curCapsule.snapshotKey = imageName
+            curCapsule.snapshotUrl = url
+            setSelectedCapsule(curCapsule)
 
-                //get url
-                const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
-                const url = urlRes.data.url
-                //update selectedCaspsule
-                curCapsule = selectedCapsule
-                curCapsule.snapshotKey = imageName
-                curCapsule.snapshotUrl = url
-                setSelectedCapsule(curCapsule)
+            setSelectedImage(url)
+            setAddedImages(Array(6).fill(null))
 
-                setSelectedImage(url)
-                setAddedImages(Array(6).fill(null))
-
-                getCapsulesFunc();
-            } catch (error) {
-                console.error('Upload error', error);
-            }
+            getCapsulesFunc();
+        } catch (error) {
+            console.error('Upload error', error);
+        }
     };
 
     const handleEditImagePress = async (index) => {
@@ -133,6 +191,7 @@ const History = ({ navigation }) => {
                 const urlRes = await axios.get(`${BASE_S3_URL}api/get/${imageName}`);
                 const url = urlRes.data.url
                 //add new photo to mongo and remove old
+                //technically would replace if the user doesn't save, won't break anything
                 await replacePhoto(selectedCapsule._id, imageName, url, index)
                 newImages = [...addedImages]
                 newImages[index] = url
@@ -196,7 +255,7 @@ const History = ({ navigation }) => {
                                     </View>
                                     {isEditOverlayVisible && (
                                         <View style={styles.editOverlay}>
-                                            <TouchableOpacity style={styles.editSpotifyButton}><Text>spotify</Text></TouchableOpacity>
+                                            <TouchableOpacity style={styles.editSpotifyButton} onPress={() => { handleEditSpotify() }}><Text>spotify</Text></TouchableOpacity>
                                             <View style={styles.editButtonContainer}>
                                                 {editButtons.map((button, index) => (
                                                     <TouchableOpacity
@@ -223,7 +282,7 @@ const History = ({ navigation }) => {
                                         <Text>Edit</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
-                                        <Text>Save</Text>
+                                        <Text>Save Changes</Text>
                                     </TouchableOpacity>
                                 </View>
                             )}
@@ -367,9 +426,6 @@ const styles = StyleSheet.create({
         zIndex: 1
     },
     editButtonWrapper: {
-        borderWidth: 2,
-        borderTopWidth: 3,
-        borderColor: 'red',
         width: 115.2,
         height: 150,
         alignItems: 'center',

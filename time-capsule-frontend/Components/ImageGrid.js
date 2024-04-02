@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         //borderWidth: 2,
-        //borderColor: 'green', // Ensure the container is above other elements
+        //borderColor: 'green',
         zIndex: 0,
     },
     row: {
@@ -37,12 +37,13 @@ const styles = StyleSheet.create({
     },
     imageWrapper: {
         flex: 1, // Equal width for all cells
-        height: 100,
-        aspectRatio: 3 / 4,
-        padding: 4, // Adjust padding to control spacing
+        height: 152,
+        width: 80,
+        //aspectRatio: 3 / 4,
+        padding: 2,
         //borderWidth: 2,
-        //borderColor: 'blue',
-        top: '22%',
+        //borderColor: 'white',
+        top: '23%',
         //borderWidth: 2,
         //borderTopWidth: 3,
         //borderColor: '#fff',
