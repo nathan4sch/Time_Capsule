@@ -6,6 +6,7 @@ import HistoryBackground from "../Components/HistoryBackground";
 import BackButton from "../Components/lightBackButton";
 import ImageGrid from "../Components/ImageGrid"
 import * as ImagePicker from 'expo-image-picker';
+import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import ViewShot from "react-native-view-shot";
 
@@ -54,6 +55,16 @@ const History = ({ navigation }) => {
 
     const handleEditPress = () => {
         setEditOverlayVisible(!isEditOverlayVisible);
+    };
+    
+    const handleSharePress = async () => {
+        if (!selectedImage) return;
+        
+        try {
+            await Sharing.shareAsync(selectedImage);
+        } catch (error) {
+            console.error('Error sharing image:', error);
+        }
     };
 
     const handleEditSpotify = async () => {
@@ -167,6 +178,16 @@ const History = ({ navigation }) => {
             aspect: [4, 3],
             quality: 0,
         });
+
+        const handleSharePress = async () => {
+            if (!selectedImage) return;
+            
+            try {
+                await Sharing.shareAsync(selectedImage);
+            } catch (error) {
+                console.error('Error sharing image:', error);
+            }
+        };
 
         if (!result.canceled) {
             //from react client, to express server, to s3 bucket
@@ -289,6 +310,9 @@ const History = ({ navigation }) => {
                                     <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
                                         <Text>Edit</Text>
                                     </TouchableOpacity>
+                                    <TouchableOpacity style={styles.shareButton} onPress={() => { handleSharePress() }}>
+                                        <Text>Share Photo</Text>
+                                    </TouchableOpacity>
                                     <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
                                         <Text>Save Changes</Text>
                                     </TouchableOpacity>
@@ -387,18 +411,24 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        width: '100%',
+        width: '80%',
         paddingVertical: 10,
     },
     editButton: {
         backgroundColor: 'lightblue',
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    shareButton: {
+        backgroundColor: 'lightcyan',
+        paddingHorizontal: 10,
         paddingVertical: 10,
         borderRadius: 5,
     },
     saveButton: {
         backgroundColor: 'lightgreen',
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         paddingVertical: 10,
         borderRadius: 5,
     },
