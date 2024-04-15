@@ -6,9 +6,9 @@ import { Feather } from '@expo/vector-icons';
 
 const BottomTab = ({ navigation, state }) => {
   const tabOptions = [
-    { title: 'Screen 1', icon: 'clipboard', route: 'History' },
-    { title: 'Screen 2', icon: 'home', route: 'Main' },
-    { title: 'Screen 3', icon: 'aperture', route: 'StoryBoard' },
+    { title: 'History', icon: 'clipboard', route: 'History' },
+    { title: 'Home', icon: 'home', route: 'Main' },
+    { title: 'StoryBoard', icon: 'aperture', route: 'StoryBoard' },
   ];
 
   return (
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingBottom: 10,
+    paddingBottom: 15,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
   },

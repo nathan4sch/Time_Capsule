@@ -230,16 +230,16 @@ const Main = ({ navigation }) => {
                     onPress={() => Keyboard.dismiss()}
                 >
                     <BlackBackground>
-                        {/*<View style={styles.topButtonsContainer}>
-                    <TouchableOpacity style={[styles.button, styles.timerButton]} onPress={() => changeToTempTimer()}>
-                        <Text style={styles.buttonText}>Set Timer</Text>
-                    </TouchableOpacity>
+                        <View style={styles.topButtonsContainer}>
+                            <TouchableOpacity style={[styles.button, styles.timerButton]} onPress={() => changeToTempTimer()}>
+                                <Text style={styles.buttonText}>Set Timer</Text>
+                            </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.button, styles.generateCapsuleButton]} onPress={() => getPhotosFromMonth()}>
-                        <Text style={styles.buttonText}>Capsule</Text>
-                    </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, styles.generateCapsuleButton]} onPress={() => getPhotosFromMonth()}>
+                                <Text style={styles.buttonText}>Capsule</Text>
+                            </TouchableOpacity>
 
-    </View>*/}
+                        </View>
                         <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
                             <Image style={styles.profileIcon}
                                 source={{

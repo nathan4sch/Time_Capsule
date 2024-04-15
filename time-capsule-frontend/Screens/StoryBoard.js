@@ -111,7 +111,6 @@ const StoryBoard = ({ navigation }) => {
             }}>
             <View style={{ flex: 1 }}>
                 <HistoryBackground>
-                    <BackButton onPress={() => navigation.goBack()} />
                     {/* Add the rest of your components here */}
                     {capsuleList.length > 0 ? (
                         <>

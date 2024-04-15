@@ -238,7 +238,6 @@ const History = ({ navigation }) => {
             }}>
             <View style={{ flex: 1 }}>
                 <HistoryBackground>
-                    <BackButton onPress={() => navigation.goBack()} />
                     {capsulesArray.length > 0 ? (
                         <View style={{ flex: 1 }}>
                             <FlatList
