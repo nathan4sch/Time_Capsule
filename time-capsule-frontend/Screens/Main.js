@@ -47,7 +47,7 @@ const Main = ({ navigation }) => {
 
             month.setHours(0, 0, 0, 0);
 
-            const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const media = await MediaLibrary.getAssetsAsync({ first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
             console.log(media.assets)
             const assetInfoResults = await Promise.all(assetInfoPromises);
