@@ -8,7 +8,7 @@ import ImageGrid from "../Components/ImageGrid"
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import ViewShot from "react-native-view-shot";
-
+import BottomTab from "../Components/BottomTab";
 
 
 const History = ({ navigation }) => {
@@ -112,7 +112,7 @@ const History = ({ navigation }) => {
 
 
     const handleSavePress = async () => {
-        
+
         setEditOverlayVisible(false)
         const uri = await viewShotRef.current.capture();
         Alert.alert("Success", "Changes Saved");
@@ -302,6 +302,8 @@ const History = ({ navigation }) => {
                     <Text style={styles.overlayText}>No Past Capsules</Text>
                 </View>
             )}
+            <BottomTab navigation={navigation} state={{ index: 0 }} />
+
         </HistoryBackground>
     );
 };

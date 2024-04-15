@@ -5,6 +5,7 @@ import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import BackButton from "../Components/lightBackButton";
+import BottomTab from "../Components/BottomTab";
 
 
 const StoryBoard = ({ navigation }) => {
@@ -45,9 +46,9 @@ const StoryBoard = ({ navigation }) => {
             // Create a list with required information
             const friendInfoList = [];
             for (const friend of filteredFriends) {
-                
+
                 if (friend.capsules.length > 0) {
-                    const capsuleID = friend.capsules[friend.capsules.length-1];
+                    const capsuleID = friend.capsules[friend.capsules.length - 1];
                     const capsule = await getCapsuleUrl(capsuleID);
                     const capsuleObj = await getCapsule(capsuleID)
 
@@ -85,7 +86,7 @@ const StoryBoard = ({ navigation }) => {
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleImagePress(item.snapshot)}>
-                <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
+                    <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
                 </TouchableOpacity>
             </TouchableOpacity>
         );
@@ -97,43 +98,45 @@ const StoryBoard = ({ navigation }) => {
             {/* Add the rest of your components here */}
             {capsuleList.length > 0 ? (
                 <>
-                <FlatList
-                    style={styles.capsuleList}
-                    data={capsuleList}
-                    keyExtractor={(item) => item.username}
-                    renderItem={({ item }) => renderFriendCapsule(item)}
-                    ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
-                />
-                <Modal
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-                >
-                    <TouchableOpacity
-                        style={styles.modalOverlay}
-                        activeOpacity={1}
-                        onPressOut={() => setModalVisible(false)}
+                    <FlatList
+                        style={styles.capsuleList}
+                        data={capsuleList}
+                        keyExtractor={(item) => item.username}
+                        renderItem={({ item }) => renderFriendCapsule(item)}
+                        ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+                    />
+                    <Modal
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => setModalVisible(false)}
                     >
-                        <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
-                            <View style={styles.modalContent}>
-                                <View style={styles.imageContainer}>
-                                    {imageLoading && (
-                                        <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                    )}
-                                    <Image
-                                        style={styles.enlargedImage}
-                                        source={{ uri: selectedImage }}
-                                        onLoad={() => setImageLoading(false)}
-                                    />
+                        <TouchableOpacity
+                            style={styles.modalOverlay}
+                            activeOpacity={1}
+                            onPressOut={() => setModalVisible(false)}
+                        >
+                            <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+                                <View style={styles.modalContent}>
+                                    <View style={styles.imageContainer}>
+                                        {imageLoading && (
+                                            <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                        )}
+                                        <Image
+                                            style={styles.enlargedImage}
+                                            source={{ uri: selectedImage }}
+                                            onLoad={() => setImageLoading(false)}
+                                        />
+                                    </View>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         </TouchableOpacity>
-                    </TouchableOpacity>
-                </Modal>
+                    </Modal>
                 </>
             ) : (
                 <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
             )}
+            <BottomTab navigation={navigation} state={{ index: 2 }} />
+
         </HistoryBackground>
     );
 };
@@ -150,12 +153,12 @@ const styles = StyleSheet.create({
     capsuleListItem: {
         alignSelf: "center",
         width: "75%",
-        aspectRatio: 3/4,
+        aspectRatio: 3 / 4,
         marginVertical: 15,
     },
     container: {
         width: "100%",
-        aspectRatio: 3/4,
+        aspectRatio: 3 / 4,
         //height: 350,
         overflow: "hidden",
     },
@@ -176,7 +179,7 @@ const styles = StyleSheet.create({
         color: "black",
         fontWeight: "bold",
         top: "50%",
-    },modalOverlay: {
+    }, modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 20,
         resizeMode: 'contain',
-    },imageContainer: {
+    }, imageContainer: {
         width: 345,
         height: 460,
         justifyContent: 'center',
