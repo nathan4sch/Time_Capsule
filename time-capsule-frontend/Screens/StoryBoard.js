@@ -5,6 +5,8 @@ import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import BackButton from "../Components/lightBackButton";
+import BottomTab from "../Components/BottomTab";
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 
 const StoryBoard = ({ navigation }) => {
@@ -15,6 +17,10 @@ const StoryBoard = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageLoading, setImageLoading] = useState(true);
+
+    const onSwipeRight = () => {
+        navigation.navigate('Main');
+    };
 
 
     // handle image presses for enlarging the capsule
@@ -45,9 +51,9 @@ const StoryBoard = ({ navigation }) => {
             // Create a list with required information
             const friendInfoList = [];
             for (const friend of filteredFriends) {
-                
+
                 if (friend.capsules.length > 0) {
-                    const capsuleID = friend.capsules[friend.capsules.length-1];
+                    const capsuleID = friend.capsules[friend.capsules.length - 1];
                     const capsule = await getCapsuleUrl(capsuleID);
                     const capsuleObj = await getCapsule(capsuleID)
 
@@ -85,56 +91,71 @@ const StoryBoard = ({ navigation }) => {
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleImagePress(item.snapshot)}>
-                <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
+                    <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
                 </TouchableOpacity>
             </TouchableOpacity>
         );
     };
 
     return (
-        <HistoryBackground>
-            <BackButton onPress={() => navigation.goBack()} />
-            {/* Add the rest of your components here */}
-            {capsuleList.length > 0 ? (
-                <>
-                <FlatList
-                    style={styles.capsuleList}
-                    data={capsuleList}
-                    keyExtractor={(item) => item.username}
-                    renderItem={({ item }) => renderFriendCapsule(item)}
-                    ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
-                />
-                <Modal
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-                >
-                    <TouchableOpacity
-                        style={styles.modalOverlay}
-                        activeOpacity={1}
-                        onPressOut={() => setModalVisible(false)}
-                    >
-                        <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
-                            <View style={styles.modalContent}>
-                                <View style={styles.imageContainer}>
-                                    {imageLoading && (
-                                        <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                    )}
-                                    <Image
-                                        style={styles.enlargedImage}
-                                        source={{ uri: selectedImage }}
-                                        onLoad={() => setImageLoading(false)}
-                                    />
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                    </TouchableOpacity>
-                </Modal>
-                </>
-            ) : (
-                <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
-            )}
-        </HistoryBackground>
+        <PanGestureHandler
+            onGestureEvent={({ nativeEvent }) => {
+                if (nativeEvent.translationX > 50) {
+                    onSwipeRight();
+                }
+            }}
+            onHandlerStateChange={({ nativeEvent }) => {
+                if (nativeEvent.state === State.END) {
+                    // Reset any animation or state changes related to the gesture
+                }
+            }}>
+            <View style={{ flex: 1 }}>
+                <HistoryBackground>
+                    {/* Add the rest of your components here */}
+                    {capsuleList.length > 0 ? (
+                        <>
+                            <FlatList
+                                style={styles.capsuleList}
+                                data={capsuleList}
+                                keyExtractor={(item) => item.username}
+                                renderItem={({ item }) => renderFriendCapsule(item)}
+                                ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+                            />
+                            <Modal
+                                transparent={true}
+                                visible={modalVisible}
+                                onRequestClose={() => setModalVisible(false)}
+                            >
+                                <TouchableOpacity
+                                    style={styles.modalOverlay}
+                                    activeOpacity={1}
+                                    onPressOut={() => setModalVisible(false)}
+                                >
+                                    <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+                                        <View style={styles.modalContent}>
+                                            <View style={styles.imageContainer}>
+                                                {imageLoading && (
+                                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                                )}
+                                                <Image
+                                                    style={styles.enlargedImage}
+                                                    source={{ uri: selectedImage }}
+                                                    onLoad={() => setImageLoading(false)}
+                                                />
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                </TouchableOpacity>
+                            </Modal>
+                        </>
+                    ) : (
+                        <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
+                    )}
+                    <BottomTab navigation={navigation} state={{ index: 2 }} />
+
+                </HistoryBackground>
+            </View>
+        </PanGestureHandler>
     );
 };
 
@@ -150,12 +171,12 @@ const styles = StyleSheet.create({
     capsuleListItem: {
         alignSelf: "center",
         width: "75%",
-        aspectRatio: 3/4,
+        aspectRatio: 3 / 4,
         marginVertical: 15,
     },
     container: {
         width: "100%",
-        aspectRatio: 3/4,
+        aspectRatio: 3 / 4,
         //height: 350,
         overflow: "hidden",
     },
@@ -176,7 +197,7 @@ const styles = StyleSheet.create({
         color: "black",
         fontWeight: "bold",
         top: "50%",
-    },modalOverlay: {
+    }, modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -206,7 +227,7 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 20,
         resizeMode: 'contain',
-    },imageContainer: {
+    }, imageContainer: {
         width: 345,
         height: 460,
         justifyContent: 'center',

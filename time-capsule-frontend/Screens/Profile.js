@@ -157,12 +157,6 @@ const Profile = ({ navigation }) => {
                         <Text style={styles.buttonText}>Friends</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('History')}>
-                    <View style={buttonStyle.button}>
-                        <Image style={styles.icon} source={require('../icons/history-.png')} />
-                        <Text style={styles.buttonText}>My Capsules</Text>
-                    </View>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Moment')}>
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/moment-.png')} />
@@ -190,6 +184,15 @@ const Profile = ({ navigation }) => {
         </>
     );
 }
+
+/*
+<TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('History')}>
+                    <View style={buttonStyle.button}>
+                        <Image style={styles.icon} source={require('../icons/history-.png')} />
+                        <Text style={styles.buttonText}>My Capsules</Text>
+                    </View>
+                </TouchableOpacity>
+*/
 
 const styles = StyleSheet.create({
     separator: {
