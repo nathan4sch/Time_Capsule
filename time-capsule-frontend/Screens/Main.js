@@ -8,7 +8,7 @@ import axios from 'axios'
 import Loading from "../Components/Loading";
 import { useIsFocused } from '@react-navigation/native';
 import BottomTab from "../Components/BottomTab";
-import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 
 const Main = ({ navigation }) => {
@@ -29,13 +29,13 @@ const Main = ({ navigation }) => {
 
     const isFocused = useIsFocused();
 
-    const LeftSwipeActions = () => {
-        navigation.navigate('History')
-        
-    };
-    const rightSwipeActions = () => {
-        navigation.navigate('StoryBoard')
 
+    const onSwipeLeft = () => {
+        navigation.navigate('StoryBoard');
+    };
+
+    const onSwipeRight = () => {
+        navigation.navigate('History');
     };
 
     async function getPhotosFromMonth() {
@@ -209,17 +209,28 @@ const Main = ({ navigation }) => {
     }
 
     return (
-        <Swipeable
-            renderLeftActions={LeftSwipeActions}
-            renderRightActions={rightSwipeActions}
-        >
-            <TouchableOpacity
-                style={{ flex: 1 }}
-                activeOpacity={1}
-                onPress={() => Keyboard.dismiss()}
-            >
-                <BlackBackground>
-                    {/*<View style={styles.topButtonsContainer}>
+        <PanGestureHandler
+            onGestureEvent={({ nativeEvent }) => {
+                //console.log(nativeEvent)
+                if (nativeEvent.translationX < -50) {
+                    onSwipeLeft();
+                } else if (nativeEvent.translationX > 50) {
+                    onSwipeRight();
+                }
+            }}
+            onHandlerStateChange={({ nativeEvent }) => {
+                if (nativeEvent.state === State.END) {
+                    // Reset any animation or state changes related to the gesture
+                }
+            }}>
+            <View style={{ flex: 1 }}>
+                <TouchableOpacity
+                    style={{ flex: 1 }}
+                    activeOpacity={1}
+                    onPress={() => Keyboard.dismiss()}
+                >
+                    <BlackBackground>
+                        {/*<View style={styles.topButtonsContainer}>
                     <TouchableOpacity style={[styles.button, styles.timerButton]} onPress={() => changeToTempTimer()}>
                         <Text style={styles.buttonText}>Set Timer</Text>
                     </TouchableOpacity>
@@ -229,71 +240,73 @@ const Main = ({ navigation }) => {
                     </TouchableOpacity>
 
     </View>*/}
-                    <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
-                        <Image style={styles.profileIcon}
-                            source={{
-                                uri: curUser.profileSettings.profilePictureUrl,
-                            }}
-                            cachePolicy='memory-disk'
-                        />
-                    </TouchableOpacity>
-                    {/* <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
+                        <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
+                            <Image style={styles.profileIcon}
+                                source={{
+                                    uri: curUser.profileSettings.profilePictureUrl,
+                                }}
+                                cachePolicy='memory-disk'
+                            />
+                        </TouchableOpacity>
+                        {/* <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
                     <Text style={styles.timerbuttonText}>SetTimer</Text>
                 </TouchableOpacity> */}
 
-                    <View style={styles.tempTimeContainer}>
-                        <Text style={styles.timerText}>{timer}</Text>
-                        <Text style={styles.unitText}>day       hour       min       sec</Text>
-                    </View>
-                    <View style={styles.buttonsContainer}>
-                        {!publishState && shownCapsule && (
-                            <TouchableOpacity
-                                style={styles.publishButton}
-                                onPress={handlePublish}
-                            >
-                                <Text style={styles.publishButtonText}>Publish</Text>
-                            </TouchableOpacity>
-                        )}
+                        <View style={styles.tempTimeContainer}>
+                            <Text style={styles.timerText}>{timer}</Text>
+                            <Text style={styles.unitText}>day       hour       min       sec</Text>
+                        </View>
+                        <View style={styles.buttonsContainer}>
+                            {!publishState && shownCapsule && (
+                                <TouchableOpacity
+                                    style={styles.publishButton}
+                                    onPress={handlePublish}
+                                >
+                                    <Text style={styles.publishButtonText}>Publish</Text>
+                                </TouchableOpacity>
+                            )}
 
-                        {/* <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
+                            {/* <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
                         <Text style={styles.overlayText}>Test: Generate Capsule</Text>
                     </TouchableOpacity> */}
 
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={[styles.momentEnter, { marginTop: margin }]}
-                                placeholder="Enter Moment"
-                                returnKeyType="done"
-                                onSubmitEditing={submitMoment}
-                                onChangeText={handleTextChange}
-                                onFocus={() => setMargin((shownCapsule && !publishState ? -495 : -360))}
-                                onBlur={() => setMargin(0)}
-                                value={moment}
-                            />
-                            <View style={[styles.numberSquare, { marginTop: margin }]}>
-                                <Text style={styles.number}>{momentCount}</Text>
+                            <View style={styles.inputContainer}>
+                                <TextInput
+                                    style={[styles.momentEnter, { marginTop: margin }]}
+                                    placeholder="Enter Moment"
+                                    returnKeyType="done"
+                                    onSubmitEditing={submitMoment}
+                                    onChangeText={handleTextChange}
+                                    onFocus={() => setMargin((shownCapsule && !publishState ? -495 : -360))}
+                                    onBlur={() => setMargin(0)}
+                                    value={moment}
+                                />
+                                <View style={[styles.numberSquare, { marginTop: margin }]}>
+                                    <Text style={styles.number}>{momentCount}</Text>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                    <View style={styles.imageContainer}>
-                        <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
-                            {shownCapsule ? (
-                                <Image
-                                    style={styles.capsuleImage}
-                                    source={{ uri: shownCapsule }}
-                                />
-                            ) : (
-                                <Text style={styles.overlayText}>No Capsule Available</Text>
-                            )}
-                        </TouchableOpacity>
+                        <View style={styles.imageContainer}>
+                            <View style={styles.overlayButton}>
+                                {shownCapsule ? (
+                                    <Image
+                                        style={styles.capsuleImage}
+                                        source={{ uri: shownCapsule }}
+                                    />
+                                ) : (
+                                    <Text style={styles.overlayText}>No Capsule Available</Text>
+                                )}
+                            </View>
 
-                    </View>
-                    <View style={styles.capsuleList} />
-                    <BottomTab navigation={navigation} state={{ index: 1 }} />
+                        </View>
+                        <View style={styles.capsuleList} />
+                        <BottomTab navigation={navigation} state={{ index: 1 }} />
 
-                </BlackBackground>
-            </TouchableOpacity>
-        </Swipeable>
+                    </BlackBackground>
+                </TouchableOpacity>
+            </View>
+        </PanGestureHandler>
+
     );
 }
 

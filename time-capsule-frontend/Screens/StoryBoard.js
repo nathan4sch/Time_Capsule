@@ -6,6 +6,7 @@ import HistoryBackground from "../Components/HistoryBackground";
 import { commonStyles } from "../Components/FriendsPageStylings";
 import BackButton from "../Components/lightBackButton";
 import BottomTab from "../Components/BottomTab";
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 
 const StoryBoard = ({ navigation }) => {
@@ -16,6 +17,10 @@ const StoryBoard = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageLoading, setImageLoading] = useState(true);
+
+    const onSwipeRight = () => {
+        navigation.navigate('Main');
+    };
 
 
     // handle image presses for enlarging the capsule
@@ -93,51 +98,65 @@ const StoryBoard = ({ navigation }) => {
     };
 
     return (
-        <HistoryBackground>
-            <BackButton onPress={() => navigation.goBack()} />
-            {/* Add the rest of your components here */}
-            {capsuleList.length > 0 ? (
-                <>
-                    <FlatList
-                        style={styles.capsuleList}
-                        data={capsuleList}
-                        keyExtractor={(item) => item.username}
-                        renderItem={({ item }) => renderFriendCapsule(item)}
-                        ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
-                    />
-                    <Modal
-                        transparent={true}
-                        visible={modalVisible}
-                        onRequestClose={() => setModalVisible(false)}
-                    >
-                        <TouchableOpacity
-                            style={styles.modalOverlay}
-                            activeOpacity={1}
-                            onPressOut={() => setModalVisible(false)}
-                        >
-                            <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
-                                <View style={styles.modalContent}>
-                                    <View style={styles.imageContainer}>
-                                        {imageLoading && (
-                                            <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                        )}
-                                        <Image
-                                            style={styles.enlargedImage}
-                                            source={{ uri: selectedImage }}
-                                            onLoad={() => setImageLoading(false)}
-                                        />
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
-                        </TouchableOpacity>
-                    </Modal>
-                </>
-            ) : (
-                <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
-            )}
-            <BottomTab navigation={navigation} state={{ index: 2 }} />
+        <PanGestureHandler
+            onGestureEvent={({ nativeEvent }) => {
+                if (nativeEvent.translationX > 50) {
+                    onSwipeRight();
+                }
+            }}
+            onHandlerStateChange={({ nativeEvent }) => {
+                if (nativeEvent.state === State.END) {
+                    // Reset any animation or state changes related to the gesture
+                }
+            }}>
+            <View style={{ flex: 1 }}>
+                <HistoryBackground>
+                    <BackButton onPress={() => navigation.goBack()} />
+                    {/* Add the rest of your components here */}
+                    {capsuleList.length > 0 ? (
+                        <>
+                            <FlatList
+                                style={styles.capsuleList}
+                                data={capsuleList}
+                                keyExtractor={(item) => item.username}
+                                renderItem={({ item }) => renderFriendCapsule(item)}
+                                ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+                            />
+                            <Modal
+                                transparent={true}
+                                visible={modalVisible}
+                                onRequestClose={() => setModalVisible(false)}
+                            >
+                                <TouchableOpacity
+                                    style={styles.modalOverlay}
+                                    activeOpacity={1}
+                                    onPressOut={() => setModalVisible(false)}
+                                >
+                                    <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+                                        <View style={styles.modalContent}>
+                                            <View style={styles.imageContainer}>
+                                                {imageLoading && (
+                                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                                )}
+                                                <Image
+                                                    style={styles.enlargedImage}
+                                                    source={{ uri: selectedImage }}
+                                                    onLoad={() => setImageLoading(false)}
+                                                />
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                </TouchableOpacity>
+                            </Modal>
+                        </>
+                    ) : (
+                        <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
+                    )}
+                    <BottomTab navigation={navigation} state={{ index: 2 }} />
 
-        </HistoryBackground>
+                </HistoryBackground>
+            </View>
+        </PanGestureHandler>
     );
 };
 
