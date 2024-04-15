@@ -229,19 +229,6 @@ const Main = ({ navigation }) => {
                     <Text style={styles.timerText}>{timer}</Text>
                     <Text style={styles.unitText}>day       hour       min       sec</Text>
                 </View>
-                <View style={styles.imageContainer}>
-                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
-                        {shownCapsule ? (
-                            <Image
-                                style={styles.capsuleImage}
-                                source={{ uri: shownCapsule }}
-                            />
-                        ) : (
-                            <Text style={styles.overlayText}>No Capsule Available</Text>
-                        )}
-                    </TouchableOpacity>
-                    
-                </View>
                 <View style={styles.buttonsContainer}>
                     {!publishState && shownCapsule && (
                         <TouchableOpacity
@@ -263,7 +250,7 @@ const Main = ({ navigation }) => {
                             returnKeyType="done" 
                             onSubmitEditing={submitMoment}
                             onChangeText={handleTextChange}
-                            onFocus={() => setMargin(-330)}
+                            onFocus={() => setMargin((shownCapsule && !publishState? -495 : -360 ))}
                             onBlur={() => setMargin(0)}
                             value={moment}
                         />
@@ -271,9 +258,20 @@ const Main = ({ navigation }) => {
                             <Text style={styles.number}>{momentCount}</Text>
                         </View>
                     </View>
-                </View>
-                
-                
+                </View>   
+                <View style={styles.imageContainer}>
+                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
+                        {shownCapsule ? (
+                            <Image
+                                style={styles.capsuleImage}
+                                source={{ uri: shownCapsule }}
+                            />
+                        ) : (
+                            <Text style={styles.overlayText}>No Capsule Available</Text>
+                        )}
+                    </TouchableOpacity>
+                    
+                </View>            
                 <View style={styles.capsuleList} />
             </BlackBackground>
         </TouchableOpacity>
@@ -375,11 +373,12 @@ const styles = StyleSheet.create({
         width: '80%',
         alignItems: 'center',
         justifyContent: 'space-between',
+        zIndex: 3
     },
     
     publishButton: {
         marginTop: 20,
-        width: '80%',
+        width: '95%',
         backgroundColor: '#4CAF50',
         borderRadius: 10,
         padding: 10,
@@ -440,18 +439,21 @@ const styles = StyleSheet.create({
     },momentEnter: {
         width: '80%',
         height: 40,
-        backgroundColor: 'rgba(255, 255, 255, 0.67)',
+        backgroundColor: 'rgb(200, 200, 200)',
         borderRadius: 10,
         textAlign: 'left',
         paddingLeft: 15,
-    },inputContainer: {
+    },
+    inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: 15,
+        zIndex: 3
     },
     numberSquare: {
         width: 40,
         height: 40,
-        backgroundColor: 'rgba(255, 255, 255, 0.67)',
+        backgroundColor: 'rgb(200, 200, 200)',
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
@@ -460,7 +462,7 @@ const styles = StyleSheet.create({
     number: {
         color: 'black',
         fontWeight: 'bold',
-        fontSize: 20
+        fontSize: 20,
     }
     
 });
