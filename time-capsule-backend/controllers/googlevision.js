@@ -1,21 +1,19 @@
-const axios = require('axios');
 const vision = require('@google-cloud/vision');
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { Upload } = require('@aws-sdk/lib-storage');
 const { s3 } = require('../app');
 const convert = require('heic-convert');
-const sharp = require('sharp');
 const crypto = require('crypto')
 const onnx = require('onnxruntime-node');
 const fs = require('fs');
-const csv = require('csv-parser');
 
 const client = new vision.ImageAnnotatorClient();
 
 const bucketName = process.env.BUCKET_NAME;
 
-const values = readLabels('./class-descriptions.csv');
-
 const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
+
+const values = readLabels('./class-descriptions.csv');
 
 async function analyzeImage(image) {
     const session = await onnx.InferenceSession.create('./model.onnx');
@@ -32,10 +30,12 @@ async function analyzeImage(image) {
     }
 
     const xFeatures = new Array(values.length).fill(0.0);
-    const indices = labels.map(label => values.indexOf(label)).filter(index => index !== -1);
-    indices.forEach(index => {
-        xFeatures[index] = 1.0;
-    });
+    for (const label of labels) {
+        const index = values.indexOf(label.description);
+        if (index > 0) {
+            xFeatures[index] = 1.0;
+        }
+    }
     const inputTensor = await new onnx.Tensor('float32', xFeatures, [values.length]);
     const feed = { 'onnx::MatMul_0' : inputTensor }
     const outputMap = await session.run(feed);
@@ -67,53 +67,38 @@ async function similarPicture(dominantColors1, dominantColors2) {
     return similarityScore > .5;
 }
 
-function isEqual(row1, row2) {
-    if (row1.length !== row2.length) {
-        return false;
-    }
-    for (let i = 0; i < row1.length; i++) {
-        if (row1[i] !== row2[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-
 function readLabels(csvFilePath) {
     const values = [];
-    return new Promise((resolve, reject) => {
-        fs.createReadStream(csvFilePath)
-            .pipe(csv())
-            .on('data', (row) => {
-                values.push(row['1']);
-            })
-            .on('end', () => {
-                resolve(values);
-            })
-            .on('error', (error) => {
-                reject(error);
-            });
+    const csvData = fs.readFileSync(csvFilePath, 'utf-8');
+    csvData.split('\n').forEach((row) => {
+        const columns = row.split(',');
+        if (columns[1] && columns[1].trim() !== '') {
+            const value = columns[1].replace('\r', '').trim();
+            values.push(value);
+        }
     });
+    return values;
 }
 
 exports.selectPhotos = async (req, res) => {
     const imageType = (await import('image-type')).default;
-
     const { id } = req.params;
     console.log(id)
     let image_data = []
     console.log("Before conversion")
     if (req.files) {
         const conversionPromises = req.files.map(async (image) => {
-            let processedImage = { ...image }; // Create a new object for the processed image
-            if ((await imageType(image.buffer)).mime === 'image/heic') {
-                processedImage.buffer = await convert({
-                    buffer: image.buffer, // the HEIC file buffer
-                    format: 'JPEG', // output format
-                });
-                processedImage.mimetype = 'image/jpeg';
-            }
-            return processedImage;
+            return Promise.resolve().then(async () => {
+                let processedImage = { ...image }; 
+                if ((await imageType(image.buffer)).mime === 'image/heic') {
+                    processedImage.buffer = await convert({
+                        buffer: image.buffer, 
+                        format: 'JPEG',
+                    });
+                    processedImage.mimetype = 'image/jpeg';
+                }
+                return processedImage;
+            });
         });
         const convertedImages = await Promise.all(conversionPromises);
         console.log("after conversion")
@@ -139,6 +124,7 @@ exports.selectPhotos = async (req, res) => {
     if (image_data.length > 6) {
         const sortedImageData = image_data.sort((a, b) => b[1] - a[1]);
         new_image_data = sortedImageData.slice(0, 6);
+        new_image_data = new_image_data.map(pair => pair[0]);
     }
     else {
         new_image_data = image_data.map(pair => pair[0])
@@ -148,6 +134,7 @@ exports.selectPhotos = async (req, res) => {
         //imageName = id + image.originalname
         imageName = randomImageName()
         key_array.push(imageName)
+        console.log(image.buffer)
         const params = {
             Bucket: bucketName,
             Body: image.buffer,
@@ -156,7 +143,11 @@ exports.selectPhotos = async (req, res) => {
         };
 
         try {
-            await s3.send(new PutObjectCommand(params));
+            const upload = new Upload({
+                client: s3,
+                params: params,
+            });
+            await upload.done();
             console.log("File uploaded successfully to S3");
         } catch (error) {
             console.error('Error uploading image to S3:', error);
