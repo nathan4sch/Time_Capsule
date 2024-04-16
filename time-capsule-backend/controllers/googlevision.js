@@ -1,5 +1,6 @@
 const vision = require('@google-cloud/vision');
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { Upload } = require('@aws-sdk/lib-storage');
 const { s3 } = require('../app');
 const convert = require('heic-convert');
 const crypto = require('crypto')
@@ -87,15 +88,17 @@ exports.selectPhotos = async (req, res) => {
     console.log("Before conversion")
     if (req.files) {
         const conversionPromises = req.files.map(async (image) => {
-            let processedImage = { ...image }; // Create a new object for the processed image
-            if ((await imageType(image.buffer)).mime === 'image/heic') {
-                processedImage.buffer = await convert({
-                    buffer: image.buffer, // the HEIC file buffer
-                    format: 'JPEG', // output format
-                });
-                processedImage.mimetype = 'image/jpeg';
-            }
-            return processedImage;
+            return Promise.resolve().then(async () => {
+                let processedImage = { ...image }; 
+                if ((await imageType(image.buffer)).mime === 'image/heic') {
+                    processedImage.buffer = await convert({
+                        buffer: image.buffer, 
+                        format: 'JPEG',
+                    });
+                    processedImage.mimetype = 'image/jpeg';
+                }
+                return processedImage;
+            });
         });
         const convertedImages = await Promise.all(conversionPromises);
         console.log("after conversion")
@@ -121,6 +124,7 @@ exports.selectPhotos = async (req, res) => {
     if (image_data.length > 6) {
         const sortedImageData = image_data.sort((a, b) => b[1] - a[1]);
         new_image_data = sortedImageData.slice(0, 6);
+        new_image_data = new_image_data.map(pair => pair[0]);
     }
     else {
         new_image_data = image_data.map(pair => pair[0])
@@ -130,6 +134,7 @@ exports.selectPhotos = async (req, res) => {
         //imageName = id + image.originalname
         imageName = randomImageName()
         key_array.push(imageName)
+        console.log(image.buffer)
         const params = {
             Bucket: bucketName,
             Body: image.buffer,
@@ -138,7 +143,11 @@ exports.selectPhotos = async (req, res) => {
         };
 
         try {
-            await s3.send(new PutObjectCommand(params));
+            const upload = new Upload({
+                client: s3,
+                params: params,
+            });
+            await upload.done();
             console.log("File uploaded successfully to S3");
         } catch (error) {
             console.error('Error uploading image to S3:', error);

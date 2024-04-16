@@ -36,7 +36,7 @@ const Main = ({ navigation }) => {
 
     const onSwipeRight = () => {
         navigation.navigate('History');
-    };
+    };    
 
     async function getPhotosFromMonth() {
         const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -47,14 +47,20 @@ const Main = ({ navigation }) => {
 
             month.setHours(0, 0, 0, 0);
 
-            const media = await MediaLibrary.getAssetsAsync({ first: 200, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
-            const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
-            console.log(media.assets)
-            const assetInfoResults = await Promise.all(assetInfoPromises);
-            const uris = assetInfoResults.map(item => item.localUri);
+            const media = await MediaLibrary.getAssetsAsync({ first: 300, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const assetInfoArray = [];
+            for (const asset of media.assets) {
+                try {
+                    const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
+                    assetInfoArray.push(assetInfo);
+                } catch (error) {
+                    console.error('Error:', error);
+                    assetInfoArray.push(null); // Push null if an error occurs
+                }
+            }
+            const uris = assetInfoArray.map(item => item.localUri);
             capsuleKeyChange.current = true;
-            await selectPhotos(curUser._id, uris); //calls function in global context
-            //waits till change in capsuleKeys then creates capsule with those keys
+            await selectPhotos(curUser._id, uris); 
         } else {
             alert('Permission to access camera roll denied!');
         }

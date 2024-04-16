@@ -356,7 +356,6 @@ export const GlobalProvider = ({ children }) => {
                 name: `photo${index}.jpg`,
             });
         });
-        // console.log("formdata", formData)
         try {
             const response = await axios.post(`${BASE_URL}select-photos/${id}`, formData);
             // console.log("globalCon: ", response.data)
