@@ -7,10 +7,8 @@ import axios from 'axios'
 //const BASE_URL = "https://time-capsule-server.onrender.com/api/v1/";
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
-
-const BASE_URL = "http://100.69.2.60:3000/api/v1/"
-const BASE_S3_URL = "http://100.69.2.60:3000/"
-
+const BASE_S3_URL = "http://100.67.13.152:3000/"
+const BASE_URL = BASE_S3_URL + "api/v1/"
 
 //https://time-capsule-server.onrender.com/api/v1/
 //10.186.124.112
@@ -356,10 +354,9 @@ export const GlobalProvider = ({ children }) => {
                 name: `photo${index}.jpg`,
             });
         });
-        //console.log(formData)
         try {
             const response = await axios.post(`${BASE_URL}select-photos/${id}`, formData);
-            //console.log("globalCon: ", response.data)
+            // console.log("globalCon: ", response.data)
             //capsuleKeys = response.data
             setCapsuleKeys(response.data)
         } catch (error) {

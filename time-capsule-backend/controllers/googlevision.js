@@ -1,176 +1,46 @@
-const axios = require('axios');
 const vision = require('@google-cloud/vision');
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { Upload } = require('@aws-sdk/lib-storage');
 const { s3 } = require('../app');
 const convert = require('heic-convert');
-const sharp = require('sharp');
 const crypto = require('crypto')
+const onnx = require('onnxruntime-node');
+const fs = require('fs');
 
 const client = new vision.ImageAnnotatorClient();
 
-const bucketName = process.env.BUCKET_NAME
-
-const landscape_keywords = [
-    'landscape',
-    'scenery',
-    'nature',
-    'mountain',
-    'valley',
-    'hill',
-    'field',
-    'meadow',
-    'plain',
-    'prairie',
-    'countryside',
-    'countryscape',
-    'countrysides',
-    'countryscapes',
-    'rural',
-    'ruralscape',
-    'ruralscapes',
-    'country',
-    'countrypark',
-    'countryparks',
-    'farmland',
-    'farmlands',
-    'farm',
-    'farming',
-    'vineyard',
-    'vineyards',
-    'orchard',
-    'orchards',
-    'grove',
-    'groves',
-    'forest',
-    'woodland',
-    'woods',
-    'jungle',
-    'rainforest',
-    'tropical',
-    'desert',
-    'dunes',
-    'oasis',
-    'canyon',
-    'glen',
-    'cave',
-    'cliff',
-    'coast',
-    'seashore',
-    'shore',
-    'beach',
-    'coastline',
-    'riverbank',
-    'riverbed',
-    'stream',
-    'brook',
-    'waterfall',
-    'rapids',
-    'lake',
-    'pond',
-    'lagoon',
-    'reservoir',
-    'marsh',
-    'swamp',
-    'wetland',
-    'fen',
-    'moor',
-    'heath',
-    'plateau',
-    'plain',
-    'prairie',
-    'savanna',
-    'steppe',
-    'tundra',
-    'glacier',
-    'iceberg',
-    'arctic',
-    'antarctic',
-    'permafrost',
-    'highland',
-    'lowland',
-    'upland',
-    'mesa',
-    'butte',
-    'badlands',
-    'escarpment',
-    'panorama',
-    'view',
-    'vista',
-    'outlook',
-    'scenic',
-    'picturesque',
-    'serene',
-    'tranquil',
-    'peaceful',
-    'idyllic',
-    'majestic',
-    'sublime',
-    'bucolic',
-    'pastoral',
-    'picturesque',
-    'stunning',
-    'breathtaking',
-    'awe-inspiring',
-    'exquisite',
-    'marvelous',
-    'wonderful',
-    'fantastic',
-    'amazing',
-    'beautiful',
-    'gorgeous',
-];
+const bucketName = process.env.BUCKET_NAME;
 
 const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
 
+const values = readLabels('./class-descriptions.csv');
+
 async function analyzeImage(image) {
+    const session = await onnx.InferenceSession.create('./model.onnx');
+    
+
     const [result] = await client.annotateImage({
         image: { content: image },
-        features: [{ type: 'LABEL_DETECTION', maxResults: 100 }, { type: 'FACE_DETECTION' }, { "type": "IMAGE_PROPERTIES" }],
+        features: [{ type: 'LABEL_DETECTION', maxResults: 100 }, { "type": "IMAGE_PROPERTIES" }],
     });
     const labels = result.labelAnnotations;
-    const faces = result.faceAnnotations;
     let dominantColors = null;
     if (result.imagePropertiesAnnotation) {
         dominantColors = result.imagePropertiesAnnotation.dominantColors.colors;
     }
-    let joy = 0;
-    if (faces && faces.length > 0) {
-        faces.forEach((face, index) => {
-            const faceData = {
-                confidence: face.detectionConfidence,
-                joyLikelihood: face.joyLikelihood,
-                sorrowLikelihood: face.sorrowLikelihood,
-                angerLikelihood: face.angerLikelihood,
-                surpriseLikelihood: face.surpriseLikelihood,
-                underExposedLikelihood: face.underExposedLikelihood,
-                blurredLikelihood: face.blurredLikelihood,
-                headwearLikelihood: face.headwearLikelihood,
-                bounds: face.boundingPoly.vertices
-            };
-            if (faceData.confidence > .8 && faceData.joyLikelihood == "LIKELY" || faceData.joyLikelihood == "VERY_LIKELY") {
-                joy++;
-            }
-        });
+
+    const xFeatures = new Array(values.length).fill(0.0);
+    for (const label of labels) {
+        const index = values.indexOf(label.description);
+        if (index > 0) {
+            xFeatures[index] = 1.0;
+        }
     }
-    let landscape = 0;
-    if (labels && labels.length > 0) {
-        labels.forEach((label, index) => {
-            const labelData = {
-                description: label.description,
-                mid: label.mid,
-                score: label.score,
-                topicality: label.topicality,
-            };
-            if (labelData.description == "Smile") {
-                joy++;
-            }
-            else if (landscape_keywords.includes(labelData.description.toLowerCase())) {
-                landscape += 1;
-            }
-        });
-    }
-    console.log('joy: ', joy, 'landscape: ', landscape)
-    return [joy, landscape, dominantColors];
+    const inputTensor = await new onnx.Tensor('float32', xFeatures, [values.length]);
+    const feed = { 'onnx::MatMul_0' : inputTensor }
+    const outputMap = await session.run(feed);
+    const score = outputMap['11'].cpuData[1];
+    return [score, dominantColors];
 }
 
 
@@ -197,16 +67,17 @@ async function similarPicture(dominantColors1, dominantColors2) {
     return similarityScore > .5;
 }
 
-function isEqual(row1, row2) {
-    if (row1.length !== row2.length) {
-        return false;
-    }
-    for (let i = 0; i < row1.length; i++) {
-        if (row1[i] !== row2[i]) {
-            return false;
+function readLabels(csvFilePath) {
+    const values = [];
+    const csvData = fs.readFileSync(csvFilePath, 'utf-8');
+    csvData.split('\n').forEach((row) => {
+        const columns = row.split(',');
+        if (columns[1] && columns[1].trim() !== '') {
+            const value = columns[1].replace('\r', '').trim();
+            values.push(value);
         }
-    }
-    return true;
+    });
+    return values;
 }
 
 exports.selectPhotos = async (req, res) => {
@@ -217,58 +88,43 @@ exports.selectPhotos = async (req, res) => {
     console.log("Before conversion")
     if (req.files) {
         const conversionPromises = req.files.map(async (image) => {
-            let processedImage = { ...image }; // Create a new object for the processed image
-            if ((await imageType(image.buffer)).mime === 'image/heic') {
-                processedImage.buffer = await convert({
-                    buffer: image.buffer, // the HEIC file buffer
-                    format: 'JPEG', // output format
-                });
-                processedImage.mimetype = 'image/jpeg';
-            }
-            return processedImage;
+            return Promise.resolve().then(async () => {
+                let processedImage = { ...image }; 
+                if ((await imageType(image.buffer)).mime === 'image/heic') {
+                    processedImage.buffer = await convert({
+                        buffer: image.buffer, 
+                        format: 'JPEG',
+                    });
+                    processedImage.mimetype = 'image/jpeg';
+                }
+                return processedImage;
+            });
         });
         const convertedImages = await Promise.all(conversionPromises);
         console.log("after conversion")
         for (let image of convertedImages) {
             console.log("before GV")
-            const [joy, landscape, dominantColors] = await analyzeImage(image.buffer)
-            console.log("done with google vision")
-            if ((joy == 0 && landscape == 0) || dominantColors == null) {
+            const [score, dominantColors] = await analyzeImage(image.buffer)
+            console.log("after, score: ", score)
+            if (score < 0|| dominantColors == null) {
                 continue;
             }
             let add = true;
-            for (const [i, j, l, dC] of image_data) {
-                if (j == joy && l == landscape) {
-                    if (await similarPicture(dC, dominantColors)) {
-                        add = false;
-                        break;
-                    }
+            for (const [i, s, dC] of image_data) {
+                if (await similarPicture(dC, dominantColors)) {
+                    add = false;
+                    break;
                 }
             }
             if (add)
-                image_data.push([image, joy, landscape, dominantColors])
+                image_data.push([image, score, dominantColors])
         }
     }
     let new_image_data = []
     if (image_data.length > 6) {
-        let toggle = true;
-        while (new_image_data.length < 6) {
-            if (toggle) {
-                const maxSmile = image_data.reduce((max, curr) => curr[1] > max[1] ? curr : max);
-                image_data = image_data.filter(row => !isEqual(row, maxSmile));
-                if (maxSmile[1] != 0) {
-                    new_image_data.push(maxSmile[0])
-                }
-                toggle = !toggle;
-            } else {
-                const maxLandscape = image_data.reduce((max, curr) => curr[2] > max[2] ? curr : max);
-                image_data = image_data.filter(row => !isEqual(row, maxLandscape));
-                if (maxLandscape[2] != 0) {
-                    new_image_data.push(maxLandscape[0])
-                }
-                toggle = !toggle;
-            }
-        }
+        const sortedImageData = image_data.sort((a, b) => b[1] - a[1]);
+        new_image_data = sortedImageData.slice(0, 6);
+        new_image_data = new_image_data.map(pair => pair[0]);
     }
     else {
         new_image_data = image_data.map(pair => pair[0])
@@ -278,6 +134,7 @@ exports.selectPhotos = async (req, res) => {
         //imageName = id + image.originalname
         imageName = randomImageName()
         key_array.push(imageName)
+        console.log(image.buffer)
         const params = {
             Bucket: bucketName,
             Body: image.buffer,
@@ -286,7 +143,11 @@ exports.selectPhotos = async (req, res) => {
         };
 
         try {
-            await s3.send(new PutObjectCommand(params));
+            const upload = new Upload({
+                client: s3,
+                params: params,
+            });
+            await upload.done();
             console.log("File uploaded successfully to S3");
         } catch (error) {
             console.error('Error uploading image to S3:', error);

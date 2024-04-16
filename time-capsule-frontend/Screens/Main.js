@@ -7,6 +7,9 @@ import * as MediaLibrary from 'expo-media-library';
 import axios from 'axios'
 import Loading from "../Components/Loading";
 import { useIsFocused } from '@react-navigation/native';
+import BottomTab from "../Components/BottomTab";
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+
 
 const Main = ({ navigation }) => {
     const { curUser, getMomentCount, addMoment, getCapsule, selectPhotos, capsuleKeys, BASE_S3_URL, createCapsule, getSpotifyTopSong, setCurUser, getUserbyID, getCapsuleUrl, setPublish } = useGlobalContext();
@@ -26,6 +29,15 @@ const Main = ({ navigation }) => {
 
     const isFocused = useIsFocused();
 
+
+    const onSwipeLeft = () => {
+        navigation.navigate('StoryBoard');
+    };
+
+    const onSwipeRight = () => {
+        navigation.navigate('History');
+    };    
+
     async function getPhotosFromMonth() {
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status === 'granted') {
@@ -35,14 +47,20 @@ const Main = ({ navigation }) => {
 
             month.setHours(0, 0, 0, 0);
 
-            const media = await MediaLibrary.getAssetsAsync({ first: 8, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
-            const assetInfoPromises = media.assets.map(asset => MediaLibrary.getAssetInfoAsync(asset));
-            console.log(media.assets)
-            const assetInfoResults = await Promise.all(assetInfoPromises);
-            const uris = assetInfoResults.map(item => item.localUri);
+            const media = await MediaLibrary.getAssetsAsync({ first: 300, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const assetInfoArray = [];
+            for (const asset of media.assets) {
+                try {
+                    const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
+                    assetInfoArray.push(assetInfo);
+                } catch (error) {
+                    console.error('Error:', error);
+                    assetInfoArray.push(null); // Push null if an error occurs
+                }
+            }
+            const uris = assetInfoArray.map(item => item.localUri);
             capsuleKeyChange.current = true;
-            await selectPhotos(curUser._id, uris); //calls function in global context
-            //waits till change in capsuleKeys then creates capsule with those keys
+            await selectPhotos(curUser._id, uris); 
         } else {
             alert('Permission to access camera roll denied!');
         }
@@ -121,8 +139,8 @@ const Main = ({ navigation }) => {
     useEffect(() => {
         clearInterval(intervalId)
         const id = setInterval(() => {
-                setTimer(calculateTimeUntilNextMonth());
-            }, 1000);
+            setTimer(calculateTimeUntilNextMonth());
+        }, 1000);
         setIntervalId(id)
         return () => clearInterval(id);
     }, []);
@@ -182,13 +200,13 @@ const Main = ({ navigation }) => {
 
     const submitMoment = () => {
         addMoment(curUser._id, moment)
-        setMomentCount(momentCount+1)
+        setMomentCount(momentCount + 1)
         setMoment('')
     }
 
     const handleTextChange = (text) => {
-        setMoment(text); 
-      };
+        setMoment(text);
+    };
 
     if (loading) {
         return (
@@ -197,86 +215,104 @@ const Main = ({ navigation }) => {
     }
 
     return (
-        <TouchableOpacity
-            style={{ flex: 1 }}
-            activeOpacity={1}
-            onPress={() => Keyboard.dismiss()}
-        >
-            <BlackBackground>
-            <View style={styles.topButtonsContainer}>
-                <TouchableOpacity style={[styles.button, styles.timerButton]} onPress={() => changeToTempTimer()}>
-                    <Text style={styles.buttonText}>Set Timer</Text>
-                </TouchableOpacity>
+        <PanGestureHandler
+            onGestureEvent={({ nativeEvent }) => {
+                //console.log(nativeEvent)
+                if (nativeEvent.translationX < -50) {
+                    onSwipeLeft();
+                } else if (nativeEvent.translationX > 50) {
+                    onSwipeRight();
+                }
+            }}
+            onHandlerStateChange={({ nativeEvent }) => {
+                if (nativeEvent.state === State.END) {
+                    // Reset any animation or state changes related to the gesture
+                }
+            }}>
+            <View style={{ flex: 1 }}>
+                <TouchableOpacity
+                    style={{ flex: 1 }}
+                    activeOpacity={1}
+                    onPress={() => Keyboard.dismiss()}
+                >
+                    <BlackBackground>
+                        <View style={styles.topButtonsContainer}>
+                            <TouchableOpacity style={[styles.button, styles.timerButton]} onPress={() => changeToTempTimer()}>
+                                <Text style={styles.buttonText}>Set Timer</Text>
+                            </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, styles.generateCapsuleButton]} onPress={() => getPhotosFromMonth()}>
-                    <Text style={styles.buttonText}>Capsule</Text>
-                </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, styles.generateCapsuleButton]} onPress={() => getPhotosFromMonth()}>
+                                <Text style={styles.buttonText}>Capsule</Text>
+                            </TouchableOpacity>
 
-            </View>
-                <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
-                    <Image style={styles.profileIcon}
-                        source={{
-                            uri: curUser.profileSettings.profilePictureUrl,
-                        }}
-                        cachePolicy='memory-disk'
-                    />
-                </TouchableOpacity>
-                {/* <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
+                        </View>
+                        <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
+                            <Image style={styles.profileIcon}
+                                source={{
+                                    uri: curUser.profileSettings.profilePictureUrl,
+                                }}
+                                cachePolicy='memory-disk'
+                            />
+                        </TouchableOpacity>
+                        {/* <TouchableOpacity style={styles.timerbutton} onPress={() => changeToTempTimer()}>
                     <Text style={styles.timerbuttonText}>SetTimer</Text>
                 </TouchableOpacity> */}
 
-                <View style={styles.tempTimeContainer}>
-                    <Text style={styles.timerText}>{timer}</Text>
-                    <Text style={styles.unitText}>day       hour       min       sec</Text>
-                </View>
-                <View style={styles.imageContainer}>
-                    <TouchableOpacity style={styles.overlayButton} onPress={handleOverlayButtonPress}>
-                        {shownCapsule ? (
-                            <Image
-                                style={styles.capsuleImage}
-                                source={{ uri: shownCapsule }}
-                            />
-                        ) : (
-                            <Text style={styles.overlayText}>No Capsule Available</Text>
-                        )}
-                    </TouchableOpacity>
-                    
-                </View>
-                <View style={styles.buttonsContainer}>
-                    {!publishState && shownCapsule && (
-                        <TouchableOpacity
-                            style={styles.publishButton}
-                            onPress={handlePublish}
-                        >
-                            <Text style={styles.publishButtonText}>Publish</Text>
-                        </TouchableOpacity>
-                    )}
+                        <View style={styles.tempTimeContainer}>
+                            <Text style={styles.timerText}>{timer}</Text>
+                            <Text style={styles.unitText}>day       hour       min       sec</Text>
+                        </View>
+                        <View style={styles.buttonsContainer}>
+                            {!publishState && shownCapsule && (
+                                <TouchableOpacity
+                                    style={styles.publishButton}
+                                    onPress={handlePublish}
+                                >
+                                    <Text style={styles.publishButtonText}>Publish</Text>
+                                </TouchableOpacity>
+                            )}
 
-                    {/* <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
+                            {/* <TouchableOpacity style={styles.tempImageSelect} onPress={() => getPhotosFromMonth()}>
                         <Text style={styles.overlayText}>Test: Generate Capsule</Text>
                     </TouchableOpacity> */}
 
-                    <View style={styles.inputContainer}>
-                        <TextInput 
-                            style={[styles.momentEnter, { marginTop: margin }]}
-                            placeholder="Enter Moment"
-                            returnKeyType="done" 
-                            onSubmitEditing={submitMoment}
-                            onChangeText={handleTextChange}
-                            onFocus={() => setMargin(-330)}
-                            onBlur={() => setMargin(0)}
-                            value={moment}
-                        />
-                        <View style={[styles.numberSquare, { marginTop: margin }]}>
-                            <Text style={styles.number}>{momentCount}</Text>
+                            <View style={styles.inputContainer}>
+                                <TextInput
+                                    style={[styles.momentEnter, { marginTop: margin }]}
+                                    placeholder="Enter Moment"
+                                    returnKeyType="done"
+                                    onSubmitEditing={submitMoment}
+                                    onChangeText={handleTextChange}
+                                    onFocus={() => setMargin((shownCapsule && !publishState ? -495 : -360))}
+                                    onBlur={() => setMargin(0)}
+                                    value={moment}
+                                />
+                                <View style={[styles.numberSquare, { marginTop: margin }]}>
+                                    <Text style={styles.number}>{momentCount}</Text>
+                                </View>
+                            </View>
                         </View>
-                    </View>
-                </View>
-                
-                
-                <View style={styles.capsuleList} />
-            </BlackBackground>
-        </TouchableOpacity>
+                        <View style={styles.imageContainer}>
+                            <View style={styles.overlayButton}>
+                                {shownCapsule ? (
+                                    <Image
+                                        style={styles.capsuleImage}
+                                        source={{ uri: shownCapsule }}
+                                    />
+                                ) : (
+                                    <Text style={styles.overlayText}>No Capsule Available</Text>
+                                )}
+                            </View>
+
+                        </View>
+                        <View style={styles.capsuleList} />
+                        <BottomTab navigation={navigation} state={{ index: 1 }} />
+
+                    </BlackBackground>
+                </TouchableOpacity>
+            </View>
+        </PanGestureHandler>
+
     );
 }
 
@@ -324,7 +360,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#FFFFFF',
     },
-    
+
     capsuleList: {
         position: 'absolute',
         top: '27%',
@@ -375,8 +411,9 @@ const styles = StyleSheet.create({
         width: '80%',
         alignItems: 'center',
         justifyContent: 'space-between',
+        zIndex: 3
     },
-    
+
     publishButton: {
         marginTop: 20,
         marginBottom: 20,
@@ -386,22 +423,22 @@ const styles = StyleSheet.create({
         padding: 10,
         alignItems: 'center',
     },
-    
+
     publishButtonText: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
-    },  
+    },
     timerButton: {
         flex: 1,
         backgroundColor: 'rgba(0, 245, 186, 0.5)',
         marginRight: 5,
         borderRadius: 10,
     },
-      timerbuttonText: {
+    timerbuttonText: {
         color: 'white',
         fontWeight: 'bold',
-      },
+    },
     photoButton: {
         left: '83%',
         aspectRatio: 1,
@@ -430,7 +467,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 40,
         paddingHorizontal: 10,
-    },button: {
+    }, button: {
         justifyContent: 'center',
         alignItems: 'center',
         padding: 10,
@@ -438,21 +475,24 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontWeight: 'bold',
-    },momentEnter: {
+    }, momentEnter: {
         width: '80%',
         height: 40,
-        backgroundColor: 'rgba(255, 255, 255, 0.67)',
+        backgroundColor: 'rgb(200, 200, 200)',
         borderRadius: 10,
         textAlign: 'left',
         paddingLeft: 15,
-    },inputContainer: {
+    },
+    inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: 15,
+        zIndex: 3
     },
     numberSquare: {
         width: 40,
         height: 40,
-        backgroundColor: 'rgba(255, 255, 255, 0.67)',
+        backgroundColor: 'rgb(200, 200, 200)',
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
@@ -461,7 +501,7 @@ const styles = StyleSheet.create({
     number: {
         color: 'black',
         fontWeight: 'bold',
-        fontSize: 20
+        fontSize: 20,
     }
-    
+
 });

@@ -10,6 +10,9 @@ import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import ViewShot from "react-native-view-shot";
 import * as MediaLibrary from 'expo-media-library';
+import BottomTab from "../Components/BottomTab";
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+
 
 
 const History = ({ navigation }) => {
@@ -37,6 +40,10 @@ const History = ({ navigation }) => {
         { id: 'btn5', label: 'Btn 5' },
         { id: 'btn6', label: 'Btn 6' },
     ];
+
+    const onSwipeLeft = () => {
+        navigation.navigate('Main');
+    };
 
 
     // handle image presses for enlarging the capsule
@@ -129,7 +136,7 @@ const History = ({ navigation }) => {
 
 
     const handleSavePress = async () => {
-        
+
         setEditOverlayVisible(false)
         const uri = await viewShotRef.current.capture();
         Alert.alert("Success", "Changes Saved");
@@ -236,68 +243,102 @@ const History = ({ navigation }) => {
     }, [curUser.capsules]);
 
     return (
-        <HistoryBackground>
-            <BackButton onPress={() => navigation.goBack()} />
-            {capsulesArray.length > 0 ? (
-                <View style={{ flex: 1 }}>
-                    <FlatList
-                        style={styles.capsuleList}
-                        data={capsulesArray}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item, index }) => (
-                            <TouchableOpacity onPress={() => handleImagePress(item, index)}>
-                                <Image style={styles.capsuleListItem} source={{ uri: item }} />
-                            </TouchableOpacity>
-                        )}
-                    />
-                    <Modal
-                        transparent={true}
-                        visible={modalVisible}
-                        onRequestClose={() => setModalVisible(false)}
-                    >
-                        <TouchableOpacity
-                            style={styles.modalOverlay}
-                            activeOpacity={1}
-                            onPressOut={() => setModalVisible(false)}
-                        >
-                            <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
-                                <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
-                                    <View style={styles.imageContainer}>
-                                        {imageLoading && (
-                                            <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                        )}
-                                        <Image
-                                            style={styles.enlargedImage}
-                                            source={{ uri: selectedImage }}
-                                            onLoad={() => setImageLoading(false)}
-                                        />
-                                    </View>
-                                    {isEditOverlayVisible && (
-                                        <View style={styles.editOverlay}>
-                                            <TouchableOpacity style={styles.editSpotifyButton} onPress={() => { handleEditSpotify() }}></TouchableOpacity>
-                                            <View style={styles.editButtonContainer}>
-                                                {editButtons.map((button, index) => (
-                                                    <TouchableOpacity
-                                                        key={button.id}
-                                                        style={styles.editButtonWrapper}
-                                                        onPress={() => handleEditImagePress(index)}
-                                                    >
-                                                        <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
-                                                    </TouchableOpacity>
-                                                ))}
+        <PanGestureHandler
+            onGestureEvent={({ nativeEvent }) => {
+                //console.log(nativeEvent)
+                if (nativeEvent.translationX < -50) {
+                    onSwipeLeft();
+                }
+            }}
+            onHandlerStateChange={({ nativeEvent }) => {
+                if (nativeEvent.state === State.END) {
+                    // Reset any animation or state changes related to the gesture
+                }
+            }}>
+            <View style={{ flex: 1 }}>
+                <HistoryBackground>
+                    {capsulesArray.length > 0 ? (
+                        <View style={{ flex: 1 }}>
+                            <FlatList
+                                style={styles.capsuleList}
+                                data={capsulesArray}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <TouchableOpacity onPress={() => handleImagePress(item, index)}>
+                                        <Image style={styles.capsuleListItem} source={{ uri: item }} />
+                                    </TouchableOpacity>
+                                )}
+                            />
+                            <Modal
+                                transparent={true}
+                                visible={modalVisible}
+                                onRequestClose={() => setModalVisible(false)}
+                            >
+                                <TouchableOpacity
+                                    style={styles.modalOverlay}
+                                    activeOpacity={1}
+                                    onPressOut={() => setModalVisible(false)}
+                                >
+                                    <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+                                        <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
+                                            <View style={styles.imageContainer}>
+                                                {imageLoading && (
+                                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                                )}
+                                                <Image
+                                                    style={styles.enlargedImage}
+                                                    source={{ uri: selectedImage }}
+                                                    onLoad={() => setImageLoading(false)}
+                                                />
                                             </View>
-                                        </View>
-                                    )}
-                                    {spotifyVisible && (
-                                        <View style={styles.spotifyTextContainer}>
-                                            <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
-                                            <Text style={styles.spotifyText}>Top Song: {songName} by {artist}</Text>
-                                        </View>
-                                    )}
+                                            {isEditOverlayVisible && (
+                                                <View style={styles.editOverlay}>
+                                                    <TouchableOpacity style={styles.editSpotifyButton} onPress={() => { handleEditSpotify() }}></TouchableOpacity>
+                                                    <View style={styles.editButtonContainer}>
+                                                        {editButtons.map((button, index) => (
+                                                            <TouchableOpacity
+                                                                key={button.id}
+                                                                style={styles.editButtonWrapper}
+                                                                onPress={() => handleEditImagePress(index)}
+                                                            >
+                                                                <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
+                                                            </TouchableOpacity>
+                                                        ))}
+                                                    </View>
+                                                </View>
+                                            )}
+                                            {spotifyVisible && (
+                                                <View style={styles.spotifyTextContainer}>
+                                                    <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
+                                                    <Text style={styles.spotifyText}>Top Song: {songName} by {artist}</Text>
+                                                </View>
+                                            )}
+                                            {modalVisible && (
+                                                <ImageGrid images={addedImages} />
+                                            )}
+                                        </ViewShot>
+
+                                    </TouchableOpacity>
+                                    {/* Buttons Container */}
                                     {modalVisible && (
-                                        <ImageGrid images={addedImages} />
+                                        <View style={styles.buttonsContainer}>
+                                            <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
+                                                <Text>Edit</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
+                                                <Text>Save Changes</Text>
+                                            </TouchableOpacity>
+                                        </View>
                                     )}
-                                </ViewShot>
+                                </TouchableOpacity>
+                            </Modal>
+                        </View>
+                    ) : (
+                        <View style={styles.noPastCapsulesContainer}>
+                            <Text style={styles.overlayText}>No Past Capsules</Text>
+                        </View>
+                    )}
+                    <BottomTab navigation={navigation} state={{ index: 0 }} />
 
                             </TouchableOpacity>
                             {/* Buttons Container */}
@@ -322,7 +363,11 @@ const History = ({ navigation }) => {
                     <Text style={styles.overlayText}>No Past Capsules</Text>
                 </View>
             )}
-        </HistoryBackground>
+
+                </HistoryBackground>
+            </View>
+        </PanGestureHandler>
+
     );
 };
 
