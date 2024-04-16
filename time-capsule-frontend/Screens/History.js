@@ -9,7 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import ViewShot from "react-native-view-shot";
-
+import * as MediaLibrary from 'expo-media-library';
 
 
 const History = ({ navigation }) => {
@@ -59,9 +59,15 @@ const History = ({ navigation }) => {
     
     const handleSharePress = async () => {
         if (!selectedImage) return;
-        
         try {
-            await Sharing.shareAsync(selectedImage);
+            const isAvailable = await Sharing.isAvailableAsync();
+            if (!isAvailable) {
+                Alert.alert("Sharing not available on this device.");
+                return;
+            }
+            await Sharing.shareAsync(selectedImage, {
+                mimeType: 'image/jpeg',
+            });
         } catch (error) {
             console.error('Error sharing image:', error);
         }
@@ -178,16 +184,6 @@ const History = ({ navigation }) => {
             aspect: [4, 3],
             quality: 0,
         });
-
-        const handleSharePress = async () => {
-            if (!selectedImage) return;
-            
-            try {
-                await Sharing.shareAsync(selectedImage);
-            } catch (error) {
-                console.error('Error sharing image:', error);
-            }
-        };
 
         if (!result.canceled) {
             //from react client, to express server, to s3 bucket
