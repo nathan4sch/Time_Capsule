@@ -15,7 +15,8 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 
 
-const History = ({ navigation }) => {
+const History = ({ navigation, isSwiping }) => {
+    //console.log(isSwiping)
     const { curUser, getCapsuleUrl, BASE_S3_URL, getCapsule, replacePhoto, setSnapshotKey, replaceSong } = useGlobalContext();
     const [capsulesArray, setCapsules] = useState([]);
 
@@ -300,7 +301,7 @@ const History = ({ navigation }) => {
                                                                 key={button.id}
                                                                 style={styles.editButtonWrapper}
                                                                 onPress={() => handleEditImagePress(index)}
-                                                                //disabled={isSwiping}
+                                                                disabled={isSwiping}
                                                             >
                                                                 <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
                                                             </TouchableOpacity>

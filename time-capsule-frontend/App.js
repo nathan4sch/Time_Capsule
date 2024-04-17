@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -45,18 +45,37 @@ export default function App() {
 }
 
 function MainTabs() {
+  const [isSwiping, setSwiping] = useState(false);
+
+  const handleSwipeStart = () => {
+    console.log('Swipe started');
+    setSwiping(true);
+  };
+
+  const handleSwipeEnd = () => {
+    console.log('Swipe ended');
+    setSwiping(false);
+  };
+
   return (
     <Tab.Navigator
       initialRouteName="Main"
-      //swipeEnabled={true}
+      onSwipeStart={handleSwipeStart}
+      onSwipeEnd={handleSwipeEnd}
       tabBarOptions={{
         showLabel: false,
         style: { height: 0 },
       }}
     >
-      <Tab.Screen name="History" component={History} />
-      <Tab.Screen name="Main" component={Main} />
-      <Tab.Screen name="StoryBoard" component={StoryBoard} />
+      <Tab.Screen name="History">
+        {props => <History {...props} isSwiping={isSwiping} />}
+      </Tab.Screen>
+      <Tab.Screen name="Main">
+        {props => <Main {...props} isSwiping={isSwiping} />}
+      </Tab.Screen>
+      <Tab.Screen name="StoryBoard">
+        {props => <StoryBoard {...props} isSwiping={isSwiping} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
