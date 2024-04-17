@@ -53,7 +53,7 @@ const Photos = ({ navigation }) => {
 
   useLayoutEffect(() => {
     const saveSnapshot = async () => {
-      if (viewShotRef.current && isContentReady) { 
+      if (viewShotRef.current && isContentReady) {
         setTimeout(async () => {
           const uri = await viewShotRef.current.capture();
           const imageKey = await postPhoto(uri);
@@ -62,32 +62,44 @@ const Photos = ({ navigation }) => {
       }
     };
 
-    if (isContentReady) { 
+    if (isContentReady) {
       saveSnapshot();
     }
   }, [isContentReady, capsuleId]);
 
   const combineImages = async () => {
-    const uri = await viewShotRef.current.capture(); 
+    const uri = await viewShotRef.current.capture();
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status === 'granted') {
-      const asset = await MediaLibrary.createAssetAsync(uri); 
-      await MediaLibrary.createAlbumAsync('YourAlbumName', asset, false);
-      Alert.alert("Image Saved", "Your combined image has been saved to the camera roll.");
+      const asset = await MediaLibrary.createAssetAsync(uri);
+      const albumName = 'Monthly Capsules';
+      const albums = await MediaLibrary.getAlbumsAsync();
+
+      const existingAlbum = albums.find(album => album.title === albumName);
+
+      if (existingAlbum) {
+        // Album already exists, add the photo to it
+        await MediaLibrary.addAssetsToAlbumAsync([asset], existingAlbum, false);
+        Alert.alert("Image Saved", "Your combined image has been saved to the album 'Monthly Capsules'.");
+      } else {
+        // Album doesn't exist, create a new album and add the photo to it
+        const createdAlbum = await MediaLibrary.createAlbumAsync(albumName, asset, false);
+        Alert.alert("Image Saved", `Your combined image has been saved to the new album '${albumName}'.`);
+      }
     }
   };
 
   const getCurrentMonthName = () => {
-    const date = new Date(); 
-    const monthNames = [ 
+    const date = new Date();
+    const monthNames = [
       "January", "February", "March",
       "April", "May", "June",
       "July", "August", "September",
       "October", "November", "December"
     ];
-    return monthNames[date.getMonth()]; 
+    return monthNames[date.getMonth()];
   };
-  
+
   const getCurrentYear = () => {
     const date = new Date();
     return date.getFullYear();
@@ -98,7 +110,7 @@ const Photos = ({ navigation }) => {
       <BlackBackground>
         <BackButton onPress={() => navigation.goBack()} />
         <Text style={styles.title}>Monthly Capsule</Text>
-        
+
         <ViewShot ref={viewShotRef} options={{ format: 'jpg', quality: 0.9 }} style={styles.viewShotContainer}>
           <View style={styles.informationContainer}>
             <View style={styles.topbarContainer}>
@@ -147,9 +159,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   spacer: {
-    width: 75, 
-    height: 50, 
-    opacity: 0, 
+    width: 75,
+    height: 50,
+    opacity: 0,
   },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -184,13 +196,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   monthTextContainer: {
-    flex: 1, 
+    flex: 1,
     position: 'absolute',
     left: 0,
     right: 0,
     textAlign: 'center',
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   monthText: {
     fontSize: 40,
@@ -210,7 +222,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "50%",
     padding: 10,
-    
+
     //borderWidth: 2,
     //borderColor: 'blue',
   },
