@@ -63,7 +63,7 @@ const History = ({ navigation }) => {
     const handleEditPress = () => {
         setEditOverlayVisible(!isEditOverlayVisible);
     };
-    
+
     const handleSharePress = async () => {
         if (!selectedImage) return;
         try {
@@ -325,6 +325,9 @@ const History = ({ navigation }) => {
                                             <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
                                                 <Text>Edit</Text>
                                             </TouchableOpacity>
+                                            <TouchableOpacity style={styles.shareButton} onPress={() => { handleSharePress() }}>
+                                                <Text>Share Photo</Text>
+                                            </TouchableOpacity>
                                             <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
                                                 <Text>Save Changes</Text>
                                             </TouchableOpacity>
@@ -339,34 +342,9 @@ const History = ({ navigation }) => {
                         </View>
                     )}
                     <BottomTab navigation={navigation} state={{ index: 0 }} />
-
-                            </TouchableOpacity>
-                            {/* Buttons Container */}
-                            {modalVisible && (
-                                <View style={styles.buttonsContainer}>
-                                    <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
-                                        <Text>Edit</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.shareButton} onPress={() => { handleSharePress() }}>
-                                        <Text>Share Photo</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
-                                        <Text>Save Changes</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                        </TouchableOpacity>
-                    </Modal>
-                </View>
-            ) : (
-                <View style={styles.noPastCapsulesContainer}>
-                    <Text style={styles.overlayText}>No Past Capsules</Text>
-                </View>
-            )}
-
-                </HistoryBackground>
-            </View>
-        </PanGestureHandler>
+                </HistoryBackground >
+            </View >
+        </PanGestureHandler >
 
     );
 };
@@ -376,13 +354,13 @@ export default History;
 const styles = StyleSheet.create({
     capsuleList: {
         position: "absolute",
-        top: "15%",
+        top: "5%",
         width: "100%",
-        height: '85%',
+        height: '90%',
     },
     capsuleListItem: {
         alignSelf: 'center',
-        width: '75%',
+        width: '100%',
         aspectRatio: 3 / 4,
         marginVertical: 15,
         borderRadius: 10
