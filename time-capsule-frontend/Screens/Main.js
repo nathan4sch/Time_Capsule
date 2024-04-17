@@ -416,7 +416,8 @@ const styles = StyleSheet.create({
 
     publishButton: {
         marginTop: 20,
-        width: '95%',
+        marginBottom: 20,
+        width: '80%',
         backgroundColor: '#4CAF50',
         borderRadius: 10,
         padding: 10,

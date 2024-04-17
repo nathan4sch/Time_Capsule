@@ -6,10 +6,13 @@ import HistoryBackground from "../Components/HistoryBackground";
 import BackButton from "../Components/lightBackButton";
 import ImageGrid from "../Components/ImageGrid"
 import * as ImagePicker from 'expo-image-picker';
+import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import ViewShot from "react-native-view-shot";
+import * as MediaLibrary from 'expo-media-library';
 import BottomTab from "../Components/BottomTab";
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+
 
 
 const History = ({ navigation }) => {
@@ -59,6 +62,22 @@ const History = ({ navigation }) => {
 
     const handleEditPress = () => {
         setEditOverlayVisible(!isEditOverlayVisible);
+    };
+    
+    const handleSharePress = async () => {
+        if (!selectedImage) return;
+        try {
+            const isAvailable = await Sharing.isAvailableAsync();
+            if (!isAvailable) {
+                Alert.alert("Sharing not available on this device.");
+                return;
+            }
+            await Sharing.shareAsync(selectedImage, {
+                mimeType: 'image/jpeg',
+            });
+        } catch (error) {
+            console.error('Error sharing image:', error);
+        }
     };
 
     const handleEditSpotify = async () => {
@@ -321,9 +340,34 @@ const History = ({ navigation }) => {
                     )}
                     <BottomTab navigation={navigation} state={{ index: 0 }} />
 
+                            </TouchableOpacity>
+                            {/* Buttons Container */}
+                            {modalVisible && (
+                                <View style={styles.buttonsContainer}>
+                                    <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
+                                        <Text>Edit</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.shareButton} onPress={() => { handleSharePress() }}>
+                                        <Text>Share Photo</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
+                                        <Text>Save Changes</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                    </Modal>
+                </View>
+            ) : (
+                <View style={styles.noPastCapsulesContainer}>
+                    <Text style={styles.overlayText}>No Past Capsules</Text>
+                </View>
+            )}
+
                 </HistoryBackground>
             </View>
         </PanGestureHandler>
+
     );
 };
 
@@ -408,18 +452,24 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        width: '100%',
+        width: '80%',
         paddingVertical: 10,
     },
     editButton: {
         backgroundColor: 'lightblue',
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    shareButton: {
+        backgroundColor: 'lightcyan',
+        paddingHorizontal: 10,
         paddingVertical: 10,
         borderRadius: 5,
     },
     saveButton: {
         backgroundColor: 'lightgreen',
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         paddingVertical: 10,
         borderRadius: 5,
     },
