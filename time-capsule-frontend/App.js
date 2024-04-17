@@ -25,21 +25,19 @@ const Tab = createMaterialTopTabNavigator();
 export default function App() {
   return (
     <GlobalProvider>
-      <GestureHandlerRootView>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Registration" component={Registration} />
-            <Stack.Screen name="Spotify" component={Spotify} />
-            <Stack.Screen name="Instagram" component={Instagram} />
-            <Stack.Screen name="Friends" component={Friends} />
-            <Stack.Screen name="Profile" component={Profile} />
-            <Stack.Screen name="Photos" component={Photos} />
-            <Stack.Screen name="Moment" component={Moment} />
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </GestureHandlerRootView>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Registration" component={Registration} />
+          <Stack.Screen name="Spotify" component={Spotify} />
+          <Stack.Screen name="Instagram" component={Instagram} />
+          <Stack.Screen name="Friends" component={Friends} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }}/>
+          <Stack.Screen name="Profile" component={Profile} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }} />
+          <Stack.Screen name="Photos" component={Photos} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }} />
+          <Stack.Screen name="Moment" component={Moment} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }} />
+          <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerLeft: null, gestureEnabled: false}}/>
+        </Stack.Navigator>
+      </NavigationContainer>
     </GlobalProvider>
   );
 }
@@ -62,9 +60,9 @@ function MainTabs() {
       initialRouteName="Main"
       onSwipeStart={handleSwipeStart}
       onSwipeEnd={handleSwipeEnd}
-      tabBarOptions={{
-        showLabel: false,
-        style: { height: 0 },
+      screenOptions={{
+        tabBarShowLabel: false,
+        tabBarStyle: { height: 0 },
       }}
     >
       <Tab.Screen name="History">
