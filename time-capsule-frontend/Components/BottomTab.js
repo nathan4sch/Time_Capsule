@@ -19,12 +19,15 @@ const BottomTab = ({ navigation, state }) => {
             key={index}
             style={[
               styles.tabButton,
-              state.index === index && styles.activeTabButton,
             ]}
             onPress={() => navigation.navigate(tab.route)}
           >
-            <Feather name={tab.icon} size={24} color="black" />
-            <Text style={styles.tabTitle}>{tab.title}</Text>
+            <Feather
+              name={tab.icon}
+              size={state.index === index ? 30 : 24}
+              color={state.index === index ? 'black' : 'grey'}
+              style={state.index === index ? styles.boldIcon : null}
+            />
           </TouchableOpacity>
         ))}
       </View>
@@ -58,6 +61,9 @@ const styles = StyleSheet.create({
   tabTitle: {
     marginTop: 3,
     fontSize: 12,
+  },
+  boldIcon: {
+    fontWeight: 'bold',
   },
 });
 
