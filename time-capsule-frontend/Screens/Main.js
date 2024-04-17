@@ -215,20 +215,7 @@ const Main = ({ navigation }) => {
     }
 
     return (
-        <PanGestureHandler
-            onGestureEvent={({ nativeEvent }) => {
-                //console.log(nativeEvent)
-                if (nativeEvent.translationX < -50) {
-                    onSwipeLeft();
-                } else if (nativeEvent.translationX > 50) {
-                    onSwipeRight();
-                }
-            }}
-            onHandlerStateChange={({ nativeEvent }) => {
-                if (nativeEvent.state === State.END) {
-                    // Reset any animation or state changes related to the gesture
-                }
-            }}>
+        
             <View style={{ flex: 1 }}>
                 <TouchableOpacity
                     style={{ flex: 1 }}
@@ -311,7 +298,7 @@ const Main = ({ navigation }) => {
                     </BlackBackground>
                 </TouchableOpacity>
             </View>
-        </PanGestureHandler>
+        
 
     );
 }

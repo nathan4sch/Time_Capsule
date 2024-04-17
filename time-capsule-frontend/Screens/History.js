@@ -12,10 +12,14 @@ import ViewShot from "react-native-view-shot";
 import * as MediaLibrary from 'expo-media-library';
 import BottomTab from "../Components/BottomTab";
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { Feather } from '@expo/vector-icons';
+import GreenBackground from "../Components/GreenBackground";
 
 
 
-const History = ({ navigation }) => {
+
+const History = ({ navigation, isSwiping }) => {
+    //console.log(isSwiping)
     const { curUser, getCapsuleUrl, BASE_S3_URL, getCapsule, replacePhoto, setSnapshotKey, replaceSong } = useGlobalContext();
     const [capsulesArray, setCapsules] = useState([]);
 
@@ -63,7 +67,7 @@ const History = ({ navigation }) => {
     const handleEditPress = () => {
         setEditOverlayVisible(!isEditOverlayVisible);
     };
-    
+
     const handleSharePress = async () => {
         if (!selectedImage) return;
         try {
@@ -243,130 +247,102 @@ const History = ({ navigation }) => {
     }, [curUser.capsules]);
 
     return (
-        <PanGestureHandler
-            onGestureEvent={({ nativeEvent }) => {
-                //console.log(nativeEvent)
-                if (nativeEvent.translationX < -50) {
-                    onSwipeLeft();
-                }
-            }}
-            onHandlerStateChange={({ nativeEvent }) => {
-                if (nativeEvent.state === State.END) {
-                    // Reset any animation or state changes related to the gesture
-                }
-            }}>
-            <View style={{ flex: 1 }}>
-                <HistoryBackground>
-                    {capsulesArray.length > 0 ? (
-                        <View style={{ flex: 1 }}>
-                            <FlatList
-                                style={styles.capsuleList}
-                                data={capsulesArray}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={({ item, index }) => (
-                                    <TouchableOpacity onPress={() => handleImagePress(item, index)}>
-                                        <Image style={styles.capsuleListItem} source={{ uri: item }} />
-                                    </TouchableOpacity>
-                                )}
-                            />
-                            <Modal
-                                transparent={true}
-                                visible={modalVisible}
-                                onRequestClose={() => setModalVisible(false)}
-                            >
-                                <TouchableOpacity
-                                    style={styles.modalOverlay}
-                                    activeOpacity={1}
-                                    onPressOut={() => setModalVisible(false)}
-                                >
-                                    <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
-                                        <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
-                                            <View style={styles.imageContainer}>
-                                                {imageLoading && (
-                                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                                )}
-                                                <Image
-                                                    style={styles.enlargedImage}
-                                                    source={{ uri: selectedImage }}
-                                                    onLoad={() => setImageLoading(false)}
-                                                />
-                                            </View>
-                                            {isEditOverlayVisible && (
-                                                <View style={styles.editOverlay}>
-                                                    <TouchableOpacity style={styles.editSpotifyButton} onPress={() => { handleEditSpotify() }}></TouchableOpacity>
-                                                    <View style={styles.editButtonContainer}>
-                                                        {editButtons.map((button, index) => (
-                                                            <TouchableOpacity
-                                                                key={button.id}
-                                                                style={styles.editButtonWrapper}
-                                                                onPress={() => handleEditImagePress(index)}
-                                                            >
-                                                                <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
-                                                            </TouchableOpacity>
-                                                        ))}
-                                                    </View>
-                                                </View>
-                                            )}
-                                            {spotifyVisible && (
-                                                <View style={styles.spotifyTextContainer}>
-                                                    <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
-                                                    <Text style={styles.spotifyText}>Top Song: {songName} by {artist}</Text>
-                                                </View>
-                                            )}
-                                            {modalVisible && (
-                                                <ImageGrid images={addedImages} />
-                                            )}
-                                        </ViewShot>
 
-                                    </TouchableOpacity>
-                                    {/* Buttons Container */}
-                                    {modalVisible && (
-                                        <View style={styles.buttonsContainer}>
-                                            <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
-                                                <Text>Edit</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
-                                                <Text>Save Changes</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    )}
+        <View style={{ flex: 1 }}>
+            <HistoryBackground>
+                {capsulesArray.length > 0 ? (
+                    <View style={{ flex: 1 }}>
+                        <FlatList
+                            style={styles.capsuleList}
+                            data={capsulesArray}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item, index }) => (
+                                <TouchableOpacity onPress={() => handleImagePress(item, index)}>
+                                    <Image style={styles.capsuleListItem} source={{ uri: item }} />
                                 </TouchableOpacity>
-                            </Modal>
-                        </View>
-                    ) : (
-                        <View style={styles.noPastCapsulesContainer}>
-                            <Text style={styles.overlayText}>No Past Capsules</Text>
-                        </View>
-                    )}
-                    <BottomTab navigation={navigation} state={{ index: 0 }} />
-
-                            </TouchableOpacity>
-                            {/* Buttons Container */}
-                            {modalVisible && (
-                                <View style={styles.buttonsContainer}>
-                                    <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
-                                        <Text>Edit</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.shareButton} onPress={() => { handleSharePress() }}>
-                                        <Text>Share Photo</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
-                                        <Text>Save Changes</Text>
-                                    </TouchableOpacity>
-                                </View>
                             )}
-                        </TouchableOpacity>
-                    </Modal>
-                </View>
-            ) : (
-                <View style={styles.noPastCapsulesContainer}>
-                    <Text style={styles.overlayText}>No Past Capsules</Text>
-                </View>
-            )}
+                        />
+                        <Modal
+                            transparent={true}
+                            visible={modalVisible}
+                            onRequestClose={() => setModalVisible(false)}
+                        >
+                            <TouchableOpacity
+                                style={styles.modalOverlay}
+                                activeOpacity={1}
+                                onPressOut={() => setModalVisible(false)}
+                            >
+                                <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+                                    <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
+                                        <View style={styles.imageContainer}>
+                                            {imageLoading && (
+                                                <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
+                                            )}
+                                            <Image
+                                                style={styles.enlargedImage}
+                                                source={{ uri: selectedImage }}
+                                                onLoad={() => setImageLoading(false)}
+                                            />
+                                        </View>
+                                        {isEditOverlayVisible && (
+                                            <View style={styles.editOverlay}>
+                                                <TouchableOpacity style={styles.editSpotifyButton} onPress={() => { handleEditSpotify() }}></TouchableOpacity>
+                                                <View style={styles.editButtonContainer}>
+                                                    {editButtons.map((button, index) => (
+                                                        <TouchableOpacity
+                                                            key={button.id}
+                                                            style={styles.editButtonWrapper}
+                                                            onPress={() => handleEditImagePress(index)}
+                                                            disabled={isSwiping}
+                                                        >
+                                                            <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
+                                                        </TouchableOpacity>
+                                                    ))}
+                                                </View>
+                                            </View>
+                                        )}
+                                        {spotifyVisible && (
+                                            <View style={styles.spotifyTextContainer}>
+                                                <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
+                                                <Text style={styles.spotifyText}>Top Song: {songName} by {artist}</Text>
+                                            </View>
+                                        )}
+                                        {modalVisible && (
+                                            <ImageGrid images={addedImages} />
+                                        )}
+                                    </ViewShot>
 
-                </HistoryBackground>
-            </View>
-        </PanGestureHandler>
+                                </TouchableOpacity>
+                                {/* Buttons Container */}
+                                {modalVisible && (
+                                    <View style={styles.buttonsContainer}>
+                                        <TouchableOpacity style={styles.editButton} onPress={() => { handleEditPress() }}>
+                                            <Text>Edit</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={styles.saveButton} onPress={() => { handleSavePress() }}>
+                                            <Text>Save Changes</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={styles.shareButton} onPress={() => { handleSharePress() }}>
+                                            <Feather
+                                                name={"share"}
+                                                size={18}
+                                                color={'black'}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </Modal>
+                    </View>
+                ) : (
+                    <View style={styles.noPastCapsulesContainer}>
+                        <Text style={styles.overlayText}>No Past Capsules</Text>
+                    </View>
+                )}
+                <BottomTab navigation={navigation} state={{ index: 0 }} />
+            </HistoryBackground >
+        </View >
+
 
     );
 };
@@ -376,15 +352,15 @@ export default History;
 const styles = StyleSheet.create({
     capsuleList: {
         position: "absolute",
-        top: "15%",
+        top: "5%",
         width: "100%",
-        height: '85%',
+        height: '90%',
     },
     capsuleListItem: {
         alignSelf: 'center',
-        width: '75%',
+        width: '92%',
         aspectRatio: 3 / 4,
-        marginVertical: 15,
+        marginVertical: 8,
         borderRadius: 10
     },
     modalOverlay: {

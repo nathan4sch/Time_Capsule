@@ -61,6 +61,7 @@ const StoryBoard = ({ navigation }) => {
                     const capsuleYear = capsuleDate.getFullYear();
                     const capsuleMonth = capsuleDate.getMonth();
 
+
                     if (capsuleObj.published && capsuleYear === currentYear && capsuleMonth === currentMonth) {
                         friendInfoList.push({
                             username: friend.username,
@@ -90,25 +91,12 @@ const StoryBoard = ({ navigation }) => {
                     />
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleImagePress(item.snapshot)}>
                     <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
-                </TouchableOpacity>
             </TouchableOpacity>
         );
     };
 
     return (
-        <PanGestureHandler
-            onGestureEvent={({ nativeEvent }) => {
-                if (nativeEvent.translationX > 50) {
-                    onSwipeRight();
-                }
-            }}
-            onHandlerStateChange={({ nativeEvent }) => {
-                if (nativeEvent.state === State.END) {
-                    // Reset any animation or state changes related to the gesture
-                }
-            }}>
             <View style={{ flex: 1 }}>
                 <HistoryBackground>
                     {/* Add the rest of your components here */}
@@ -121,7 +109,7 @@ const StoryBoard = ({ navigation }) => {
                                 renderItem={({ item }) => renderFriendCapsule(item)}
                                 ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
                             />
-                            <Modal
+                            {/*<Modal
                                 transparent={true}
                                 visible={modalVisible}
                                 onRequestClose={() => setModalVisible(false)}
@@ -146,7 +134,7 @@ const StoryBoard = ({ navigation }) => {
                                         </View>
                                     </TouchableOpacity>
                                 </TouchableOpacity>
-                            </Modal>
+                                            </Modal>*/}
                         </>
                     ) : (
                         <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
@@ -155,7 +143,7 @@ const StoryBoard = ({ navigation }) => {
 
                 </HistoryBackground>
             </View>
-        </PanGestureHandler>
+        
     );
 };
 
@@ -164,15 +152,16 @@ export default StoryBoard;
 const styles = StyleSheet.create({
     capsuleList: {
         position: "absolute",
-        top: "15%",
+        top: "5%",
         width: "100%",
-        height: "80%",
+        height: '90%',
     },
     capsuleListItem: {
-        alignSelf: "center",
-        width: "75%",
+        alignSelf: 'center',
+        width: '85%',
         aspectRatio: 3 / 4,
-        marginVertical: 15,
+        marginVertical: 8,
+        borderRadius: 10
     },
     container: {
         width: "100%",
@@ -185,6 +174,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 10,
         paddingHorizontal: 20,
+        backgroundColor: "white"
     },
     usernameText: {
         fontSize: 20,
