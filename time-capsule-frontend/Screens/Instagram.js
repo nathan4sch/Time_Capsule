@@ -10,11 +10,11 @@ const Instagram = ({ navigation }) => {
     return (
         <GreenBackground>
             <Image style={styles.capsule} source={require('../icons/capsule-.png')} />
-            <TouchableOpacity style={styles.container} onPress={() => instagramLogin({navigation, page: "Main"})} title=''>
+            <TouchableOpacity style={styles.container} onPress={() => instagramLogin({navigation, page: "MainTabs"})} title=''>
                 <Text style={styles.text}>Link Instagram</Text>
                 <Image style={styles.spotify} source={require('../icons/instagram-.png')} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.press} onPress={() => navigation.navigate("Main")}>
+            <TouchableOpacity style={styles.press} onPress={() => navigation.navigate("MainTabs")}>
                 <Text style={styles.text2}>skip for now</Text>
             </TouchableOpacity>
         </GreenBackground>

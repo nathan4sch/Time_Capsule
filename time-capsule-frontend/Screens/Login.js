@@ -64,7 +64,7 @@ const Login = ({ navigation }) => {
                         curUserChanged.current = true
                     }
                     await setCurUser(user)
-                    navigation.navigate('Main');
+                    navigation.navigate('MainTabs');
                 }
             }
         };

@@ -300,6 +300,7 @@ const History = ({ navigation }) => {
                                                                 key={button.id}
                                                                 style={styles.editButtonWrapper}
                                                                 onPress={() => handleEditImagePress(index)}
+                                                                //disabled={isSwiping}
                                                             >
                                                                 <Image style={styles.transparentImage} source={require('../icons/editOverlay.jpg')} />
                                                             </TouchableOpacity>
