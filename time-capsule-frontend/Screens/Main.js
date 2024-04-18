@@ -38,7 +38,7 @@ const Main = ({ navigation }) => {
 
             month.setHours(0, 0, 0, 0);
 
-            const media = await MediaLibrary.getAssetsAsync({ first: 7, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
+            const media = await MediaLibrary.getAssetsAsync({ first: 9, createdAfter: month, mediaType: 'photo', sortBy: MediaLibrary.SortBy.creationTime });
             const assetInfoArray = [];
             for (const asset of media.assets) {
                 try {
@@ -75,7 +75,7 @@ const Main = ({ navigation }) => {
 
                 if (curUser.profileSettings.spotifyAccount !== "") {
                     spotifySongs = await getSpotifyTopSong();
-                    spotifySongsArray.push(spotifySongs);
+                    spotifySongsArray.push(spotifySongs[0]);
                 } else {
                     spotifySongsArray.push("Hey Jude by The Beatles");
                 }
