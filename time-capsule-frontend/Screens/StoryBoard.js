@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image, FlatList, Modal, ActivityIndicator, RefreshControl } from "react-native";
+import { Platform, StyleSheet, View, Text, TouchableOpacity, Image, FlatList, Modal, ActivityIndicator, RefreshControl } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
@@ -249,31 +249,4 @@ const styles = StyleSheet.create({
         color: 'black',
         fontWeight: 'bold',
     },
-    rectangle1: {
-        position: 'absolute',
-        width: '390px',
-        height: '458px',
-        left: '0px',
-        top: '211px',
-        background: '#8E8E8E',
-        borderRadius: '20px'
-    },
-    line1: {
-        position: 'absolute',
-        width: '500.81px',
-        height: '156.25px',
-        left: '334px',
-        top: '209px',
-        borderRadius: '100px',
-        transform: 'rotate(102.13deg)'
-    },
-    line2: {
-        position: 'absolute',
-        width: '560.72px',
-        height: '166.88px',
-        left: '11px',
-        top: '215px',
-        borderRadius: '100px',
-        transform: 'rotate(34.95deg)'
-    }
 });

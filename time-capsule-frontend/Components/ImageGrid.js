@@ -24,29 +24,29 @@ const ImageGrid = ({ images }) => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
+        left: "0%",
         width: '88%',
         height: '100%',
-        justifyContent: 'center',
+        justifyContent: 'space',
         alignItems: 'center',
         //borderWidth: 2,
         //borderColor: 'green',
         zIndex: 0,
+
     },
     row: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     imageWrapper: {
-        flex: 1, // Equal width for all cells
-        height: 152,
-        width: 80,
-        //aspectRatio: 3 / 4,
-        padding: 2,
-        //borderWidth: 2,
-        //borderColor: 'white',
-        top: '23%',
-        //borderWidth: 2,
-        //borderTopWidth: 3,
-        //borderColor: '#fff',
+        width: "32.2%",
+        height: 147,
+        //backgroundColor: "red",
+        marginBottom: 3,
+        top: "45.6%",
+        margin: 1.4
+
     },
     image: {
         width: '100%',
