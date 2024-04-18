@@ -16,7 +16,6 @@ const Photos = ({ navigation }) => {
   //const [photos, setPhotos] = useState([]);
   const [capsulePhotos, setCapsulePhotos] = useState([]);
   const [spotifySong, setSpotifySong] = useState();
-  //const [spotifySongID, setSpotifySongID] = useState();
   const [loading, setLoading] = useState(true); // State variable to track loading
   const [capsuleId, setCapsuleId] = useState("")
   const viewShotRef = useRef(null); // Reference for ViewShot
@@ -70,8 +69,26 @@ const Photos = ({ navigation }) => {
   }, [isContentReady, capsuleId]);
 
   const openSpotifySong = async () => {
-    spotifySongs = await getSpotifyTopSong();
-    console.log("bruh");
+    let spotifyUrl;
+    if (curUser.profileSettings.spotifyAccount !== "") {
+      const spotifySongs = await getSpotifyTopSong();
+      spotifyUrl = `https://open.spotify.com/track/${spotifySongs[1].id}`;
+    }
+    else {
+      // Hey Jude by The Beatles
+      spotifyUrl = `https://open.spotify.com/track/1eT2CjXwFXNx6oY5ydvzKU`;
+    }
+
+    try {                
+      const supported = await Linking.canOpenURL(spotifyUrl);
+      if (supported) {
+        Linking.openURL(spotifyUrl);
+      } else {
+        console.log("Don't know how to open URI: " + spotifyUrl);
+      }
+    } catch (error) {
+      console.error('Failed to open link:', error);
+    }
   }
 
   const combineImages = async () => {
@@ -133,21 +150,7 @@ const Photos = ({ navigation }) => {
               <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
               <TouchableOpacity
                 //style={styles.spotifyButton}  // Apply your custom styles
-                onPress={async () => {
-                  try {
-                    const spotifySongs = await getSpotifyTopSong();
-                    const spotifyUrl = `https://open.spotify.com/track/${spotifySongs[1].id}`;
-                    const supported = await Linking.canOpenURL(spotifyUrl);
-          
-                    if (supported) {
-                      Linking.openURL(spotifyUrl);
-                    } else {
-                      console.log("Don't know how to open URI: " + spotifyUrl);
-                    }
-                  } catch (error) {
-                    console.error('Failed to open link:', error);
-                  }
-                }}
+                onPress={openSpotifySong}
               >
                 <Text style={styles.spotifyText}>{`Top Song: ${spotifySong}`}</Text>
               </TouchableOpacity>
@@ -171,21 +174,7 @@ const Photos = ({ navigation }) => {
                 <Text style={styles.buttonText}>Save Capsule</Text>
             </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonContainer} onPress={async () => {
-              try {
-                const spotifySongs = await getSpotifyTopSong();
-                const spotifyUrl = `https://open.spotify.com/track/${spotifySongs[1].id}`;
-                const supported = await Linking.canOpenURL(spotifyUrl);
-      
-                if (supported) {
-                  Linking.openURL(spotifyUrl);
-                } else {
-                  console.log("Don't know how to open URI: " + spotifyUrl);
-                }
-              } catch (error) {
-                console.error('Failed to open link:', error);
-              }
-            }}>
+        <TouchableOpacity style={styles.buttonContainer} onPress={openSpotifySong}>
             <View style={buttonStyle.button}>
                 <Image style={styles.icon} source={require('../icons/spotify-.png')} />
                 <Text style={styles.buttonText}>Play Song</Text>
