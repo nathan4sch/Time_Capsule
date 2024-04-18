@@ -112,17 +112,17 @@ const StoryBoard = ({ navigation }) => {
                             }
                         />
                     </>
-                ) : ( 
+                ) : (
                     <>
-                    <FlatList
-                        style={styles.defaultCapsuleList}
-                        refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="white" />
-                        }
-                    />
-                     <View style={styles.noFriends}>
-                        <Text style={styles.noFrendsText}>No Past Capsules</Text>
-                    </View>
+                        <FlatList
+                            style={styles.defaultCapsuleList}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="white" />
+                            }
+                        />
+                        <View style={styles.noFriends}>
+                            <Text style={styles.noFrendsText}>No Friend's Capsules</Text>
+                        </View>
                     </>
                 )}
                 <BottomTab navigation={navigation} state={{ index: 2 }} />
@@ -248,5 +248,32 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         color: 'black',
         fontWeight: 'bold',
+    },
+    rectangle1: {
+        position: 'absolute',
+        width: '390px',
+        height: '458px',
+        left: '0px',
+        top: '211px',
+        background: '#8E8E8E',
+        borderRadius: '20px'
+    },
+    line1: {
+        position: 'absolute',
+        width: '500.81px',
+        height: '156.25px',
+        left: '334px',
+        top: '209px',
+        borderRadius: '100px',
+        transform: 'rotate(102.13deg)'
+    },
+    line2: {
+        position: 'absolute',
+        width: '560.72px',
+        height: '166.88px',
+        left: '11px',
+        top: '215px',
+        borderRadius: '100px',
+        transform: 'rotate(34.95deg)'
     }
 });
