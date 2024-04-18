@@ -50,13 +50,17 @@ const Friends = ({ navigation }) => {
 
     const handleSearchSubmit = async () => {
         //console.log(searchInput); // Print the input value to the console
-        ret = await sendFriendRequest(searchInput)
-        if (ret === "Success") {
-            Alert.alert("Success", "Friend Request Sent");
-        } else if (ret === "Not Found") {
-            Alert.alert("Error", "Username Not Found");
-        } else if (ret === "Already Sent") {
-            Alert.alert("Error", "Request Already Sent");
+        if (searchInput == curUser.username)
+            Alert.alert("Error", "Cannot send friend request to yourself")
+        else {
+            ret = await sendFriendRequest(searchInput)
+            if (ret === "Success") {
+                Alert.alert("Success", "Friend Request Sent");
+            } else if (ret === "Not Found") {
+                Alert.alert("Error", "Username Not Found");
+            } else if (ret === "Already Sent") {
+                Alert.alert("Error", "Request Already Sent");
+            }
         }
         setSearchInput(""); // Clear the TextInput
     };
