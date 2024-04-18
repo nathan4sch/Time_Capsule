@@ -8,7 +8,6 @@ import axios from 'axios'
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
 
-
 const BASE_S3_URL = "http://100.70.10.173:3000/"
 const BASE_URL = BASE_S3_URL + "api/v1/"
 
