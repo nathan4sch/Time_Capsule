@@ -252,7 +252,7 @@ const History = ({ navigation, isSwiping }) => {
 
         <View style={{ flex: 1 }}>
             <BlackBackground>
-            <Text style={styles.title}>History</Text>
+                <Text style={styles.title}>History</Text>
 
                 {capsulesArray.length > 0 ? (
                     <View style={{ flex: 1 }}>
@@ -312,7 +312,9 @@ const History = ({ navigation, isSwiping }) => {
                                             </View>
                                         )}
                                         {modalVisible && (
+
                                             <ImageGrid images={addedImages} />
+
                                         )}
                                     </ViewShot>
 
@@ -490,15 +492,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        top: 38,
+        top: "11.4%",
         marginHorizontal: 0,
+        width: "98%",
         zIndex: 1
     },
     editButtonWrapper: {
-        width: 115.2,
-        height: 150,
+        width: "32.7%",
+        height: 147.9,
         alignItems: 'center',
         justifyContent: 'center',
+        //backgroundColor: "red",
+        marginBottom: 3
     },
     editSpotifyButton: {
         width: '100%',
