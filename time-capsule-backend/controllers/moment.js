@@ -54,6 +54,7 @@ exports.getMoment = async (req, res) => {
 exports.deleteMoment = async (req, res) => {
     const { momentId } = req.params;
     const { userId } = req.body
+    console.log(momentId)
 
     try {
         // Assuming user.moments is the array in your UserSchema
@@ -70,6 +71,7 @@ exports.deleteMoment = async (req, res) => {
         await MomentSchema.findByIdAndDelete(momentId);
         res.status(200).json({ message: 'Moment deleted' });
     } catch (error) {
+        console.log(error)
         console.error('Error deleting moment:', error);
         res.status(500).json({ message: 'Server Error' });
     }

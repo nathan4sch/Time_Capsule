@@ -8,7 +8,7 @@ import axios from 'axios'
 //const BASE_S3_URL = "https://time-capsule-server.onrender.com/"
 
 
-const BASE_S3_URL = "http://100.70.10.59:3000/"
+const BASE_S3_URL = "http://100.70.10.173:3000/"
 const BASE_URL = BASE_S3_URL + "api/v1/"
 
 //https://time-capsule-server.onrender.com/api/v1/
@@ -128,7 +128,7 @@ export const GlobalProvider = ({ children }) => {
         // The return value contains TONS of information about the top song, which we can use for graphics or other stuff.
         //console.log(response.data.data);
         //console.log(response.data.data.items[0].name)
-        let returnStr = response.data.data.items[0].name + " by " + response.data.data.items[0].artists[0].name
+        let returnStr = [response.data.data.items[0].name + " by " + response.data.data.items[0].artists[0].name, response.data.data.items[0]]
         return (returnStr)
     }
 

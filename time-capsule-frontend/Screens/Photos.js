@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
-  StyleSheet, Text, View, Image, ScrollView, Alert, ActivityIndicator, Button, Dimensions
+  StyleSheet, Text, View, Image, ScrollView, Alert, Linking,  TouchableOpacity, ActivityIndicator, Button, Dimensions
 } from 'react-native'; // Import ActivityIndicator
 import BackButton from "../Components/lightBackButton";
+import { buttonStyle } from "../Components/Button";
 import BlackBackground from "../Components/BlackBackground";
 import * as MediaLibrary from 'expo-media-library';
 import { useGlobalContext } from "../context/globalContext";
@@ -67,6 +68,29 @@ const Photos = ({ navigation }) => {
     }
   }, [isContentReady, capsuleId]);
 
+  const openSpotifySong = async () => {
+    let spotifyUrl;
+    if (curUser.profileSettings.spotifyAccount !== "") {
+      const spotifySongs = await getSpotifyTopSong();
+      spotifyUrl = `https://open.spotify.com/track/${spotifySongs[1].id}`;
+    }
+    else {
+      // Hey Jude by The Beatles
+      spotifyUrl = `https://open.spotify.com/track/1eT2CjXwFXNx6oY5ydvzKU`;
+    }
+
+    try {                
+      const supported = await Linking.canOpenURL(spotifyUrl);
+      if (supported) {
+        Linking.openURL(spotifyUrl);
+      } else {
+        console.log("Don't know how to open URI: " + spotifyUrl);
+      }
+    } catch (error) {
+      console.error('Failed to open link:', error);
+    }
+  }
+
   const combineImages = async () => {
     const uri = await viewShotRef.current.capture();
     const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -124,7 +148,12 @@ const Photos = ({ navigation }) => {
             </View>
             <View style={styles.spotifySection}>
               <Image source={require('../icons/spotify-.png')} style={styles.spotifyIcon} />
-              <Text style={styles.spotifyText}>Top Song: {spotifySong}</Text>
+              <TouchableOpacity
+                //style={styles.spotifyButton}  // Apply your custom styles
+                onPress={openSpotifySong}
+              >
+                <Text style={styles.spotifyText}>{`Top Song: ${spotifySong}`}</Text>
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.photosContainer}>
@@ -135,10 +164,22 @@ const Photos = ({ navigation }) => {
             ))}
           </View>
         </ViewShot>
-        <Button title="Save Combined Image" onPress={async () => {
-          const combinedImageUri = await combineImages(capsulePhotos);
-          //-await saveToCameraRoll(combinedImageUri);
-        }} />
+
+        <TouchableOpacity style={styles.buttonContainer} onPress={async () => {
+            const combinedImageUri = await combineImages(capsulePhotos);
+            //-await saveToCameraRoll(combinedImageUri);
+            }}>
+            <View style={buttonStyle.button}>
+                <Image style={styles.icon} source={require('../icons/downloadIcon.png')} />
+                <Text style={styles.buttonText}>Save Capsule</Text>
+            </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.buttonContainer} onPress={openSpotifySong}>
+            <View style={buttonStyle.button}>
+                <Image style={styles.icon} source={require('../icons/spotify-.png')} />
+                <Text style={styles.buttonText}>Play Song</Text>
+            </View>
+        </TouchableOpacity>
       </BlackBackground>
     </>
   );
@@ -222,6 +263,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "50%",
     padding: 10,
+    zIndex: 100,
 
     //borderWidth: 2,
     //borderColor: 'blue',
@@ -276,6 +318,26 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover'
   },
+
+  buttonContainer: {
+    top: 25,
+    position: 'relative',
+    width: '80%',
+    height: '6.5%',
+    marginBottom: '4%',
+  },
+  buttonText: {
+    top: '23%',
+    fontSize: 21,
+    color: 'black',
+  },
+  icon: {
+    position: 'absolute',
+    left: '4%',
+    top: '20%',
+    width: 30,
+    height: 30,
+  }
 });
 
 export default Photos;
