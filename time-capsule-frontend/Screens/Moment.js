@@ -3,6 +3,8 @@ import { View, StyleSheet, Text, FlatList } from "react-native";
 import GreenBackground from "../Components/GreenBackground";
 import { useGlobalContext } from "../context/globalContext";
 import BackButton from "../Components/lightBackButton";
+import BlackBackground from "../Components/BlackBackground";
+
 
 const Friends = ({ navigation }) => {
     const { setCurUser, curUser, getUserbyID, getAllMoments } = useGlobalContext();
@@ -34,7 +36,7 @@ const Friends = ({ navigation }) => {
     };
 
     return (
-        <GreenBackground>
+        <BlackBackground>
             <BackButton onPress={() => navigation.goBack()} />
             <Text style={styles.title}>Yearly Moments</Text>
             <View style={styles.listContainer}>
@@ -47,7 +49,7 @@ const Friends = ({ navigation }) => {
                     showsHorizontalScrollIndicator={false}
                 />
             </View>
-        </GreenBackground>
+        </BlackBackground>
     );
 };
 
@@ -76,11 +78,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 5,
-        color: 'black'
+        color: 'white'
     },
     timestamp: {
         fontSize: 14,
-        color: 'gray',
+        color: 'rgb(205, 205, 205)',
         paddingLeft: 15
     },
     listContainer: {

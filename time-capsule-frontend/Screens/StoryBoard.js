@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image, FlatList, Modal, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Image, FlatList, Modal, ActivityIndicator, RefreshControl } from "react-native";
 import PageNavBar from "../Components/PageNavBar";
 import { useGlobalContext } from "../context/globalContext";
 import HistoryBackground from "../Components/HistoryBackground";
@@ -7,6 +7,8 @@ import { commonStyles } from "../Components/FriendsPageStylings";
 import BackButton from "../Components/lightBackButton";
 import BottomTab from "../Components/BottomTab";
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import BlackBackground from "../Components/BlackBackground";
+
 
 
 const StoryBoard = ({ navigation }) => {
@@ -14,21 +16,17 @@ const StoryBoard = ({ navigation }) => {
     const [friendObj, setFriendObj] = React.useState([]);
     const [capsuleList, setCapsuleList] = React.useState([]);
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [imageLoading, setImageLoading] = useState(true);
+    const [refreshing, setRefreshing] = React.useState(false);
+    const [pageRefresh, setPageRefresh] = React.useState(0);
 
-    const onSwipeRight = () => {
-        navigation.navigate('Main');
+    const onRefresh = () => {
+        setRefreshing(true);
+        setPageRefresh(pageRefresh + 1)
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
     };
 
-
-    // handle image presses for enlarging the capsule
-    const handleImagePress = (imageUrl) => {
-        setSelectedImage(imageUrl);
-        setImageLoading(true);
-        setModalVisible(true);
-    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -77,7 +75,7 @@ const StoryBoard = ({ navigation }) => {
 
         fetchData();
         //console.log(capsuleList)
-    }, []);
+    }, [pageRefresh]);
 
 
     const renderFriendCapsule = (item) => {
@@ -91,68 +89,79 @@ const StoryBoard = ({ navigation }) => {
                     />
                     <Text style={styles.usernameText}>{item.username}</Text>
                 </TouchableOpacity>
-                    <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
+                <Image style={styles.capsuleListItem} source={{ uri: item.snapshot }} />
             </TouchableOpacity>
         );
     };
 
     return (
-            <View style={{ flex: 1 }}>
-                <HistoryBackground>
-                    {/* Add the rest of your components here */}
-                    {capsuleList.length > 0 ? (
-                        <>
-                            <FlatList
-                                style={styles.capsuleList}
-                                data={capsuleList}
-                                keyExtractor={(item) => item.username}
-                                renderItem={({ item }) => renderFriendCapsule(item)}
-                                ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
-                            />
-                            {/*<Modal
-                                transparent={true}
-                                visible={modalVisible}
-                                onRequestClose={() => setModalVisible(false)}
-                            >
-                                <TouchableOpacity
-                                    style={styles.modalOverlay}
-                                    activeOpacity={1}
-                                    onPressOut={() => setModalVisible(false)}
-                                >
-                                    <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
-                                        <View style={styles.modalContent}>
-                                            <View style={styles.imageContainer}>
-                                                {imageLoading && (
-                                                    <ActivityIndicator style={styles.activityIndicator} size="large" color="#000000" />
-                                                )}
-                                                <Image
-                                                    style={styles.enlargedImage}
-                                                    source={{ uri: selectedImage }}
-                                                    onLoad={() => setImageLoading(false)}
-                                                />
-                                            </View>
-                                        </View>
-                                    </TouchableOpacity>
-                                </TouchableOpacity>
-                                            </Modal>*/}
-                        </>
-                    ) : (
-                        <Text style={styles.overlayText}>Your friend's capsules will be displayed here</Text>
-                    )}
-                    <BottomTab navigation={navigation} state={{ index: 2 }} />
 
-                </HistoryBackground>
-            </View>
-        
+        <View style={{ flex: 1 }}>
+            <BlackBackground>
+                <Text style={styles.title}>Story Board</Text>
+                {capsuleList.length > 0 ? (
+                    <>
+                        <FlatList
+                            style={styles.capsuleList}
+                            data={capsuleList}
+                            keyExtractor={(item) => item.username}
+                            renderItem={({ item }) => renderFriendCapsule(item)}
+                            ItemSeparatorComponent={() => <View style={commonStyles.separator} />}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="white" />
+                            }
+                        />
+                    </>
+                ) : ( 
+                    <>
+                    <FlatList
+                        style={styles.defaultCapsuleList}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="white" />
+                        }
+                    />
+                     <View style={styles.noFriends}>
+                        <Text style={styles.noFrendsText}>No Past Capsules</Text>
+                    </View>
+                    </>
+                )}
+                <BottomTab navigation={navigation} state={{ index: 2 }} />
+
+            </BlackBackground>
+        </View>
     );
 };
 
 export default StoryBoard;
 
 const styles = StyleSheet.create({
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        marginTop: 70,
+        marginBottom: 10,
+        //top: "5%"
+    },
     capsuleList: {
         position: "absolute",
-        top: "5%",
+        top: "13.5%",
+        width: "100%",
+        height: '90%',
+    },
+    defaultContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    defaultImage: {
+        width: 200, // Adjust width as needed
+        height: 200, // Adjust height as needed
+    },
+    defaultCapsuleList: {
+        position: "absolute",
+        top: "13.5%",
         width: "100%",
         height: '90%',
     },
@@ -170,11 +179,12 @@ const styles = StyleSheet.create({
         overflow: "hidden",
     },
     listItemContainer: {
-        width: "100%",
-        height: 50,
+        left: "5%",
+        width: "90%",
+        height: 40,
         borderRadius: 10,
         paddingHorizontal: 20,
-        backgroundColor: "white"
+        backgroundColor: "rgba(255, 255, 255, 0.6)"
     },
     usernameText: {
         fontSize: 20,
@@ -184,7 +194,7 @@ const styles = StyleSheet.create({
     },
     overlayText: {
         alignSelf: "center",
-        color: "black",
+        color: "white",
         fontWeight: "bold",
         top: "50%",
     }, modalOverlay: {
@@ -223,4 +233,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    noFriends: {
+        position: "absolute",
+        alignSelf: 'center',
+        justifyContent: 'center',
+        top: "44.5%",
+        width: "50%",
+        height: '5.25%',
+        padding: '25px',
+        backgroundColor: 'white',
+        borderRadius: '10px',
+    },
+    noFrendsText: {
+        alignSelf: 'center',
+        color: 'black',
+        fontWeight: 'bold',
+    }
 });

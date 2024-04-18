@@ -14,6 +14,8 @@ import BottomTab from "../Components/BottomTab";
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
 import GreenBackground from "../Components/GreenBackground";
+import BlackBackground from "../Components/BlackBackground";
+
 
 
 
@@ -249,7 +251,9 @@ const History = ({ navigation, isSwiping }) => {
     return (
 
         <View style={{ flex: 1 }}>
-            <HistoryBackground>
+            <BlackBackground>
+            <Text style={styles.title}>History</Text>
+
                 {capsulesArray.length > 0 ? (
                     <View style={{ flex: 1 }}>
                         <FlatList
@@ -340,7 +344,7 @@ const History = ({ navigation, isSwiping }) => {
                     </View>
                 )}
                 <BottomTab navigation={navigation} state={{ index: 0 }} />
-            </HistoryBackground >
+            </BlackBackground >
         </View >
 
 
@@ -350,11 +354,21 @@ const History = ({ navigation, isSwiping }) => {
 export default History;
 
 const styles = StyleSheet.create({
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        marginTop: 70,
+        marginBottom: 10,
+        //top: "5%"
+    },
     capsuleList: {
         position: "absolute",
-        top: "5%",
+        top: "0%",
         width: "100%",
         height: '90%',
+        left: "-50%"
     },
     capsuleListItem: {
         alignSelf: 'center',
