@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 
 import Login from "./Screens/Login";
 import TempMain from './Screens/TempMain';
@@ -26,17 +26,19 @@ export default function App() {
   return (
     <GlobalProvider>
       <NavigationContainer>
+
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Registration" component={Registration} />
           <Stack.Screen name="Spotify" component={Spotify} />
           <Stack.Screen name="Instagram" component={Instagram} />
-          <Stack.Screen name="Friends" component={Friends} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }}/>
+          <Stack.Screen name="Friends" component={Friends} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }} />
           <Stack.Screen name="Profile" component={Profile} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }} />
           <Stack.Screen name="Photos" component={Photos} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }} />
           <Stack.Screen name="Moment" component={Moment} options={{ headerLeft: null, gestureEnabled: true, fullScreenGestureEnabled: true }} />
-          <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerLeft: null, gestureEnabled: false}}/>
+          <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerLeft: null, gestureEnabled: false }} />
         </Stack.Navigator>
+
       </NavigationContainer>
     </GlobalProvider>
   );
@@ -72,7 +74,11 @@ function MainTabs() {
         {props => <Main {...props} isSwiping={isSwiping} />}
       </Tab.Screen>
       <Tab.Screen name="StoryBoard">
-        {props => <StoryBoard {...props} isSwiping={isSwiping} />}
+        {props => (
+          //<PanGestureHandler>
+          <StoryBoard {...props} isSwiping={isSwiping} />
+          //</PanGestureHandler>
+        )}
       </Tab.Screen>
     </Tab.Navigator>
   );

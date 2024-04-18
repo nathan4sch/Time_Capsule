@@ -27,16 +27,7 @@ const Main = ({ navigation }) => {
 
     const capsuleKeyChange = useRef(false);
 
-    const isFocused = useIsFocused();
-
-
-    const onSwipeLeft = () => {
-        navigation.navigate('StoryBoard');
-    };
-
-    const onSwipeRight = () => {
-        navigation.navigate('History');
-    };    
+    const isFocused = useIsFocused();  
 
     async function getPhotosFromMonth() {
         const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -418,7 +409,7 @@ const styles = StyleSheet.create({
     },
     timerButton: {
         flex: 1,
-        backgroundColor: 'rgba(0, 245, 186, 0.5)',
+        backgroundColor: 'transparent',
         marginRight: 5,
         borderRadius: 10,
     },
@@ -445,7 +436,7 @@ const styles = StyleSheet.create({
     },
     generateCapsuleButton: {
         flex: 1,
-        backgroundColor: 'rgba(0, 245, 186, 0.5)',
+        backgroundColor: 'transparent',
         marginRight: 5,
         borderRadius: 10,
     },
