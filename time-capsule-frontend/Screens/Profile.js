@@ -143,14 +143,14 @@ const Profile = ({ navigation }) => {
                     </View>
                 )}
                 {/* Render Instagram button only if the field is empty */}
-                {showInstagramButton && (
+                {/* {showInstagramButton && (
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={buttonStyle.button} onPress={handleInstagramLogin} title=''>
                             <Image style={styles.icon} source={require('../icons/instagram-.png')} />
                             <Text style={styles.buttonText}>   Link Instagram Account</Text>
                         </TouchableOpacity>
                     </View>
-                )}
+                )} */}
                 <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Friends')}>
                     <View style={buttonStyle.button}>
                         <Image style={styles.icon} source={require('../icons/friends-.png')} />

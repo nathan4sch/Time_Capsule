@@ -11,11 +11,11 @@ const Spotify = ({ navigation }) => {
     return (
         <GreenBackground>
             <Image style={styles.capsule} source={require('../icons/capsule-.png')} />
-            <TouchableOpacity style={styles.container} onPress={() => spotifyLogin({ navigation, page: "Instagram", setSpotify })} title=''>
+            <TouchableOpacity style={styles.container} onPress={() => spotifyLogin({ navigation, page: "MainTabs", setSpotify })} title=''>
                 <Text style={styles.text}>Link Spotify</Text>
                 <Image style={styles.spotify} source={require('../icons/spotify-.png')} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.press} onPress={() => navigation.navigate('Instagram')}>
+            <TouchableOpacity style={styles.press} onPress={() => navigation.navigate('MainTabs')}>
                 <Text style={styles.text2}>skip for now</Text>
             </TouchableOpacity>
         </GreenBackground>
