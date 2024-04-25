@@ -1,4 +1,7 @@
-![capsuleWhite-](https://github.com/nathan4sch/Time_Capsule/assets/47926489/0d5847f4-5f59-45b8-828a-7eedda340ecc)
+<p align="center">
+  <img src="https://github.com/nathan4sch/Time_Capsule/assets/47926489/0f020972-6b11-4300-963d-de44a2a72ad5" />
+</p>
+
 # Time_Capsule
 ## Overview
 Our project is a time capsule mobile application. An app that users can download and then receive monthly snapshots (called capsules) of their recent memories; from pictures to music, this allows users to reminisce on the positive aspects of their month. The magic of our application is its automation: unlike other apps where the user is forced to spend the time creating their own monthly snapshot, our app gets downloaded and forgotten about… until the end of the month, when the user is surprised with a personalized monthly recap.
