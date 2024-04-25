@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/nathan4sch/Time_Capsule/assets/47926489/0f020972-6b11-4300-963d-de44a2a72ad5" />
+  <img scr="https://cdn.discordapp.com/attachments/363804691634847769/1233108673522434108/IMG_6854.jpg?ex=662be571&is=662a93f1&hm=ae2ece93e678e677e89b6b3fda7f9e4b01eb469fb26f3a66155c05449936fbc8&">
 </p>
 
 # Time_Capsule
