@@ -1,7 +1,6 @@
 <p align="center">
-  <img scr="https://github.com/nathan4sch/Time_Capsule/assets/112205153/d5d9e8b9-52d3-4509-bd0a-181a1c1c4a9c">
+  <img width="50%" src="https://github.com/nathan4sch/Time_Capsule/assets/112205153/074c28d5-c37f-40d2-845e-cb30d2d97157">
 </p>
-
 
 # Time_Capsule
 ## Overview
