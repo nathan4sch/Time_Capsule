@@ -1,13 +1,2 @@
 {
-  "type": "service_account",
-  "project_id": "timecapsule-414205",
-  "private_key_id": "9d5c6c694c6d3efd7162c62729b34db8360adb49",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCjRuAJkCaWIId5\n416RXcd+acGkXW2ekYbsX5R15tPtEOjgVwXnrG4ssUHdByur3FjXm3GmFirfMqnI\n6fV9xlBoCG7Sg66+n/CZPKFSGgFqv8tH6nl58NKoxIlDUtG4jdkZRXn5+BV0WCCF\npbrFR0Y4dJPVxKsmn2QW/In71WFgDwFk9TUl1Hhsa6ZxMsEpFLXaWgIyh1IY6wEl\nwpYmAvEc29uSblgqnXk6uLyN5qbCJRYpJ6Khw5OebBa5O6LCZUQmG7p/TshDcojA\nVrySCf/nZA3gwIVdW/zdHmXHc7+eflFFCmNmKaSQaPkI0y48EMfoiQIuuq+QH/mv\nSA4Lu2qHAgMBAAECggEALlA0zVGfuFbKxtapJOeqZh+eZz5/EQrrcBHefSD3/Rce\nT0Av8xqUd8Xhzk2x5AJRCvtTHc7M41muEkjWsxH1DcVSlhD3GKgqaXTqt2yb+Ukk\n4qXORjn6rxdsbfXIeiZ2LbZo1nA5ubIjq3UqiLniX7Ilmu25tG9ixyhkBVRt1f6H\nnG9fQggAlf1nHdIJW7033XWWkmXdU2pLH+73gDb/2gkcav0Bb+CH8hsRNkYbK8k7\ny0TrqDNdxnXLrJIaAQ0i5q0CSFi6u8Twvkt64a85achhUswGw3ySgnoe+lfbFAvn\nDu6LChdXPR/drpfUIS1m2C2JjBb/+uRAqJov1NIwfQKBgQDReJaWmDRlBJmp5dE8\nfutEJ6WufHccLu2QePPD4wbSioax4zukIw+1FKKSOG0fT+9rx6julTRKxA9/bBwz\nzun9yG0+EjBiAfX4XYQtfZDon4+QVkn7Fvit969rH13J+UMq3ah/N494zuukTCq5\nh32NgyFywkkHVtMO5nihH3jihQKBgQDHi31Fe3pnLQt8m1b0B1nEEXGxzZ6vPA0Q\nIryG9Umi/P3B8ANp9m/EnztWHWFTsgUWI/ub9+qUyG/+KQnVDHz2Zip4B0C+ZgMo\nJD42g9ikI60zHKWFEbqjbh4vHJQqvBy4mC3mBMYYt7QkonjPsROofS6iQskP411o\nT6AtZy50mwKBgGZ0e/tmsOHkESDnlqLnVT19wu0IVd4EGhB7CIf8aB7cwKsLgOV0\nfL9OO4IXdVBGcc2e18LyWaRkJ0xk3Zp9jzehK8WbcezOFrgHTZpOe208diTb/81/\nW90Dc9qKef5LHA5AYqTu0Q7+7oTq+E7MtZ1c0SRnYP7k+dCk68WrNh5dAoGAGsmx\nEYjYD83OQvYfoDb0aAvndXUjHmczYb0oDf4T2puX/VcZPjplGsI9lvvuuuulHynJ\nd1C63yphTn934HACvplMjjx7BpRvTA5Bg9QDW1WmxLvNxKVypsn7p1tw0KPcPzO+\nxahSZ7MRrfFZwpgFCZN0lTfeAhIF0iEOYcn+RI0CgYEAuK8kXZ0ACMZVSZYGnhr8\n0ifORydW7RQUdflX8a2iBD8LhROjOBbTX0Ct6b9nno85WcUGl0wIRwk8VB5HMtvQ\nF7p+XLUbSqoSqWj+FpT+stsx30l6aIevY7nMPepYkpsvYTZPFtPli0Sl4sITt7WV\nF0H1qYbLpsoOhyoXD+ZCem0=\n-----END PRIVATE KEY-----\n",
-  "client_email": "time-capsule-vision@timecapsule-414205.iam.gserviceaccount.com",
-  "client_id": "106439941941212599733",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/time-capsule-vision%40timecapsule-414205.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
 }
