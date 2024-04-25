@@ -1,7 +1,12 @@
 ![capsuleWhite-](https://github.com/nathan4sch/Time_Capsule/assets/47926489/0d5847f4-5f59-45b8-828a-7eedda340ecc)
 # Time_Capsule
 ## Overview
-(What our app is and why its cool)
+Our project is a time capsule mobile application. An app that users can download and then receive monthly snapshots (called capsules) of their recent memories; from pictures to music, this immersive experience allows users to reminisce on the positive aspects of their month. The magic of our application is its automation: unlike other apps where the user is forced to spend the time creating their own monthly snapshot, our app gets downloaded and forgotten about… until the end of the month, when the user is surprised with a captivating, personalized visual and acoustic masterpiece!
+
+As the world around us continues to move at an increasingly fast pace, time seems to fly by and good memories fall to the backs of our minds. This is the problem we hope to solve. People don’t have enough time to scroll through all their history of the past month and organize it to find their favorite moments. Capsule automates this process so that users can focus on their other day to day tasks and still enjoy a recap of their best memories.
+
+We also seek to create a platform where users are able to share their Capsules with their friends and reminisce on good memories together. By allowing users to comment and react to their friend’s Capsules, we provide a platform in which a community wishing to be reminded of their best moments from the month can come together and positively impact one another. Our app combines automation and ease with an uplifting social platform, revolutionizing how people share past experiences together. 
+
 
 ## Database Design
 In our project, we used MongoDB. Here we will store user info such as capsules, capsule data friends, and, usernames. Using MongoDB’s flexible schema, we can have varied ways to store information making MongoDB a good choice for flexible development. MondoDB is also very scalable which allows us to have a high quantity of data stored in our Mongo database.
