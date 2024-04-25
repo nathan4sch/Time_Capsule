@@ -1,6 +1,7 @@
 <p align="center">
-  <img scr="https://cdn.discordapp.com/attachments/363804691634847769/1233108673522434108/IMG_6854.jpg?ex=662be571&is=662a93f1&hm=ae2ece93e678e677e89b6b3fda7f9e4b01eb469fb26f3a66155c05449936fbc8&">
+  <img scr="https://github.com/nathan4sch/Time_Capsule/assets/112205153/d5d9e8b9-52d3-4509-bd0a-181a1c1c4a9c">
 </p>
+
 
 # Time_Capsule
 ## Overview
