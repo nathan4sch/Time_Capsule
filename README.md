@@ -3,11 +3,7 @@
 https://github.com/nathan4sch/Time_Capsule/assets/112205153/2927f3f2-2722-454f-9fbb-8dadbfcb8a4c
 
 ## Overview
-Our project is a time capsule mobile application. An app that users can download and then receive monthly snapshots (called capsules) of their recent memories; from pictures to music, this allows users to reminisce on the positive aspects of their month. The magic of our application is its automation: unlike other apps where the user is forced to spend the time creating their own monthly snapshot, our app gets downloaded and forgotten about… until the end of the month, when the user is surprised with a personalized monthly recap.
-
-As the world around us continues to move at an increasingly fast pace, time seems to fly by and good memories fall to the backs of our minds. This is the problem we hope to solve. People don’t have enough time to scroll through all their history of the past month and organize it to find their favorite moments. Capsule automates this process so that users can focus on their other day to day tasks and still enjoy a recap of their best memories.
-
-We also seek to create a platform where users are able to share their Capsules with their friends and reminisce on good memories together. Our app combines automation and ease with an uplifting social platform, revolutionizing how people share past experiences together. 
+Capsule is a mobile application that every month creates a snapshot (called a capsule), which recaps the month. The capsule has 6 of your best photos from the last month and your most-played Spotify song all saved as one photo so it is easy to reminisce or share with friends and family. What sets Capsule apart from the competition is its automation. Unlike other apps that force the user to spend time scrolling through past photos and choosing a song of the month, Capsule automates this process by using AI to pick out your best photos and top songs from the last month. Furthermore, if you don’t like what Capsule picked for you then you can always use our editing features to switch out our photos for your favorite photos of the month. Once you're happy with your capsule, you can then share your last month with anyone with just one photo. Capsule combines automation and ease with an uplifting social platform, revolutionizing how people share past experiences. 
 
 
 ## Database Design
